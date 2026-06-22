@@ -7,14 +7,34 @@ node_modules/
 *.backup-*
 *.orig
 *.orig-recovered
+backup-*/
 
-# Temporary files
+# Screenshots and images
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Logs
+*.log
+.playwright-mcp/
+
+# Temporary and utility scripts
 _temp_*
+check_*.py
+chk*.py
+validate_*.js
+validate_*.py
+
+# Archives
+*.zip
+*.tar.gz
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# IDE
+# IDE and tool configs
 .vscode/
 .idea/
+.claude/
