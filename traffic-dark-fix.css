@@ -1,0 +1,360 @@
+/* Traffic page residual light-surface sweep for dark theme */
+:root[data-theme="dark"] .tr-page {
+  --traffic-dark-panel: rgba(10, 21, 36, 0.92);
+  --traffic-dark-panel-soft: rgba(10, 21, 36, 0.72);
+  --traffic-dark-panel-deep: rgba(7, 16, 28, 0.92);
+  --traffic-dark-line: rgba(77, 212, 255, 0.20);
+  --traffic-dark-line-strong: rgba(77, 212, 255, 0.34);
+}
+
+/* Catch inline light backgrounds used heavily in traffic.html */
+:root[data-theme="dark"] .tr-page [style*="background:#fff"],
+:root[data-theme="dark"] .tr-page [style*="background: #fff"],
+:root[data-theme="dark"] .tr-page [style*="background:#FFF"],
+:root[data-theme="dark"] .tr-page [style*="background: #FFF"],
+:root[data-theme="dark"] .tr-page [style*="background:#F6F8FA"],
+:root[data-theme="dark"] .tr-page [style*="background: #F6F8FA"],
+:root[data-theme="dark"] .tr-page [style*="background:#FAFBFC"],
+:root[data-theme="dark"] .tr-page [style*="background: #FAFBFC"],
+:root[data-theme="dark"] .tr-page [style*="background:#F8FAFC"],
+:root[data-theme="dark"] .tr-page [style*="background: #F8FAFC"],
+:root[data-theme="dark"] .tr-page [style*="background:#FFF5F5"],
+:root[data-theme="dark"] .tr-page [style*="background: #FFF5F5"],
+:root[data-theme="dark"] .tr-page [style*="background:#FFFB"],
+:root[data-theme="dark"] .tr-page [style*="background: #FFFB"],
+:root[data-theme="dark"] .tr-page [style*="background:#FFFC"],
+:root[data-theme="dark"] .tr-page [style*="background: #FFFC"] {
+  background: var(--traffic-dark-panel) !important;
+  border-color: var(--traffic-dark-line) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+:root[data-theme="dark"] .tr-page [style*="color:#1F2328"],
+:root[data-theme="dark"] .tr-page [style*="color: #1F2328"],
+:root[data-theme="dark"] .tr-page [style*="color:#1E293B"],
+:root[data-theme="dark"] .tr-page [style*="color: #1E293B"],
+:root[data-theme="dark"] .tr-page [style*="color:#24292F"],
+:root[data-theme="dark"] .tr-page [style*="color: #24292F"] {
+  color: var(--dark-fg-title) !important;
+}
+
+:root[data-theme="dark"] .tr-page [style*="color:#64748B"],
+:root[data-theme="dark"] .tr-page [style*="color: #64748B"],
+:root[data-theme="dark"] .tr-page [style*="color:#636C76"],
+:root[data-theme="dark"] .tr-page [style*="color: #636C76"],
+:root[data-theme="dark"] .tr-page [style*="color:#8C959F"],
+:root[data-theme="dark"] .tr-page [style*="color: #8C959F"] {
+  color: var(--dark-fg-subtle) !important;
+}
+
+/* Main traffic surfaces */
+:root[data-theme="dark"] .wsp-wrap,
+:root[data-theme="dark"] .wsp-card,
+:root[data-theme="dark"] .wsp-mode,
+:root[data-theme="dark"] .wsp-tab,
+:root[data-theme="dark"] .wsp-tbl tbody tr,
+:root[data-theme="dark"] .up-card,
+:root[data-theme="dark"] .up-card-icon,
+:root[data-theme="dark"] .pp-node,
+:root[data-theme="dark"] .pp-icon-wrap,
+:root[data-theme="dark"] .pp-layer-tag,
+:root[data-theme="dark"] .tr-proto-absent-overlay,
+:root[data-theme="dark"] .tr-tbl th,
+:root[data-theme="dark"] .tr-tbl td,
+:root[data-theme="dark"] .tr-pie-row,
+:root[data-theme="dark"] .tr-wf-bar-wrap,
+:root[data-theme="dark"] .tr-bn-bar-wrap,
+:root[data-theme="dark"] .tr-pcap-banner,
+:root[data-theme="dark"] .tr-pcap-tile,
+:root[data-theme="dark"] .tr-pcap-result,
+:root[data-theme="dark"] .tr-flow-act-btn,
+:root[data-theme="dark"] .tr-ctx-menu,
+:root[data-theme="dark"] .tr-ctx-item,
+:root[data-theme="dark"] .tr-entity-panel,
+:root[data-theme="dark"] .tr-entity-header,
+:root[data-theme="dark"] .tr-entity-toolbar,
+:root[data-theme="dark"] .tr-entity-list,
+:root[data-theme="dark"] .tr-entity-ai-hint,
+:root[data-theme="dark"] .tr-entity-row,
+:root[data-theme="dark"] .tr-row-body,
+:root[data-theme="dark"] .tr-row-util-bar,
+:root[data-theme="dark"] .tr-kpi-card,
+:root[data-theme="dark"] .ov-warn-row,
+:root[data-theme="dark"] .ov-warn-src,
+:root[data-theme="dark"] .ov-info-row,
+:root[data-theme="dark"] .ov-info-src,
+:root[data-theme="dark"] .ov-alert-summary,
+:root[data-theme="dark"] .ov-summary-card,
+:root[data-theme="dark"] .ov-summary-stat,
+:root[data-theme="dark"] .ov-matrix-cell,
+:root[data-theme="dark"] .ov-svc-table thead th,
+:root[data-theme="dark"] .ov-svc-table tbody td,
+:root[data-theme="dark"] .ov-rank-row,
+:root[data-theme="dark"] .ov-proto-card,
+:root[data-theme="dark"] .tcp-diag-modal-main,
+:root[data-theme="dark"] .tcp-diag-modal-side,
+:root[data-theme="dark"] .tcp-diag-modal-content,
+:root[data-theme="dark"] .ov-summary-bar-track,
+:root[data-theme="dark"] .ov-river-stream,
+:root[data-theme="dark"] .ov-app-rail-track,
+:root[data-theme="dark"] .ov-cmd-trend {
+  background: var(--traffic-dark-panel) !important;
+  border-color: var(--traffic-dark-line) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+:root[data-theme="dark"] .tr-entity-row:hover,
+:root[data-theme="dark"] .wsp-tbl tbody tr:nth-child(odd),
+:root[data-theme="dark"] .tr-tbl tr.clickable:hover,
+:root[data-theme="dark"] .ov-warn-row:hover,
+:root[data-theme="dark"] .ov-info-row:hover,
+:root[data-theme="dark"] .ov-svc-table tbody tr:hover td {
+  background: rgba(77, 212, 255, 0.08) !important;
+}
+
+:root[data-theme="dark"] .tr-entity-row.selected,
+:root[data-theme="dark"] .wsp-tab.active {
+  background: rgba(77, 212, 255, 0.14) !important;
+  border-color: var(--traffic-dark-line-strong) !important;
+}
+
+/* Semantic cards */
+:root[data-theme="dark"] .ov-event-card.red,
+:root[data-theme="dark"] .ov-alert-summary.red,
+:root[data-theme="dark"] .ov-matrix-cell.err,
+:root[data-theme="dark"] .up-card.up-err,
+:root[data-theme="dark"] .pp-node.pp-err {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.18), rgba(10, 21, 36, 0.92) 62%) !important;
+  border-color: rgba(244, 63, 94, 0.38) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+:root[data-theme="dark"] .ov-event-card.yellow,
+:root[data-theme="dark"] .ov-alert-summary.yellow,
+:root[data-theme="dark"] .ov-matrix-cell.warn,
+:root[data-theme="dark"] .up-card.up-warn,
+:root[data-theme="dark"] .pp-node.pp-warn,
+:root[data-theme="dark"] .ov-warn-row,
+:root[data-theme="dark"] .tr-callout-yellow {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.17), rgba(10, 21, 36, 0.92) 62%) !important;
+  border-color: rgba(245, 158, 11, 0.36) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+:root[data-theme="dark"] .ov-matrix-cell.ok,
+:root[data-theme="dark"] .pp-node.pp-cascade,
+:root[data-theme="dark"] .up-card.up-dim {
+  background: var(--traffic-dark-panel-soft) !important;
+  border-color: rgba(77, 212, 255, 0.14) !important;
+  color: var(--dark-fg-subtle) !important;
+}
+
+/* Traffic text */
+:root[data-theme="dark"] .wsp-title,
+:root[data-theme="dark"] .wsp-ip-src,
+:root[data-theme="dark"] .up-card-title,
+:root[data-theme="dark"] .up-card-num,
+:root[data-theme="dark"] .pp-node-name,
+:root[data-theme="dark"] .tr-entity-header-label,
+:root[data-theme="dark"] .tr-row-name,
+:root[data-theme="dark"] .ov-event-title,
+:root[data-theme="dark"] .ov-warn-title,
+:root[data-theme="dark"] .ov-info-title,
+:root[data-theme="dark"] .ov-alert-summary-count,
+:root[data-theme="dark"] .ov-alert-summary-title,
+:root[data-theme="dark"] .ov-summary-card-title,
+:root[data-theme="dark"] .ov-summary-stat-val,
+:root[data-theme="dark"] .ov-summary-worst b,
+:root[data-theme="dark"] .ov-cmd-val,
+:root[data-theme="dark"] .ov-event-river-title,
+:root[data-theme="dark"] .ov-river-count,
+:root[data-theme="dark"] .ov-insight-title,
+:root[data-theme="dark"] .ov-matrix-title,
+:root[data-theme="dark"] .ov-svc-name,
+:root[data-theme="dark"] .ov-svc-stat,
+:root[data-theme="dark"] .ov-rank-name,
+:root[data-theme="dark"] .ov-proto-card-name,
+:root[data-theme="dark"] .ov-proto-kpi-val,
+:root[data-theme="dark"] .tr-pcap-title,
+:root[data-theme="dark"] .tr-flow-tuple,
+:root[data-theme="dark"] .tr-pie-name,
+:root[data-theme="dark"] .tr-wf-label,
+:root[data-theme="dark"] .tr-wf-val,
+:root[data-theme="dark"] .tr-bn-name,
+:root[data-theme="dark"] .tr-kpi-value,
+:root[data-theme="dark"] .tr-section-title,
+:root[data-theme="dark"] .pp-causation-bar b,
+:root[data-theme="dark"] .ov-drawer-item-kpi b,
+:root[data-theme="dark"] .ov-event-kpi b,
+:root[data-theme="dark"] .ov-warn-kpi b,
+:root[data-theme="dark"] .ov-event-desc b,
+:root[data-theme="dark"] .ov-summary-worst b {
+  color: var(--dark-fg-title) !important;
+}
+
+:root[data-theme="dark"] .wsp-meta,
+:root[data-theme="dark"] .aet-label,
+:root[data-theme="dark"] .aet-scope-clear,
+:root[data-theme="dark"] .up-card-sub,
+:root[data-theme="dark"] .up-card-hint,
+:root[data-theme="dark"] .pp-node-sub,
+:root[data-theme="dark"] .pp-layer-tag,
+:root[data-theme="dark"] .tr-entity-header-count,
+:root[data-theme="dark"] .tr-entity-ai-hint,
+:root[data-theme="dark"] .tr-row-meta,
+:root[data-theme="dark"] .tr-row-util-val,
+:root[data-theme="dark"] .tr-proto-absent-overlay .absent-title,
+:root[data-theme="dark"] .tr-proto-absent-overlay .absent-desc,
+:root[data-theme="dark"] .tr-tbl .td-sub,
+:root[data-theme="dark"] .tr-pie-val,
+:root[data-theme="dark"] .tr-wf-pct,
+:root[data-theme="dark"] .tr-bn-pct,
+:root[data-theme="dark"] .tr-bn-resp,
+:root[data-theme="dark"] .tr-pcap-desc,
+:root[data-theme="dark"] .tr-flow-meta,
+:root[data-theme="dark"] .tr-kpi-label,
+:root[data-theme="dark"] .tr-kpi-sub,
+:root[data-theme="dark"] .tr-kpi-unit,
+:root[data-theme="dark"] .tr-section-sub,
+:root[data-theme="dark"] .ov-ai-meta,
+:root[data-theme="dark"] .ov-event-src,
+:root[data-theme="dark"] .ov-event-desc,
+:root[data-theme="dark"] .ov-event-kpi,
+:root[data-theme="dark"] .ov-warn-src,
+:root[data-theme="dark"] .ov-warn-kpi,
+:root[data-theme="dark"] .ov-info-sev,
+:root[data-theme="dark"] .ov-info-src,
+:root[data-theme="dark"] .ov-info-kpi,
+:root[data-theme="dark"] .ov-alert-summary-meta,
+:root[data-theme="dark"] .ov-alert-hint,
+:root[data-theme="dark"] .ov-summary-card-meta,
+:root[data-theme="dark"] .ov-summary-stat-label,
+:root[data-theme="dark"] .ov-summary-bar-label,
+:root[data-theme="dark"] .ov-summary-worst,
+:root[data-theme="dark"] .ov-cmd-unit,
+:root[data-theme="dark"] .ov-cmd-sub,
+:root[data-theme="dark"] .ov-event-river-meta,
+:root[data-theme="dark"] .ov-river-text,
+:root[data-theme="dark"] .ov-matrix-sub,
+:root[data-theme="dark"] .ov-svc-th,
+:root[data-theme="dark"] .ov-proto-kpi-label,
+:root[data-theme="dark"] .ov-app-rail-meta {
+  color: var(--dark-fg-subtle) !important;
+}
+
+/* Badges and pills */
+:root[data-theme="dark"] .ov-event-src,
+:root[data-theme="dark"] .ov-info-src,
+:root[data-theme="dark"] .ov-warn-src,
+:root[data-theme="dark"] .tr-flow-act-btn,
+:root[data-theme="dark"] .tr-tag-gray,
+:root[data-theme="dark"] .pp-badge-gray,
+:root[data-theme="dark"] .ov-ai-count.gray,
+:root[data-theme="dark"] .ov-tier-count,
+:root[data-theme="dark"] .tr-pcap-input,
+:root[data-theme="dark"] .tr-ctx-item,
+:root[data-theme="dark"] .tr-row-action {
+  background: var(--traffic-dark-panel-deep) !important;
+  border-color: rgba(77, 212, 255, 0.18) !important;
+  color: var(--dark-fg-subtle) !important;
+}
+
+:root[data-theme="dark"] .wsp-badge-warn,
+:root[data-theme="dark"] .ov-event-card.yellow .ov-event-sev,
+:root[data-theme="dark"] .ov-ai-count.yellow,
+:root[data-theme="dark"] .ov-tier-header.warning .ov-tier-count,
+:root[data-theme="dark"] .ov-alert-summary-badge.yellow,
+:root[data-theme="dark"] .ov-river-badge.warn,
+:root[data-theme="dark"] .ov-proto-card.warn .ov-proto-card-badge,
+:root[data-theme="dark"] .ov-health-badge.warn,
+:root[data-theme="dark"] .ov-rank-metric.m-warn,
+:root[data-theme="dark"] .pp-badge-warn {
+  background: rgba(245, 158, 11, 0.18) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  color: var(--sem-yellow-soft) !important;
+}
+
+:root[data-theme="dark"] .ov-event-card.red .ov-event-sev,
+:root[data-theme="dark"] .ov-ai-count.red,
+:root[data-theme="dark"] .ov-river-badge.err,
+:root[data-theme="dark"] .pp-badge-err {
+  background: rgba(244, 63, 94, 0.18) !important;
+  border-color: rgba(244, 63, 94, 0.35) !important;
+  color: var(--sem-red-soft) !important;
+}
+
+:root[data-theme="dark"] .ov-river-badge.info,
+:root[data-theme="dark"] .ov-tier-header.info .ov-tier-count,
+:root[data-theme="dark"] .tr-tag-gray {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.32) !important;
+  color: var(--sem-blue-soft) !important;
+}
+
+
+/* Emergency sweep: traffic.html has many inline white blocks in every view. */
+html[data-theme="dark"] body .tr-page :is(div,section,article,aside,header,footer,nav,button,span,table,thead,tbody,tr,th,td)[style*="background"]:not([style*="background:#1A7F37"]):not([style*="background: #1A7F37"]):not([style*="background:#CF222E"]):not([style*="background: #CF222E"]):not([style*="background:#D09B00"]):not([style*="background: #D09B00"]):not([style*="background:#6E40C9"]):not([style*="background: #6E40C9"]):not([style*="background:#8957E5"]):not([style*="background: #8957E5"]) {
+  background: rgba(10, 21, 36, 0.92) !important;
+  background-color: rgba(10, 21, 36, 0.92) !important;
+  border-color: rgba(77, 212, 255, 0.22) !important;
+  color: var(--dark-fg-body) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] body .tr-page :is(div,section,article,aside,header,footer,nav,button,span,table,thead,tbody,tr,th,td)[style*="border"] {
+  border-color: rgba(77, 212, 255, 0.22) !important;
+}
+
+html[data-theme="dark"] body .tr-page :is(div,span,b,strong,td,th,p,label)[style*="color:#1"],
+html[data-theme="dark"] body .tr-page :is(div,span,b,strong,td,th,p,label)[style*="color: #1"],
+html[data-theme="dark"] body .tr-page :is(div,span,b,strong,td,th,p,label)[style*="color:#2"],
+html[data-theme="dark"] body .tr-page :is(div,span,b,strong,td,th,p,label)[style*="color: #2"] {
+  color: var(--dark-fg-title) !important;
+}
+
+html[data-theme="dark"] body .tr-page :is(div,span,b,strong,td,th,p,label)[style*="color:#6"],
+html[data-theme="dark"] body .tr-page :is(div,span,b,strong,td,th,p,label)[style*="color: #6"],
+html[data-theme="dark"] body .tr-page :is(div,span,b,strong,td,th,p,label)[style*="color:#8"],
+html[data-theme="dark"] body .tr-page :is(div,span,b,strong,td,th,p,label)[style*="color: #8"] {
+  color: var(--dark-fg-subtle) !important;
+}
+
+/* View-specific root containers and cards */
+html[data-theme="dark"] body .tr-page #appTabsArea,
+html[data-theme="dark"] body .tr-page #macroView,
+html[data-theme="dark"] body .tr-page #sessionPivotView,
+html[data-theme="dark"] body .tr-page #overviewArea,
+html[data-theme="dark"] body .tr-page #epLink,
+html[data-theme="dark"] body .tr-page #epApp,
+html[data-theme="dark"] body .tr-page #epIp,
+html[data-theme="dark"] body .tr-page #epTunnel,
+html[data-theme="dark"] body .tr-page .tr-workspace,
+html[data-theme="dark"] body .tr-page .tr-workspace-main,
+html[data-theme="dark"] body .tr-page .tr-section,
+html[data-theme="dark"] body .tr-page .tr-kpi-card,
+html[data-theme="dark"] body .tr-page .up-card,
+html[data-theme="dark"] body .tr-page .pp-node,
+html[data-theme="dark"] body .tr-page .ov-section-card,
+html[data-theme="dark"] body .tr-page .ov-event-card,
+html[data-theme="dark"] body .tr-page .ov-summary-card,
+html[data-theme="dark"] body .tr-page .ov-cmd-lane,
+html[data-theme="dark"] body .tr-page .tr-entity-row,
+html[data-theme="dark"] body .tr-page .tr-row-body {
+  background-color: rgba(10, 21, 36, 0.92) !important;
+  border-color: rgba(77, 212, 255, 0.22) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+/* Keep meaningful semantic cards dark-tinted, not white/pastel. */
+html[data-theme="dark"] body .tr-page .red,
+html[data-theme="dark"] body .tr-page .err,
+html[data-theme="dark"] body .tr-page [class*="red"],
+html[data-theme="dark"] body .tr-page [class*="err"] {
+  border-color: rgba(244,63,94,0.38) !important;
+}
+html[data-theme="dark"] body .tr-page .yellow,
+html[data-theme="dark"] body .tr-page .warn,
+html[data-theme="dark"] body .tr-page [class*="yellow"],
+html[data-theme="dark"] body .tr-page [class*="warn"] {
+  border-color: rgba(245,158,11,0.36) !important;
+}

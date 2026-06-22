@@ -1,0 +1,350 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>NGPM · 资产管理</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="ai-page.css">
+<style>
+.page-tabs{display:flex;gap:0;padding:0 20px;background:#fff;border-bottom:1px solid #D0D7DE;flex-shrink:0}
+.page-tab{height:42px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:13px;color:#636C76;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s;text-decoration:none}
+.page-tab:hover{color:#1F2328}
+.page-tab.active{color:#6E40C9;border-bottom-color:#6E40C9;font-weight:600}
+.page-tab .material-symbols-rounded{font-size:15px}
+/* 资产健康矩阵 */
+.asset-matrix{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:4px;margin-bottom:10px}
+.asset-cell{padding:6px 8px;border-radius:6px;text-align:center;cursor:pointer;transition:opacity .15s;border:1px solid transparent}
+.asset-cell.ok{background:#DAFBE1;border-color:#aceebb;color:#1A7F37}
+.asset-cell.warn{background:#FFF8C5;border-color:#f0d070;color:#6A4800}
+.asset-cell.crit{background:#FFEBE9;border-color:#f5b8b5;color:#82071E}
+.asset-cell.offline{background:#F6F8FA;border-color:#D0D7DE;color:#8C959F}
+.asset-cell-name{font-size:10px;font-weight:600;font-family:'Geist Mono',monospace;word-break:break-all}
+.asset-cell-type{font-size:9px;margin-top:2px;opacity:.75}
+/* 资产列表表格 */
+.asset-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px}
+.asset-table th{text-align:left;padding:5px 8px;background:#F6F8FA;color:#636C76;font-weight:600;border-bottom:1px solid #D0D7DE;white-space:nowrap}
+.asset-table td{padding:6px 8px;border-bottom:1px solid #F0F3F6;color:#1F2328}
+.asset-table tr:last-child td{border-bottom:none}
+.asset-status{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600}
+.asset-status::before{content:'';width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.asset-status.ok::before{background:#1A7F37} .asset-status.ok{color:#1A7F37}
+.asset-status.warn::before{background:#D09B00} .asset-status.warn{color:#8B6400}
+.asset-status.crit::before{background:#CF222E} .asset-status.crit{color:#CF222E}
+.asset-status.offline::before{background:#8C959F} .asset-status.offline{color:#8C959F}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo-row"><span class="material-symbols-rounded logo-icon">hub</span><span class="logo-text">NGPM</span></div>
+    <div class="sidebar-divider"></div>
+    <nav class="nav-list">
+      <a href="dashboard.html" class="nav-item"><span class="material-symbols-rounded">dashboard</span><span>总览</span></a>
+      <a href="network.html" class="nav-item"><span class="material-symbols-rounded">account_tree</span><span>网络</span></a>
+      <a href="app.html" class="nav-item"><span class="material-symbols-rounded">apps</span><span>应用</span></a>
+      <a href="security.html" class="nav-item"><span class="material-symbols-rounded">security</span><span>安全</span></a>
+      <a href="assets.html" class="nav-item active"><span class="material-symbols-rounded">inventory_2</span><span>资产</span></a>
+      <a href="policy.html" class="nav-item"><span class="material-symbols-rounded">bolt</span><span>策略</span></a>
+    </nav>
+    <div class="nav-spacer"></div>
+    <a href="#" class="nav-item nav-settings"><span class="material-symbols-rounded">settings</span><span>设置</span></a>
+  </aside>
+
+  <main class="main">
+    <header class="top-header">
+      <span class="material-symbols-rounded page-icon">inventory_2</span>
+      <span class="page-title">资产管理</span>
+      <div class="header-spacer"></div>
+      <button class="btn-secondary time-btn"><span class="material-symbols-rounded">schedule</span><span>今日</span><span class="material-symbols-rounded">expand_more</span></button>
+      <button class="btn-bell"><span class="material-symbols-rounded">notifications</span><span class="bell-badge">2</span></button>
+      <button class="btn-ai"><span class="material-symbols-rounded ai-spark">psychology</span><span>AI Copilot</span></button>
+    </header>
+
+    <div class="page-tabs">
+      <a href="assets.html" class="page-tab active"><span class="material-symbols-rounded">psychology</span>AI 资产助手</a>
+      <a href="assets.html" class="page-tab"><span class="material-symbols-rounded">grid_view</span>资产台账</a>
+      <a href="assets.html" class="page-tab"><span class="material-symbols-rounded">update</span>生命周期</a>
+      <a href="assets.html" class="page-tab"><span class="material-symbols-rounded">sync</span>CMDB 同步</a>
+    </div>
+
+    <div class="ai-page-layout">
+
+      <div class="ai-event-panel">
+        <div class="aep-header">
+          <span class="material-symbols-rounded" style="color:#D09B00;font-size:16px;font-variation-settings:'FILL' 1">warning</span>
+          <span class="aep-title">资产待办事项</span>
+          <span class="aep-badge" style="background:#D09B00">5</span>
+        </div>
+        <div class="aep-body">
+
+          <div class="ai-event-card severity-crit" data-scenario="patch">
+            <div class="ec-top"><span class="ec-sev crit">紧急</span><span class="ec-device">补丁合规</span><span class="ec-time">今日</span></div>
+            <div class="ec-desc">3台 APP-SRV 存在高危漏洞 CVE-2024-38094（未打补丁），另有 SW-Core-02 固件版本落后 2 个大版本。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="patch"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">生成补丁部署优先级计划</span></div>
+              <div class="ec-q" data-scenario="patch"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">哪些设备存在 RCE 漏洞风险？</span></div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-warn" data-scenario="cert">
+            <div class="ec-top"><span class="ec-sev warn">告警</span><span class="ec-device">证书到期</span><span class="ec-time">7天内</span></div>
+            <div class="ec-desc">NGFW-EXT-02 HTTPS 管理证书 7 天后到期，API-GW-01 的 TLS 证书 14 天后到期，需提前更新。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="cert"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">列出所有即将到期证书并生成更新方案</span></div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-warn" data-scenario="offline">
+            <div class="ec-top"><span class="ec-sev warn">离线</span><span class="ec-device">SNMP 离线</span><span class="ec-time">2台</span></div>
+            <div class="ec-desc">ACC-B3-02 和 AP-204 SNMP agent 离线超过 4 小时，自动上线任务失败，可能存在设备宕机。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="offline"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">分析 SNMP 离线设备的可能原因</span></div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-info" data-scenario="lifecycle">
+            <div class="ec-top"><span class="ec-sev info">提醒</span><span class="ec-device">生命周期</span><span class="ec-time">30天内</span></div>
+            <div class="ec-desc">SW-ACC-01（2019年采购）、ROUTER-B1-01（2018年采购）已超设计使用年限，建议纳入更换计划。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="lifecycle"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">生成资产生命周期评估和更换预算建议</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="ai-main-panel">
+        <div class="ai-chat-area" id="chatArea">
+          <div class="ai-welcome">
+            <span class="material-symbols-rounded ai-welcome-icon">psychology</span>
+            <div class="ai-welcome-content">
+              <div class="ai-welcome-title">资产 AI 助手已就绪</div>
+              <div class="ai-welcome-desc">
+                我已接入 CMDB、NMS 设备台账、漏洞扫描（CVE）、证书管理等数据，可自动识别高风险资产、生成补丁优先级计划、预测生命周期更换需求。<br><br>
+                <strong>当前关注：</strong>3 台 APP-SRV 高危漏洞未修复、2 台证书即将到期、2 台设备 SNMP 离线
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-quick-scenarios">
+          <button class="ai-scenario-btn" data-scenario="health"><span class="material-symbols-rounded">grid_view</span>全资产健康矩阵</button>
+          <button class="ai-scenario-btn" data-scenario="patch"><span class="material-symbols-rounded">security_update_good</span>补丁部署计划</button>
+          <button class="ai-scenario-btn" data-scenario="cert"><span class="material-symbols-rounded">verified_user</span>证书到期管理</button>
+          <button class="ai-scenario-btn" data-scenario="lifecycle"><span class="material-symbols-rounded">autorenew</span>生命周期评估</button>
+        </div>
+
+        <div class="ai-input-bar">
+          <div class="ai-input-wrap">
+            <textarea class="ai-input" id="chatInput" rows="1" placeholder="输入问题，例如：哪些设备需要立即维护？"></textarea>
+            <button class="ai-send-btn" id="sendBtn"><span class="material-symbols-rounded">send</span></button>
+          </div>
+          <span class="ai-input-hint">Enter 发送 · Shift+Enter 换行</span>
+        </div>
+      </div>
+
+      <div class="ai-summary-panel">
+        <div class="asp-header">
+          <span class="material-symbols-rounded" style="color:#6E40C9;font-size:16px;font-variation-settings:'FILL' 1">inventory_2</span>
+          <span class="asp-title">资产概览</span>
+        </div>
+        <div class="asp-body">
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">在管设备总数</div>
+            <div class="asp-stat-value">142 台</div>
+            <div class="asp-stat-sub">跨 3 个站点</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">高危漏洞设备</div>
+            <div class="asp-stat-value red">3 台</div>
+            <div class="asp-stat-sub">CVE-2024-38094</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">证书即将到期</div>
+            <div class="asp-stat-value yellow">2 个</div>
+            <div class="asp-stat-sub">7-14 天内</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">SNMP 离线设备</div>
+            <div class="asp-stat-value yellow">2 台</div>
+            <div class="asp-stat-sub">&gt; 4 小时离线</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#1F2328;padding:4px 0 2px">资产待办</div>
+          <div class="asp-alert-list">
+            <div class="asp-alert-item" data-scenario="patch">
+              <div class="asp-alert-dot crit"></div>
+              <div class="asp-alert-content"><div class="asp-alert-device">未打补丁</div><div class="asp-alert-desc">APP-SRV 3台 · RCE 漏洞</div></div>
+            </div>
+            <div class="asp-alert-item" data-scenario="cert">
+              <div class="asp-alert-dot warn"></div>
+              <div class="asp-alert-content"><div class="asp-alert-device">证书到期</div><div class="asp-alert-desc">NGFW-EXT-02 · 7天</div></div>
+            </div>
+            <div class="asp-alert-item" data-scenario="offline">
+              <div class="asp-alert-dot warn"></div>
+              <div class="asp-alert-content"><div class="asp-alert-device">设备离线</div><div class="asp-alert-desc">ACC-B3-02 · AP-204</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+var SCENARIOS = {
+  'health': {
+    title: '全资产健康状态矩阵',
+    icon: 'grid_view',
+    question: '显示全资产健康矩阵',
+    answer: `当前 <strong>142 台</strong>在管设备健康状态分布：\n\n• 正常（绿）：129 台（90.8%）\n• 告警（黄）：10 台（7.0%）\n• 严重（红）：3 台（2.1%）— APP-SRV-01/02/03\n• 离线（灰）：2 台（1.4%）— ACC-B3-02、AP-204\n\n<strong>高风险设备：</strong>APP-SRV-01~03 存在 CVE-2024-38094 漏洞（CVSS 9.8），暂未检测到主动利用，建议在本周末维护窗口内完成补丁部署。`,
+    kpis: [
+      { label: '在管总数', value: '142台', color: '', sub: '3个站点' },
+      { label: '严重告警', value: '3台', color: 'red', sub: 'APP-SRV 漏洞' },
+      { label: '设备离线', value: '2台', color: 'yellow', sub: 'ACC/AP' },
+      { label: '健康率', value: '90.8%', color: 'green', sub: '' }
+    ],
+    timeline: [
+      { time: '今日 08:00', text: 'CMDB 自动巡检完成，更新 142 台设备状态', sev: 'info' },
+      { time: '今日 08:15', text: 'CVE 扫描完成，APP-SRV-01/02/03 发现高危漏洞', sev: 'crit' },
+      { time: '今日 10:30', text: 'ACC-B3-02 SNMP agent 离线超 4 小时，自动重启任务失败', sev: 'warn' },
+      { time: '今日 12:45', text: 'AP-204 离线，关联排查发现 POE 供电异常', sev: 'warn' }
+    ],
+    showMatrix: true
+  },
+  'patch': {
+    title: '补丁部署优先级计划',
+    icon: 'security_update_good',
+    question: '生成补丁部署优先级计划',
+    answer: `AI 根据 CVSS 评分、资产业务重要度、补丁测试状态，生成如下优先级部署计划：\n\n<strong>P1 - 本周末维护窗口（2天内）：</strong>\n• APP-SRV-01/02/03：CVE-2024-38094（CVSS 9.8，RCE）补丁 KB5040434，预计每台 15 分钟\n\n<strong>P2 - 下周完成（7天内）：</strong>\n• SW-Core-02：Comware 固件升级至 7.1.075，修复热管理和 BGP 相关问题（需维护窗口）\n• DB-SRV-01：PostgreSQL 安全更新 16.3，修复权限提升漏洞\n\n<strong>P3 - 本月完成（30天内）：</strong>\n• NGFW-EXT-02：PAN-OS 11.0.4 升级（包含 7 项安全修复）\n• AGG-02：Comware 小版本更新`,
+    kpis: [
+      { label: 'P1 紧急补丁', value: '3台', color: 'red', sub: 'CVSS 9.8 RCE' },
+      { label: 'P2 本周完成', value: '2台', color: 'yellow', sub: '固件/数据库' },
+      { label: 'P3 本月计划', value: '2台', color: '', sub: '防火墙/交换' },
+      { label: '总预计工时', value: '8h', color: '', sub: '含测试回滚' }
+    ],
+    timeline: [
+      { time: 'P1 本周末', text: 'APP-SRV-01 → APP-SRV-02 → APP-SRV-03 依次打补丁（滚动发布）', sev: 'crit' },
+      { time: 'P2 下周', text: 'SW-Core-02 固件升级（需申请维护窗口，影响 VLAN 100/200）', sev: 'warn' },
+      { time: 'P2 下周', text: 'DB-SRV-01 PostgreSQL 16.3 升级（低风险，5 分钟重启）', sev: 'warn' },
+      { time: 'P3 本月末', text: 'NGFW-EXT-02 PAN-OS 升级（需申请防火墙变更审批）', sev: 'info' }
+    ],
+    showMatrix: false
+  },
+  'cert': {
+    title: '数字证书到期管理报告',
+    icon: 'verified_user',
+    question: '列出所有即将到期证书并生成更新方案',
+    answer: `AI 扫描发现 <strong>4 个证书</strong>在 30 天内到期，其中 2 个属于高优先级：\n\n<strong>7 天内（紧急）：</strong>\n• NGFW-EXT-02 HTTPS 管理证书（自签名，2024-05-07 到期）\n  - 更新方案：重新生成自签名证书并推送至浏览器受信任列表\n\n<strong>14 天内（告警）：</strong>\n• API-GW-01 TLS 证书（Let's Encrypt，2024-05-14 到期）\n  - 更新方案：执行 certbot renew（自动化，预计 2 分钟）\n\n<strong>30 天内（提醒）：</strong>\n• WEB-SRV-02 HTTPS 证书（2024-05-28 到期）\n• MGMT-VPN-01 VPN 证书（2024-05-30 到期）`,
+    kpis: [
+      { label: '7天内到期', value: '1个', color: 'red', sub: 'NGFW-EXT-02' },
+      { label: '14天内到期', value: '1个', color: 'yellow', sub: 'API-GW-01' },
+      { label: '30天内到期', value: '4个', color: 'yellow', sub: '含上述2个' },
+      { label: '自动续签', value: '1个', color: 'green', sub: 'Let\'s Encrypt' }
+    ],
+    timeline: [
+      { time: '今日（7天后）', text: 'NGFW-EXT-02 证书到期 → 立即手动更新自签名证书', sev: 'crit' },
+      { time: '14天后', text: 'API-GW-01 Let\'s Encrypt 证书 → 执行 certbot renew（自动化）', sev: 'warn' },
+      { time: '28天后', text: 'WEB-SRV-02 HTTPS 证书到期 → 向 CA 申请续签', sev: 'warn' },
+      { time: '建议', text: '配置证书到期自动监控（阈值 30 天），避免被动告警', sev: 'info' }
+    ],
+    showMatrix: false
+  },
+  'offline': {
+    title: 'SNMP 离线设备诊断报告',
+    icon: 'device_unknown',
+    question: '分析 SNMP 离线设备的可能原因',
+    answer: `当前 2 台设备 SNMP agent 离线超过 4 小时：\n\n<strong>ACC-B3-02（接入交换机，B3机房）：</strong>\n• 关联告警：UPS-B3 电量告警于 10:15 触发，疑似市电掉电后 UPS 供电耗尽\n• 建议：到现场检查 B3 机房电源状态，确认 UPS 是否需要切换或充电\n\n<strong>AP-204（无线 AP，3楼办公区）：</strong>\n• 关联告警：ACC-B3-02 下联的 POE 端口 Gi0/24 也已断电（连带关系）\n• 建议：恢复 ACC-B3-02 供电后，AP-204 应自动恢复上线\n\n<strong>根因：</strong>B3 机房 UPS 供电问题导致 ACC-B3-02 宕机，连带 AP-204 断电。`,
+    kpis: [
+      { label: 'SNMP 离线', value: '2台', color: 'yellow', sub: '&gt; 4 小时' },
+      { label: '根因', value: 'UPS', color: 'red', sub: 'B3机房供电' },
+      { label: '影响范围', value: '3楼', color: 'yellow', sub: '办公区无线' },
+      { label: '预计恢复', value: '1h', color: '', sub: '恢复供电后' }
+    ],
+    timeline: [
+      { time: '10:15', text: 'UPS-B3 电量告警，电池容量降至 15%（充电异常）', sev: 'warn' },
+      { time: '10:30', text: 'ACC-B3-02 SNMP agent 离线，市电/UPS 供电中断确认', sev: 'crit' },
+      { time: '10:31', text: 'AP-204（接 ACC-B3-02 POE Gi0/24）同步离线', sev: 'warn' },
+      { time: '建议', text: '联系机房运维到 B3 机房检查 UPS，恢复供电后设备自动上线', sev: 'ok' }
+    ],
+    showMatrix: false
+  },
+  'lifecycle': {
+    title: '资产生命周期评估报告',
+    icon: 'autorenew',
+    question: '生成资产生命周期评估和更换预算建议',
+    answer: `AI 基于采购日期、故障率、维保状态综合评估，以下设备建议在 <strong>2024 财年内安排更换：</strong>\n\n<strong>高优先级更换（超年限+故障频发）：</strong>\n• SW-ACC-01（2019年采购，累计故障 12次/年，过保 2 年）→ 更换预算 4.2 万元\n• ROUTER-B1-01（2018年采购，CPU 使用率持续 &gt;80%，过保 3 年）→ 更换预算 8.5 万元\n\n<strong>中优先级（维保续签 vs 更换评估）：</strong>\n• NGFW-EXT-01（2020年采购，维保 2025年到期）→ 建议续签维保，暂缓更换\n• BACKUP-SRV-01（2021年采购，磁盘利用率 78%）→ 建议扩容而非整机更换\n\n<strong>建议采购预算：</strong>12.7 万元（含安装调试）`,
+    kpis: [
+      { label: '超年限设备', value: '2台', color: 'red', sub: '故障频发' },
+      { label: '维保即将到期', value: '3台', color: 'yellow', sub: '2025年' },
+      { label: '更换预算', value: '12.7万', color: '', sub: '2024财年' },
+      { label: '可用率提升', value: '+2.1%', color: 'green', sub: '更换后预期' }
+    ],
+    timeline: [
+      { time: '立即', text: '为 SW-ACC-01 和 ROUTER-B1-01 发起采购审批', sev: 'crit' },
+      { time: 'Q3 计划', text: 'SW-ACC-01 更换（4.2万），停用后备机切换', sev: 'warn' },
+      { time: 'Q4 计划', text: 'ROUTER-B1-01 更换（8.5万），需提前规划路由迁移', sev: 'warn' },
+      { time: '2025年', text: 'NGFW-EXT-01 维保到期，届时重新评估更换或续保', sev: 'info' }
+    ],
+    showMatrix: false
+  }
+};
+
+function renderReport(key){
+  var s=SCENARIOS[key]; if(!s)return;
+  var ca=document.getElementById('chatArea');
+  var um=document.createElement('div'); um.className='chat-msg user';
+  um.innerHTML='<div class="chat-avatar user-av"><span class="material-symbols-rounded">person</span></div><div class="chat-bubble user-bubble">'+s.question+'</div>';
+  ca.appendChild(um);
+  var tid='at_'+Date.now();
+  var am=document.createElement('div'); am.className='chat-msg';
+  am.innerHTML='<div class="chat-avatar ai-av"><span class="material-symbols-rounded" style="font-variation-settings:\'FILL\' 1">psychology</span></div><div class="chat-bubble ai-bubble" id="'+tid+'"></div>';
+  ca.appendChild(am); ca.scrollTop=ca.scrollHeight;
+  var el=document.getElementById(tid),idx=0,text=s.answer;
+  function type(){if(idx<text.length){el.innerHTML=text.slice(0,idx+1).replace(/\n/g,'<br>')+'<span class="typing-cursor"></span>';idx+=3;setTimeout(type,15);}else{el.innerHTML=text.replace(/\n/g,'<br>');renderFull(key,ca);}}
+  setTimeout(type,300);
+}
+function renderFull(key,ca){
+  var s=SCENARIOS[key];
+  var r=document.createElement('div'); r.className='analysis-report';
+  var kpi=s.kpis.map(function(k){return '<div class="report-kpi"><div class="rkpi-label">'+k.label+'</div><div class="rkpi-value '+k.color+'">'+k.value+'</div><div class="rkpi-sub">'+k.sub+'</div></div>';}).join('');
+  var tl=s.timeline.map(function(t,i){var l=i===s.timeline.length-1;return '<div class="rtl-item"><div class="rtl-line"><div class="rtl-dot '+t.sev+'"></div>'+(l?'':'<div class="rtl-connector"></div>')+'</div><div class="rtl-body"><div class="rtl-time">'+t.time+'</div><div class="rtl-text">'+t.text+'</div></div></div>';}).join('');
+  var matrixHtml='';
+  if(s.showMatrix){
+    var devices=[
+      {n:'WAN-01',t:'路由器',s:'warn'},{n:'WAN-02',t:'路由器',s:'ok'},{n:'Core-01',t:'交换机',s:'ok'},{n:'Core-02',t:'交换机',s:'crit'},
+      {n:'AGG-01',t:'汇聚',s:'ok'},{n:'AGG-02',t:'汇聚',s:'warn'},{n:'AGG-03',t:'汇聚',s:'ok'},{n:'AGG-04',t:'汇聚',s:'ok'},
+      {n:'APP-SRV-01',t:'服务器',s:'crit'},{n:'APP-SRV-02',t:'服务器',s:'crit'},{n:'APP-SRV-03',t:'服务器',s:'crit'},{n:'DB-SRV-01',t:'数据库',s:'warn'},
+      {n:'BACKUP-SRV',t:'备份',s:'warn'},{n:'iSCSI-01',t:'存储',s:'ok'},{n:'iSCSI-02',t:'存储',s:'warn'},{n:'ACC-B1-01',t:'接入',s:'ok'},
+      {n:'ACC-B2-01',t:'接入',s:'ok'},{n:'ACC-B3-02',t:'接入',s:'offline'},{n:'AP-204',t:'AP',s:'offline'},{n:'NGFW-EXT',t:'防火墙',s:'warn'}
+    ];
+    matrixHtml='<div class="report-divider"></div><div style="font-size:12px;font-weight:700;color:#1F2328;margin-bottom:8px">资产健康矩阵（关键设备）</div>'
+      +'<div class="asset-matrix">'+devices.map(function(d){return '<div class="asset-cell '+d.s+'"><div class="asset-cell-name">'+d.n+'</div><div class="asset-cell-type">'+d.t+'</div></div>';}).join('')+'</div>';
+  }
+  r.innerHTML='<div class="report-header"><span class="material-symbols-rounded report-icon" style="font-variation-settings:\'FILL\' 1">'+s.icon+'</span><span class="report-title">'+s.title+'</span><span class="report-timestamp">'+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+'</span></div>'
+    +'<div class="report-kpi-row">'+kpi+'</div><div class="report-divider"></div>'
+    +'<div style="font-size:12px;font-weight:700;color:#1F2328;margin-bottom:8px">处置时间线</div>'
+    +'<div class="report-timeline">'+tl+'</div>'+matrixHtml;
+  ca.appendChild(r); ca.scrollTop=ca.scrollHeight;
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.ai-scenario-btn[data-scenario]').forEach(function(b){b.addEventListener('click',function(){renderReport(this.dataset.scenario);});});
+  document.querySelectorAll('.ec-q[data-scenario]').forEach(function(e){e.addEventListener('click',function(){renderReport(this.dataset.scenario);});});
+  document.querySelectorAll('.asp-alert-item[data-scenario]').forEach(function(e){e.addEventListener('click',function(){renderReport(this.dataset.scenario);});});
+  var ci=document.getElementById('chatInput'),sb=document.getElementById('sendBtn');
+  function send(){var q=ci.value.trim();if(!q)return;ci.value='';
+    var k='health';
+    if(/补丁|漏洞|cve/.test(q))k='patch';
+    else if(/证书|tls|https/.test(q))k='cert';
+    else if(/离线|snmp|down/.test(q))k='offline';
+    else if(/生命周期|更换|采购/.test(q))k='lifecycle';
+    renderReport(k);}
+  sb.addEventListener('click',send);
+  ci.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+  ci.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';});
+});
+</script>
+</body>
+</html>

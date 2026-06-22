@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Backup files
+*.bak
+*.bak-*
+*.backup-*
+*.orig
+*.orig-recovered
+
+# Temporary files
+_temp_*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

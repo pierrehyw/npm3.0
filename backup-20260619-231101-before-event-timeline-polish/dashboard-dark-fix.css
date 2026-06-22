@@ -1,0 +1,370 @@
+/* Dashboard role views dark-theme fix: executive / ops / security */
+html[data-theme="dark"] body #view-executive,
+html[data-theme="dark"] body #view-ops,
+html[data-theme="dark"] body #view-security {
+  --dash-dark-panel: rgba(10, 21, 36, 0.92);
+  --dash-dark-panel-soft: rgba(10, 21, 36, 0.74);
+  --dash-dark-panel-deep: rgba(7, 16, 28, 0.94);
+  --dash-dark-line: rgba(77, 212, 255, 0.20);
+  --dash-dark-line-strong: rgba(77, 212, 255, 0.34);
+  color: var(--dark-fg-body) !important;
+  background: transparent !important;
+}
+
+/* Inline light blocks across all three dashboard role views */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#fff"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #fff"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#FFF"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #FFF"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#F6F8FA"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #F6F8FA"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#FAFBFC"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #FAFBFC"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#F0F3F6"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #F0F3F6"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#FF"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #FF"] {
+  background: var(--dash-dark-panel) !important;
+  background-color: var(--dash-dark-panel) !important;
+  border-color: var(--dash-dark-line) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="border"] {
+  border-color: var(--dash-dark-line) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color:#1"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color: #1"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color:#2"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color: #2"] {
+  color: var(--dark-fg-title) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color:#6"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color: #6"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color:#8"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color: #8"] {
+  color: var(--dark-fg-subtle) !important;
+}
+
+/* Broad dashboard role surfaces */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(
+  .card,.score-card,.exec-kpi-card,.exec-bottom,.exec-top-row,.exec-kpi-col,
+  .ehs-card,.ehs-score-card,.ehs-kpi,.ehs-ai-brief,.ehs-domain-pill,.ehs-risk-item,.ehs-action-item,
+  .cs-deduct-list,.cs-deduct-item,.cs-action-btn,.av-card,.av-note,
+  .ops-net-strip,.ops-page,.ops-pages,.ons-score-block,.ons-mini-kpi,.ops-map-card,.ops-top-card,.ops-fault-card,.ops-traffic-card,.ops-inventory-card,.ops-capacity-card,
+  .sec-page,.sec-kpi,.sec-card,.sec-map-panel,.sec-panel,.sec-event-card,.sec-compliance-card,.sec-ai-card,.sec-table-wrap,
+  .role-dropdown,.role-hint,.rdrop-item,.btn-secondary,.btn-bell,.ai-progress-bar,.apb-track
+) {
+  background: var(--dash-dark-panel) !important;
+  border-color: var(--dash-dark-line) !important;
+  color: var(--dark-fg-body) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+}
+
+/* Header-ish bands inside dashboard cards */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(
+  .card-header,.ehs-header,.sec-card-header,.ops-card-header,.ops-section-header,.sec-panel-hd,.sec-table th,
+  .cs-di-left,.cs-di-right,.rdrop-item:hover
+) {
+  background: var(--dash-dark-panel-deep) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+/* Tables and chart containers */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(table,thead,tbody,tr,th,td) {
+  background-color: transparent !important;
+  border-color: rgba(77,212,255,0.14) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+/* Text */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(
+  h1,h2,h3,h4,.card-title,.page-title,.rdrop-name,.cs-di-title,.ehs-title,.ehs-kpi-value,.ehs-score-num,
+  .sec-kpi-num,.sec-title,.sec-event-title,.ops-title,.ons-score-num,.ons-kpi-val,.av-title,.av-mini-num,
+  .ds-val,.ekc-value,.score-value,.role-label
+) {
+  color: var(--dark-fg-title) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(
+  .card-subtitle,.rdrop-desc,.cs-di-desc,.cs-di-dim,.ehs-sub,.ehs-kpi-label,.ehs-domain-label,
+  .sec-kpi-label,.sec-sub,.sec-event-desc,.ops-sub,.ons-kpi-label,.av-desc,.av-mini-label,
+  .ds-name,.ekc-label,.score-sub,.role-caret,.sec-legend-item
+) {
+  color: var(--dark-fg-subtle) !important;
+}
+
+/* Semantic pastel blocks -> dark semantic blocks */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(.cs-deduct-high,.sec-high,.risk-high,.crit,.red,[class*="danger"],[class*="high"]) {
+  background: rgba(244,63,94,0.16) !important;
+  border-color: rgba(244,63,94,0.36) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(.cs-deduct-med,.sec-med,.risk-med,.warn,.yellow,[class*="warn"],[class*="medium"]) {
+  background: rgba(245,158,11,0.16) !important;
+  border-color: rgba(245,158,11,0.34) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(.ok,.green,[class*="ok"],[class*="success"],[class*="resolved"]) {
+  border-color: rgba(34,197,94,0.32) !important;
+}
+
+/* Buttons / chips */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(button,.chip,.badge,.tag,.pill,.cs-action-btn,.sab-btn,.ehs-btn,.sec-btn,.ops-btn) {
+  background: rgba(7,16,28,0.90) !important;
+  border-color: var(--dash-dark-line) !important;
+  color: var(--dark-fg-subtle) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(button:hover,.cs-action-btn:hover,.sab-btn:hover,.ehs-btn:hover,.sec-btn:hover,.ops-btn:hover) {
+  background: rgba(77,212,255,0.12) !important;
+  border-color: var(--dash-dark-line-strong) !important;
+  color: var(--dark-fg-title) !important;
+}
+
+/* Inputs */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(input,select,textarea) {
+  background: rgba(5,13,24,0.92) !important;
+  border-color: var(--dash-dark-line) !important;
+  color: var(--dark-fg-title) !important;
+}
+
+/* SVG chart readability */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) svg text { fill: var(--dark-fg-subtle) !important; }
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) svg line,
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) svg path[stroke="#D0D7DE"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) svg path[stroke="#E4E8EE"] { stroke: rgba(77,212,255,0.24) !important; }
+
+/* Keep active/primary actions visually strong */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(.active,.primary,.btn-primary) {
+  border-color: var(--dash-dark-line-strong) !important;
+}
+
+
+/* User-reported dashboard misses: business cards, role dropdown, chart grid lines */
+html[data-theme="dark"] body .role-selector,
+html[data-theme="dark"] body .role-dropdown,
+html[data-theme="dark"] body .role-dropdown .rdrop-item,
+html[data-theme="dark"] body .role-hint {
+  background: rgba(7, 16, 28, 0.98) !important;
+  border-color: rgba(77, 212, 255, 0.28) !important;
+  color: var(--dark-fg-body) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+}
+html[data-theme="dark"] body .role-dropdown .rdrop-item:hover,
+html[data-theme="dark"] body .role-dropdown .rdrop-item.active {
+  background: rgba(77, 212, 255, 0.12) !important;
+  color: var(--dark-fg-title) !important;
+}
+html[data-theme="dark"] body .role-label,
+html[data-theme="dark"] body .rdrop-name { color: var(--dark-fg-title) !important; }
+html[data-theme="dark"] body .rdrop-desc,
+html[data-theme="dark"] body .role-caret { color: var(--dark-fg-subtle) !important; }
+
+html[data-theme="dark"] body .biz-health-card,
+html[data-theme="dark"] body .biz-health-card .card-body,
+html[data-theme="dark"] body .biz-grid,
+html[data-theme="dark"] body .biz-item,
+html[data-theme="dark"] body .biz-footer {
+  background: rgba(10, 21, 36, 0.94) !important;
+  border-color: rgba(77, 212, 255, 0.22) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .biz-item.biz-warn {
+  background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(10,21,36,0.94) 62%) !important;
+  border-color: rgba(245,158,11,0.36) !important;
+}
+html[data-theme="dark"] body .biz-name,
+html[data-theme="dark"] body .biz-score { color: var(--dark-fg-title) !important; }
+html[data-theme="dark"] body .biz-score:not(.biz-score-warn) { color: #7BEEB3 !important; }
+html[data-theme="dark"] body .biz-score.biz-score-warn { color: #FFD67A !important; }
+html[data-theme="dark"] body .biz-metric,
+html[data-theme="dark"] body .biz-footer { color: var(--dark-fg-subtle) !important; }
+html[data-theme="dark"] body .biz-indicator.ind-green,
+html[data-theme="dark"] body .ind-green { box-shadow: 0 0 0 3px rgba(34,197,94,0.16) !important; }
+html[data-theme="dark"] body .biz-indicator.ind-yellow,
+html[data-theme="dark"] body .ind-yellow { box-shadow: 0 0 0 3px rgba(245,158,11,0.18) !important; }
+
+/* Chart canvases are raster drawings; invert only bright grid/background while preserving colored bars/lines reasonably. */
+html[data-theme="dark"] body #view-executive canvas,
+html[data-theme="dark"] body #view-ops canvas,
+html[data-theme="dark"] body #view-security canvas {
+  filter: invert(0.92) hue-rotate(180deg) saturate(1.15) contrast(0.92) brightness(0.95) !important;
+  mix-blend-mode: screen;
+  opacity: 0.86;
+}
+html[data-theme="dark"] body .chart-body,
+html[data-theme="dark"] body .trend-card,
+html[data-theme="dark"] body .trend-card .card-body {
+  background: rgba(7, 16, 28, 0.92) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+
+/* Extra dashboard class families not covered by exact names */
+html[data-theme="dark"] body [class^="exec-"],
+html[data-theme="dark"] body [class*=" exec-"],
+html[data-theme="dark"] body [class^="ehs-"],
+html[data-theme="dark"] body [class*=" ehs-"],
+html[data-theme="dark"] body [class^="ops-"],
+html[data-theme="dark"] body [class*=" ops-"],
+html[data-theme="dark"] body [class^="sec-"],
+html[data-theme="dark"] body [class*=" sec-"],
+html[data-theme="dark"] body [class^="cs-"],
+html[data-theme="dark"] body [class*=" cs-"] {
+  border-color: rgba(77,212,255,0.18) !important;
+}
+
+html[data-theme="dark"] body [class^="exec-"][style*="background"],
+html[data-theme="dark"] body [class*=" exec-"][style*="background"],
+html[data-theme="dark"] body [class^="ehs-"][style*="background"],
+html[data-theme="dark"] body [class*=" ehs-"][style*="background"],
+html[data-theme="dark"] body [class^="ops-"][style*="background"],
+html[data-theme="dark"] body [class*=" ops-"][style*="background"],
+html[data-theme="dark"] body [class^="sec-"][style*="background"],
+html[data-theme="dark"] body [class*=" sec-"][style*="background"],
+html[data-theme="dark"] body [class^="cs-"][style*="background"],
+html[data-theme="dark"] body [class*=" cs-"][style*="background"] {
+  background: rgba(10,21,36,0.92) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+
+/* Chart.js is now theme-aware; do not filter it globally. */
+html[data-theme="dark"] body #view-executive canvas,
+html[data-theme="dark"] body #view-ops canvas,
+html[data-theme="dark"] body #view-security canvas {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+}
+
+
+/* Security posture hover rows + event report drawer */
+html[data-theme="dark"] body .sec-posture-card .spc-event-list {
+  border-top-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body .sec-posture-card .spc-ev {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.12) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .sec-posture-card .spc-ev.ev-clickable:hover {
+  background: rgba(77,212,255,0.10) !important;
+  color: var(--dark-fg-title) !important;
+  opacity: 1 !important;
+}
+html[data-theme="dark"] body .sec-posture-card .spc-ev-title {
+  color: var(--dark-fg-title) !important;
+}
+html[data-theme="dark"] body .sec-posture-card .spc-ev-desc,
+html[data-theme="dark"] body .sec-posture-card .spc-ev-arrow {
+  color: var(--dark-fg-subtle) !important;
+}
+html[data-theme="dark"] body .sec-posture-card .stag-red {
+  background: rgba(244,63,94,0.18) !important;
+  border: 1px solid rgba(244,63,94,0.34) !important;
+  color: #FFC2D1 !important;
+}
+html[data-theme="dark"] body .sec-posture-card .stag-yellow {
+  background: rgba(245,158,11,0.18) !important;
+  border: 1px solid rgba(245,158,11,0.34) !important;
+  color: #FFE2A0 !important;
+}
+html[data-theme="dark"] body .sec-posture-card .stag-gray {
+  background: rgba(77,212,255,0.10) !important;
+  border: 1px solid rgba(77,212,255,0.22) !important;
+  color: var(--dark-fg-subtle) !important;
+}
+
+html[data-theme="dark"] body .ev-overlay.open {
+  background: rgba(2,8,16,0.76) !important;
+  backdrop-filter: blur(3px) !important;
+}
+html[data-theme="dark"] body .ev-drawer {
+  background: linear-gradient(180deg, rgba(8,18,32,0.99), rgba(7,15,26,0.99)) !important;
+  border-left: 1px solid rgba(77,212,255,0.26) !important;
+  color: var(--dark-fg-body) !important;
+  box-shadow: -18px 0 44px rgba(0,0,0,0.40), 0 0 34px rgba(77,212,255,0.08) !important;
+}
+html[data-theme="dark"] body .ev-drawer-header,
+html[data-theme="dark"] body .ev-drawer-footer {
+  background: rgba(7,16,28,0.96) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .ev-drawer-body {
+  background: radial-gradient(circle at 14% 0%, rgba(77,212,255,0.08), transparent 32%), rgba(7,15,26,0.98) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .ev-title,
+html[data-theme="dark"] body .ev-tl-label,
+html[data-theme="dark"] body .ev-stat-num,
+html[data-theme="dark"] body .ev-kv-val,
+html[data-theme="dark"] body .ev-ai-label,
+html[data-theme="dark"] body .ev-section-title {
+  color: var(--dark-fg-title) !important;
+}
+html[data-theme="dark"] body .ev-meta,
+html[data-theme="dark"] body .ev-tl-time,
+html[data-theme="dark"] body .ev-tl-desc,
+html[data-theme="dark"] body .ev-stat-label,
+html[data-theme="dark"] body .ev-kv-key,
+html[data-theme="dark"] body .ev-footer-note {
+  color: var(--dark-fg-subtle) !important;
+}
+html[data-theme="dark"] body .ev-stat-card,
+html[data-theme="dark"] body .ev-ai-block,
+html[data-theme="dark"] body .ev-impact-tag,
+html[data-theme="dark"] body .ev-progress-bar,
+html[data-theme="dark"] body .ev-tl-dot,
+html[data-theme="dark"] body .ev-btn-secondary,
+html[data-theme="dark"] body .ev-btn-danger,
+html[data-theme="dark"] body .ev-close {
+  background: rgba(10,21,36,0.92) !important;
+  border-color: rgba(77,212,255,0.20) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .ev-ai-text {
+  color: #CDE3FB !important;
+}
+html[data-theme="dark"] body .ev-tl-item:not(:last-child)::after {
+  background: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body .tl-dot-red,
+html[data-theme="dark"] body .stat-red {
+  background: rgba(244,63,94,0.18) !important;
+  color: #FFC2D1 !important;
+}
+html[data-theme="dark"] body .tl-dot-yellow,
+html[data-theme="dark"] body .stat-yellow {
+  background: rgba(245,158,11,0.18) !important;
+  color: #FFE2A0 !important;
+}
+html[data-theme="dark"] body .tl-dot-green,
+html[data-theme="dark"] body .stat-green {
+  background: rgba(34,197,94,0.16) !important;
+  color: #A8F6C8 !important;
+}
+html[data-theme="dark"] body .tl-dot-blue,
+html[data-theme="dark"] body .stat-blue {
+  background: rgba(59,130,246,0.16) !important;
+  color: #B9EBFF !important;
+}
+html[data-theme="dark"] body .tl-dot-gray {
+  background: rgba(77,212,255,0.10) !important;
+  color: var(--dark-fg-subtle) !important;
+}
+html[data-theme="dark"] body .ev-close:hover,
+html[data-theme="dark"] body .ev-btn-secondary:hover {
+  background: rgba(77,212,255,0.12) !important;
+  color: var(--dark-fg-title) !important;
+}
+html[data-theme="dark"] body .ev-btn-danger:hover {
+  background: rgba(244,63,94,0.16) !important;
+  color: #FFC2D1 !important;
+}

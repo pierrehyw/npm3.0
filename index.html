@@ -1,0 +1,387 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; url=dashboard.html">
+<title>NGPM</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <!-- ── Sidebar ─────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="logo-row">
+      <span class="material-symbols-rounded logo-icon">hub</span>
+      <span class="logo-text">NGPM</span>
+    </div>
+    <div class="sidebar-divider"></div>
+    <nav class="nav-list">
+      <a href="dashboard.html" class="nav-item" data-tip="总览">
+        <span class="material-symbols-rounded">dashboard</span>
+        <span>总览</span>
+      </a>
+      <a href="network.html" class="nav-item" data-tip="数据分析">
+        <span class="material-symbols-rounded">account_tree</span>
+        <span>数据分析</span>
+      </a>
+      <a href="app.html" class="nav-item active" data-tip="应用">
+        <span class="material-symbols-rounded">apps</span>
+        <span>应用</span>
+      </a>
+      <a href="topology.html" class="nav-item" data-tip="数字地图">
+        <span class="material-symbols-rounded">location_on</span>
+        <span>数字地图</span>
+      </a>
+      <a href="report.html" class="nav-item" data-tip="报表报告">
+        <span class="material-symbols-rounded">area_chart</span>
+        <span>报表报告</span>
+      </a>
+      <a href="ai-agent.html" class="nav-item" data-tip="AI Agent">
+        <span class="material-symbols-rounded">smart_toy</span>
+        <span>AI Agent</span>
+      </a>
+    </nav>
+    <div class="nav-spacer"></div>
+    <a href="#" class="nav-item nav-settings">
+  </aside>
+
+  <!-- ── Main ───────────────────────────────────────── -->
+  <main class="main">
+    <!-- Header -->
+    <header class="top-header">
+      <nav class="breadcrumb">
+        <span class="bc-item">应用服务</span>
+        <span class="material-symbols-rounded bc-sep">chevron_right</span>
+        <span class="bc-item">order-service</span>
+        <span class="material-symbols-rounded bc-sep">chevron_right</span>
+        <span class="bc-item bc-current">HTTP 性能分析</span>
+      </nav>
+      <div class="header-spacer"></div>
+      <div class="header-actions">
+        <button class="btn-secondary time-btn" id="timeBtnMain">
+          <span class="material-symbols-rounded">schedule</span>
+          <span id="timeLabelMain">最近 1 小时</span>
+          <span class="material-symbols-rounded">expand_more</span>
+        </button>
+        <button class="btn-ai">
+          <span class="material-symbols-rounded">psychology</span>
+          <span>AI Copilot</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- AI Banner -->
+    <div class="ai-banner">
+      <span class="material-symbols-rounded ai-icon">psychology</span>
+      <div class="ai-text">
+        <div class="ai-title">AI 根因摘要 · order-service HTTP 性能异常</div>
+        <div class="ai-desc">P99 响应时间 14:23 起从 320ms 急剧攀升至 1.23s，主要集中在 /api/orders/{id} 接口。TCP 层追踪发现 BJ→SH 专线 RTT 同步上涨 210ms，判断为网络拥塞引发后端等待超时，非服务代码问题。</div>
+      </div>
+      <button class="btn-drilldown">
+        <span class="material-symbols-rounded">account_tree</span>
+        <span>查看网络下钻</span>
+      </button>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-top-row">
+          <span class="kpi-label">请求量（RPS）</span>
+          <span class="kpi-value">2,847</span>
+        </div>
+        <div class="kpi-trend trend-green">
+          <span class="material-symbols-rounded">trending_up</span>
+          <span>+12% vs 均值</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-alert-red">
+        <div class="kpi-top-row">
+          <span class="kpi-label">P99 响应时间</span>
+          <span class="kpi-value kpi-val-red">1,230 ms</span>
+        </div>
+        <div class="kpi-trend trend-red">
+          <span class="material-symbols-rounded">trending_up</span>
+          <span>↑ 284%&nbsp;&nbsp;阈值 500ms</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-alert-yellow">
+        <div class="kpi-top-row">
+          <span class="kpi-label">HTTP 错误率</span>
+          <span class="kpi-value kpi-val-yellow">0.8 %</span>
+        </div>
+        <div class="kpi-trend trend-yellow">
+          <span class="material-symbols-rounded">warning</span>
+          <span>超基线 40×&nbsp;&nbsp;5xx 主导</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top-row">
+          <span class="kpi-label">TTFB P95</span>
+          <span class="kpi-value kpi-val-red">870 ms</span>
+        </div>
+        <div class="kpi-trend trend-red">
+          <span class="material-symbols-rounded">trending_up</span>
+          <span>↑ 服务端处理慢</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mid Zone -->
+    <div class="mid-zone">
+      <!-- URL Table -->
+      <div class="url-table-card card">
+        <div class="card-header">
+          <span class="material-symbols-rounded card-icon">link</span>
+          <span class="card-title">URL 接口耗时排行（Top 5）</span>
+          <div class="spacer"></div>
+          <span class="card-subtitle">按 P99 降序</span>
+        </div>
+        <table class="url-table">
+          <thead>
+            <tr>
+              <th class="th-url">接口</th>
+              <th class="th-num">P50 ms</th>
+              <th class="th-num">P95 ms</th>
+              <th class="th-num">P99 ms</th>
+              <th class="th-num">Req/min</th>
+            </tr>
+          </thead>
+          <tbody id="urlTableBody">
+            <tr class="row-alert">
+              <td class="td-url">
+                <div class="url-path">/api/orders/{id}</div>
+                <div class="url-meta">GET · HTTP/1.1</div>
+              </td>
+              <td class="td-num">340</td>
+              <td class="td-num">890</td>
+              <td class="td-num td-alert">1,230</td>
+              <td class="td-num">1,284</td>
+            </tr>
+            <tr>
+              <td class="td-url">
+                <div class="url-path">/api/orders</div>
+                <div class="url-meta">GET · HTTP/1.1</div>
+              </td>
+              <td class="td-num">120</td>
+              <td class="td-num">380</td>
+              <td class="td-num">520</td>
+              <td class="td-num">2,103</td>
+            </tr>
+            <tr>
+              <td class="td-url">
+                <div class="url-path">/api/payment/confirm</div>
+                <div class="url-meta">POST · HTTP/1.1</div>
+              </td>
+              <td class="td-num">280</td>
+              <td class="td-num">640</td>
+              <td class="td-num">870</td>
+              <td class="td-num">456</td>
+            </tr>
+            <tr>
+              <td class="td-url">
+                <div class="url-path">/api/users/{id}/profile</div>
+                <div class="url-meta">GET · HTTP/2</div>
+              </td>
+              <td class="td-num">95</td>
+              <td class="td-num">210</td>
+              <td class="td-num">340</td>
+              <td class="td-num">3,201</td>
+            </tr>
+            <tr>
+              <td class="td-url">
+                <div class="url-path">/health</div>
+                <div class="url-meta">GET · HTTP/1.1</div>
+              </td>
+              <td class="td-num">12</td>
+              <td class="td-num">18</td>
+              <td class="td-num">24</td>
+              <td class="td-num">120</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="long-tail-hint">
+          <span class="material-symbols-rounded">info</span>
+          <span>长尾接口 P99/P50 = <strong>2.6×</strong>，点击查看完整分布 →</span>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-col">
+        <!-- Status Code Card -->
+        <div class="card status-card">
+          <div class="status-hdr">
+            <span class="material-symbols-rounded card-icon">bar_chart</span>
+            <span class="card-title">状态码分布</span>
+          </div>
+          <div class="status-chips">
+            <div class="chip chip-green">
+              <div class="chip-code">2xx</div>
+              <div class="chip-pct">91.2%</div>
+            </div>
+            <div class="chip chip-yellow">
+              <div class="chip-code">4xx</div>
+              <div class="chip-pct">0.5%</div>
+            </div>
+            <div class="chip chip-red">
+              <div class="chip-code">5xx</div>
+              <div class="chip-pct">7.8%</div>
+            </div>
+            <div class="chip chip-gray">
+              <div class="chip-code">timeout</div>
+              <div class="chip-pct">0.5%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error Card -->
+        <div class="card error-card">
+          <div class="error-hdr">
+            <span class="material-symbols-rounded card-icon">error</span>
+            <span class="card-title">错误状态码分解</span>
+            <div class="spacer"></div>
+            <span class="time-badge">过去 1h</span>
+          </div>
+          <div class="error-body">
+            <!-- Row 1 -->
+            <div class="error-row">
+              <div class="err-info">
+                <div class="err-path">/api/orders/{id}</div>
+                <div class="err-pct err-pct-red">68% 错误</div>
+              </div>
+              <div class="err-bar-wrap">
+                <div class="err-bar" style="--w:68%">
+                  <div class="err-seg seg-red" style="--sw:89.7%">504</div>
+                  <div class="err-seg seg-orange" style="--sw:10.3%">500</div>
+                </div>
+                <div class="err-codes">
+                  <span class="code-tag code-red">504 61%</span>
+                  <span class="code-tag code-orange">500 7%</span>
+                </div>
+              </div>
+            </div>
+            <!-- Row 2 -->
+            <div class="error-row">
+              <div class="err-info">
+                <div class="err-path">/api/payment/confirm</div>
+                <div class="err-pct err-pct-orange">24% 错误</div>
+              </div>
+              <div class="err-bar-wrap">
+                <div class="err-bar" style="--w:24%">
+                  <div class="err-seg seg-red" style="--sw:100%">504</div>
+                </div>
+                <div class="err-codes">
+                  <span class="code-tag code-red">504 24%</span>
+                </div>
+              </div>
+            </div>
+            <!-- Row 3 -->
+            <div class="error-row">
+              <div class="err-info">
+                <div class="err-path">/api/users/{id}/profile</div>
+                <div class="err-pct err-pct-yellow">3% 错误</div>
+              </div>
+              <div class="err-bar-wrap">
+                <div class="err-bar" style="--w:3%">
+                  <div class="err-seg seg-blue" style="--sw:100%">4xx</div>
+                </div>
+                <div class="err-codes">
+                  <span class="code-tag code-blue">401/403/429</span>
+                  <span class="code-tag code-gray">+2 其他</span>
+                </div>
+              </div>
+            </div>
+            <!-- Footer -->
+            <div class="err-footer">
+              <span class="ai-infer">
+                <span class="material-symbols-rounded">psychology</span>
+                AI推断：504集中在14:23后，与专线RTT相关
+              </span>
+              <a href="error-drawer.html" class="view-all-link" id="openDrawer">查看全部错误码 →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart Card -->
+    <div class="chart-card card">
+      <div class="chart-hdr">
+        <span class="material-symbols-rounded card-icon">show_chart</span>
+        <span class="card-title">P99 响应时间 &amp; 错误率 趋势</span>
+        <div class="spacer"></div>
+        <div class="chart-legend">
+          <span class="legend-dot dot-blue"></span><span>P99 (ms)</span>
+          <span class="legend-dot dot-red"></span><span>错误率 (%)</span>
+        </div>
+      </div>
+      <div class="chart-body">
+        <canvas id="trendChart"></canvas>
+        <div class="event-marker" id="eventMarker">
+          <div class="event-line"></div>
+          <div class="event-label">异常触发</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Remediation Zone -->
+    <div class="remediation-zone card">
+      <div class="remed-hdr">
+        <span class="material-symbols-rounded remed-icon">psychology</span>
+        <span class="remed-title">AI 处置建议</span>
+        <span class="badge-diag">诊断中</span>
+      </div>
+      <div class="remed-body">
+        <div class="remed-col">
+          <div class="remed-col-title">⚡ 立即</div>
+          <div class="remed-item">
+            <span class="material-symbols-rounded remed-item-icon">flash_on</span>
+            <span>启动熔断限流 — orders 接口超时率 &gt;5% 触发</span>
+          </div>
+          <div class="remed-item">
+            <span class="material-symbols-rounded remed-item-icon">timer</span>
+            <span>将超时配置从 30s 调整为 3s</span>
+          </div>
+        </div>
+        <div class="remed-col">
+          <div class="remed-col-title">📅 短期</div>
+          <div class="remed-item">
+            <span class="material-symbols-rounded remed-item-icon">cable</span>
+            <span>申请 BJ→SH 专线扩容至 2Gbps</span>
+          </div>
+          <div class="remed-item">
+            <span class="material-symbols-rounded remed-item-icon">http</span>
+            <span>orders 接口升级到 HTTP/2 多路复用</span>
+          </div>
+        </div>
+        <div class="remed-col">
+          <div class="remed-col-title">🔧 根治</div>
+          <div class="remed-item">
+            <span class="material-symbols-rounded remed-item-icon">pool</span>
+            <span>连接池最大数从 50 调整为 200</span>
+          </div>
+          <div class="remed-item">
+            <span class="material-symbols-rounded remed-item-icon">location_on</span>
+            <span>在华东部署 DB 副本，降低跨域查询</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Time Range Dropdown -->
+<div class="dropdown" id="timeDropdown">
+  <div class="dropdown-item active" data-val="最近 1 小时">最近 1 小时</div>
+  <div class="dropdown-item" data-val="最近 3 小时">最近 3 小时</div>
+  <div class="dropdown-item" data-val="最近 6 小时">最近 6 小时</div>
+  <div class="dropdown-item" data-val="最近 24 小时">最近 24 小时</div>
+  <div class="dropdown-item" data-val="自定义">自定义范围…</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
+

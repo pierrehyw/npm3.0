@@ -1,0 +1,748 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>NGPM · 网络分析</title>
+<link rel="stylesheet" href="fonts.css">
+<script src="https://unpkg.com/@antv/g6@4/dist/g6.min.js"></script>
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="ai-page.css">
+<style>
+/* 页面内补充 */
+.page-tabs { display: flex; gap: 0; padding: 0 20px; background: #fff; border-bottom: 1px solid #D0D7DE; flex-shrink: 0; }
+.page-tab { height: 54px; padding: 0 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #636C76; border-bottom: 2px solid transparent; cursor: pointer; transition: color 0.15s; text-decoration: none; }
+.page-tab:hover { color: #1F2328; }
+.page-tab.active { color: #6E40C9; border-bottom-color: #6E40C9; }
+.page-tab .material-symbols-rounded { font-size: 16px; flex-shrink: 0; }
+.page-tab-text { display: flex; flex-direction: column; gap: 1px; }
+.page-tab-main { font-size: 13px; font-weight: 500; line-height: 1.3; }
+.page-tab.active .page-tab-main { font-weight: 700; }
+.page-tab-sub { font-size: 10px; color: #8C959F; font-weight: 400; white-space: nowrap; }
+.page-tab.active .page-tab-sub { color: #9B72E6; }
+
+/* === P1: AI助手三卡片导航大厅 === */
+.ai-hub-section { display: flex; flex-direction: column; gap: 0; }
+.ai-hub-status {
+  display: flex; align-items: center; gap: 6px;
+  padding: 2px 4px 10px;
+  font-size: 12px; color: #636C76;
+}
+.hub-status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #1A7F37; display: inline-block; flex-shrink: 0;
+  animation: hub-pulse 2s infinite;
+}
+@keyframes hub-pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+.hub-status-alert { color: #CF222E; font-weight: 600; }
+.ai-hub-cards {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+}
+.hub-card {
+  border: 1px solid #D0D7DE; border-radius: 10px;
+  padding: 13px 14px; display: flex; flex-direction: column; gap: 9px;
+  background: #fff; transition: box-shadow 0.15s;
+}
+.hub-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+.hub-card--fault  { border-color: #FFCECE; background: #FFF8F8; }
+.hub-card--traffic{ border-color: #FFE4A3; background: #FFFDF5; }
+.hub-card--topo   { border-color: #B6E3FF; background: #F0F8FF; }
+.hub-card-header  { display: flex; align-items: center; gap: 7px; }
+.hub-card-icon    { font-size: 18px; }
+.hub-card--fault   .hub-card-icon { color: #CF222E; }
+.hub-card--traffic .hub-card-icon { color: #D09B00; }
+.hub-card--topo    .hub-card-icon { color: #0969DA; }
+.hub-card-title   { font-size: 13px; font-weight: 700; color: #1F2328; flex: 1; }
+.hub-card-badge {
+  background: #CF222E; color: #fff;
+  border-radius: 10px; font-size: 11px; font-weight: 700;
+  padding: 1px 6px; line-height: 16px;
+}
+.hub-card-stats { display: flex; gap: 10px; }
+.hub-stat { flex: 1; }
+.hub-stat-value { font-size: 19px; font-weight: 700; color: #1F2328; line-height: 1.2; }
+.hub-stat-value.warn { color: #D09B00; font-size: 14px; }
+.hub-stat-label { font-size: 11px; color: #636C76; margin-top: 1px; }
+.hub-card-latest {
+  display: flex; align-items: flex-start; gap: 5px;
+  font-size: 11px; color: #636C76;
+  background: rgba(0,0,0,0.03); border-radius: 6px;
+  padding: 5px 8px; line-height: 1.4;
+}
+.hub-card-latest .material-symbols-rounded { flex-shrink: 0; margin-top: 1px; }
+.hub-card-btn {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 7px 10px; border-radius: 7px;
+  font-size: 12px; font-weight: 600;
+  text-decoration: none; transition: opacity 0.15s; margin-top: 2px;
+}
+.hub-card-btn:hover { opacity: 0.82; }
+.hub-card-btn .material-symbols-rounded { font-size: 15px; }
+.hub-card-btn--fault   { background: #CF222E; color: #fff; }
+.hub-card-btn--traffic { background: #9B5800; color: #fff; }
+.hub-card-btn--topo    { background: #0969DA; color: #fff; }
+.ai-hub-divider {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 4px 4px;
+  font-size: 11px; color: #8C959F; flex-shrink: 0;
+}
+.ai-hub-divider::before, .ai-hub-divider::after {
+  content: ''; flex: 1; height: 1px; background: #D0D7DE;
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Sidebar ─────────────────────────────────────────── -->
+  <aside class="sidebar secondary-rail">
+    <div class="secondary-rail-title" aria-hidden="true"><span class="material-symbols-rounded">subdirectory_arrow_right</span></div>
+    <div class="page-tabs">
+      <a href="network.html" class="page-tab active">
+        <span class="material-symbols-rounded">psychology</span>
+        <span class="page-tab-text"><span class="page-tab-main">AI 网络助手</span><span class="page-tab-sub">不确定？从这里开始</span></span>
+      </a>
+      <a href="topology.html" class="page-tab">
+        <span class="material-symbols-rounded">account_tree</span>
+        <span class="page-tab-text"><span class="page-tab-main">网络拓扑</span><span class="page-tab-sub">结构 · 路径 · 会话追踪</span></span>
+      </a>
+      <a href="traffic.html" class="page-tab">
+        <span class="material-symbols-rounded">stacked_line_chart</span>
+        <span class="page-tab-text"><span class="page-tab-main">流量分析</span><span class="page-tab-sub">带宽 · TopN · 会话 · 协议</span></span>
+      </a>
+      <a href="dashboard.html?goto=ops-fault" class="page-tab">
+        <span class="material-symbols-rounded">bug_report</span>
+        <span class="page-tab-text"><span class="page-tab-main">故障分析</span><span class="page-tab-sub">告警 · 根因 · 影响范围</span></span>
+      </a>
+    </div>
+  </aside>
+<!-- ── Main ───────────────────────────────────────────── -->
+  <main class="main">
+    <header class="top-header">
+      <a class="header-brand" href="dashboard.html">
+        <span class="material-symbols-rounded logo-icon">hub</span>
+        <span class="logo-text">NGPM</span>
+      </a>
+      <nav class="top-primary-nav">
+        <div class="nav-list">
+          <a href="dashboard.html" class="nav-item"><span class="material-symbols-rounded">dashboard</span><span>总览</span></a>
+          <a href="network.html" class="nav-item active"><span class="material-symbols-rounded">account_tree</span><span>网络</span></a>
+          <a href="app.html" class="nav-item"><span class="material-symbols-rounded">apps</span><span>应用</span></a>
+          <a href="security.html" class="nav-item"><span class="material-symbols-rounded">security</span><span>安全</span></a>
+          <a href="assets.html" class="nav-item"><span class="material-symbols-rounded">inventory_2</span><span>资产</span></a>
+          <a href="policy.html" class="nav-item"><span class="material-symbols-rounded">bolt</span><span>策略</span></a>
+          <a href="#" class="nav-item nav-settings"><span class="material-symbols-rounded">settings</span><span>设置</span></a>
+        </div>
+      </nav>
+      <div class="header-divider"></div>
+      <span class="material-symbols-rounded page-icon">account_tree</span>
+      <span class="page-title">网络分析</span>
+      <div class="header-spacer"></div>
+      <button class="btn-secondary time-btn">
+        <span class="material-symbols-rounded">schedule</span>
+        <span>今日</span>
+        <span class="material-symbols-rounded">expand_more</span>
+      </button>
+      <button class="btn-bell" onclick="location.href='dashboard.html?goto=ops-fault'" title="查看故障告警">
+        <span class="material-symbols-rounded">notifications</span>
+        <span class="bell-badge">5</span>
+      </button>
+      <button class="btn-ai" id="btnCopilot">
+        <span class="material-symbols-rounded ai-spark">psychology</span>
+        <span>AI Copilot</span>
+      </button>
+    </header>
+
+    <!-- 子页签 -->
+<!-- ── AI 三栏布局 ─────────────────────────────────── -->
+    <div class="ai-page-layout">
+
+      <!-- 左：AI 事件面板 -->
+      <div class="ai-event-panel">
+        <div class="aep-header">
+          <span class="material-symbols-rounded" style="color:#CF222E;font-size:16px;font-variation-settings:'FILL' 1">warning</span>
+          <span class="aep-title">活跃网络事件</span>
+          <span class="aep-badge">5</span>
+        </div>
+        <div class="aep-body">
+
+          <div class="ai-event-card severity-crit" data-scenario="sw-core-02">
+            <div class="ec-top">
+              <span class="ec-sev crit">CRIT</span>
+              <span class="ec-device">SW-Core-02</span>
+              <span class="ec-time">14:03</span>
+            </div>
+            <div class="ec-desc">热降频触发，CPU效能降至60%。核心交换机处理能力受损，已影响 VLAN 100/200 转发延迟。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-q="SW-Core-02 热降频的根因是什么，如何快速恢复？">
+                <span class="material-symbols-rounded">help_outline</span>
+                <span class="ec-q-text">热降频根因是什么？如何快速恢复？</span>
+              </div>
+              <div class="ec-q" data-q="SW-Core-02 故障影响了哪些业务？">
+                <span class="material-symbols-rounded">help_outline</span>
+                <span class="ec-q-text">影响了哪些业务系统？</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-warn" data-scenario="wan-01">
+            <div class="ec-top">
+              <span class="ec-sev warn">WARN</span>
+              <span class="ec-device">WAN-01</span>
+              <span class="ec-time">13:45</span>
+            </div>
+            <div class="ec-desc">互联网出口带宽利用率 84%，48h 内趋势预测将达 91%，存在拥塞风险。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-q="WAN-01 带宽告警如何处理，有哪些调度建议？">
+                <span class="material-symbols-rounded">help_outline</span>
+                <span class="ec-q-text">带宽预警如何处理？有哪些调度建议？</span>
+              </div>
+              <div class="ec-q" data-q="哪些流量占用了 WAN-01 最多带宽？">
+                <span class="material-symbols-rounded">help_outline</span>
+                <span class="ec-q-text">哪些流量占用了最多带宽？</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-warn" data-scenario="vlan100">
+            <div class="ec-top">
+              <span class="ec-sev warn">WARN</span>
+              <span class="ec-device">VLAN100</span>
+              <span class="ec-time">14:15</span>
+            </div>
+            <div class="ec-desc">生产 VLAN 东西向延迟上升至 18ms（正常 &lt;5ms），与 SW-Core-02 热降频关联。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-q="VLAN100 延迟与 SW-Core-02 故障的关联分析">
+                <span class="material-symbols-rounded">help_outline</span>
+                <span class="ec-q-text">VLAN100 延迟与 SW-Core-02 故障关联分析</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-warn" data-scenario="iscsi">
+            <div class="ec-top">
+              <span class="ec-sev warn">WARN</span>
+              <span class="ec-device">iSCSI-02</span>
+              <span class="ec-time">13:20</span>
+            </div>
+            <div class="ec-desc">存储网络链路利用率 76%，超历史基线。I/O 延迟增加，建议检查存储路径冗余。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-q="iSCSI-02 存储链路过载如何优化？">
+                <span class="material-symbols-rounded">help_outline</span>
+                <span class="ec-q-text">iSCSI-02 存储链路过载如何优化？</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-info" data-scenario="topo">
+            <div class="ec-top">
+              <span class="ec-sev info">INFO</span>
+              <span class="ec-device">全网拓扑</span>
+              <span class="ec-time">14:00</span>
+            </div>
+            <div class="ec-desc">AI 自动发现 2 台新接入设备（AGG-04、AP-305），已更新拓扑。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-q="显示全网拓扑，标注当前故障节点">
+                <span class="material-symbols-rounded">help_outline</span>
+                <span class="ec-q-text">显示全网拓扑，标注当前故障节点</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 中：AI 对话 + 报告 -->
+      <div class="ai-main-panel">
+
+        <div class="ai-chat-area" id="chatArea">
+
+          <!-- P1: 三场景导航卡大厅 -->
+          <div class="ai-hub-section">
+            <div class="ai-hub-status">
+              <span class="hub-status-dot"></span>
+              AI 已接入监控数据 &nbsp;·&nbsp;
+              <span class="hub-status-alert">5 个活跃告警，1 个严重</span>
+              &nbsp;·&nbsp; 今日 14:15
+            </div>
+            <div class="ai-hub-cards">
+
+              <!-- 故障分析卡 -->
+              <div class="hub-card hub-card--fault">
+                <div class="hub-card-header">
+                  <span class="material-symbols-rounded hub-card-icon" style="font-variation-settings:'FILL' 1">bug_report</span>
+                  <span class="hub-card-title">有告警要处理</span>
+                  <span class="hub-card-badge">5</span>
+                </div>
+                <div class="hub-card-stats">
+                  <div class="hub-stat">
+                    <div class="hub-stat-value">5</div>
+                    <div class="hub-stat-label">活跃告警</div>
+                  </div>
+                  <div class="hub-stat">
+                    <div class="hub-stat-value warn">1 严重</div>
+                    <div class="hub-stat-label">需立即处置</div>
+                  </div>
+                </div>
+                <div class="hub-card-latest">
+                  <span class="material-symbols-rounded" style="font-size:12px;color:#CF222E;font-variation-settings:'FILL' 1">circle</span>
+                  SW-Core-02 · 热降频 · CPU 60%
+                </div>
+                <a href="dashboard.html?goto=ops-fault" class="hub-card-btn hub-card-btn--fault">
+                  进入故障分析<span class="material-symbols-rounded">arrow_forward</span>
+                </a>
+              </div>
+
+              <!-- 流量分析卡 -->
+              <div class="hub-card hub-card--traffic">
+                <div class="hub-card-header">
+                  <span class="material-symbols-rounded hub-card-icon">stacked_line_chart</span>
+                  <span class="hub-card-title">看流量 / 容量</span>
+                </div>
+                <div class="hub-card-stats">
+                  <div class="hub-stat">
+                    <div class="hub-stat-value">4.82 <small style="font-size:12px;font-weight:400">Gbps</small></div>
+                    <div class="hub-stat-label">当前全网流量</div>
+                  </div>
+                  <div class="hub-stat">
+                    <div class="hub-stat-value warn">WAN 84%</div>
+                    <div class="hub-stat-label">出口利用率</div>
+                  </div>
+                </div>
+                <div class="hub-card-latest">
+                  <span class="material-symbols-rounded" style="font-size:12px;color:#D09B00;font-variation-settings:'FILL' 1">warning</span>
+                  WAN-01 · 预测 48h 达 91%，建议处置
+                </div>
+                <a href="traffic.html" class="hub-card-btn hub-card-btn--traffic">
+                  进入流量分析<span class="material-symbols-rounded">arrow_forward</span>
+                </a>
+              </div>
+
+              <!-- 网络拓扑卡 -->
+              <div class="hub-card hub-card--topo">
+                <div class="hub-card-header">
+                  <span class="material-symbols-rounded hub-card-icon">account_tree</span>
+                  <span class="hub-card-title">理解网络结构</span>
+                </div>
+                <div class="hub-card-stats">
+                  <div class="hub-stat">
+                    <div class="hub-stat-value">87</div>
+                    <div class="hub-stat-label">在线设备</div>
+                  </div>
+                  <div class="hub-stat">
+                    <div class="hub-stat-value" style="font-size:14px;color:#0969DA;font-weight:700">+2 台</div>
+                    <div class="hub-stat-label">今日新增发现</div>
+                  </div>
+                </div>
+                <div class="hub-card-latest">
+                  <span class="material-symbols-rounded" style="font-size:12px;color:#1A7F37;font-variation-settings:'FILL' 1">check_circle</span>
+                  AGG-04、AP-305 已自动纳入监控
+                </div>
+                <a href="topology.html" class="hub-card-btn hub-card-btn--topo">
+                  进入网络拓扑<span class="material-symbols-rounded">arrow_forward</span>
+                </a>
+              </div>
+
+            </div><!-- /ai-hub-cards -->
+          </div><!-- /ai-hub-section -->
+
+          <div class="ai-hub-divider">或者，直接向 AI 提问深入分析</div>
+
+          <div class="ai-welcome" style="padding:10px 14px;gap:10px">
+            <span class="material-symbols-rounded ai-welcome-icon" style="font-size:24px;font-variation-settings:'FILL' 1">psychology</span>
+            <div class="ai-welcome-content">
+              <div class="ai-welcome-title" style="font-size:13px">AI 深度分析随时待命</div>
+              <div class="ai-welcome-desc" style="font-size:12px">
+                可针对具体设备、链路或事件进行根因分析、影响评估和处置建议。点击上方卡片直接进入对应模块，或在下方输入框描述你的问题。
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 快捷场景 -->
+        <div class="ai-quick-scenarios">
+          <button class="ai-scenario-btn" data-scenario="topo">
+            <span class="material-symbols-rounded">account_tree</span>显示全网拓扑
+          </button>
+          <button class="ai-scenario-btn" data-scenario="sw-core-02">
+            <span class="material-symbols-rounded">crisis_alert</span>SW-Core-02 根因分析
+          </button>
+          <button class="ai-scenario-btn" data-scenario="wan-01">
+            <span class="material-symbols-rounded">stacked_line_chart</span>WAN-01 流量分析
+          </button>
+          <button class="ai-scenario-btn" data-scenario="capacity">
+            <span class="material-symbols-rounded">analytics</span>容量预测报告
+          </button>
+        </div>
+
+        <!-- 输入框 -->
+        <div class="ai-input-bar">
+          <div class="ai-input-wrap">
+            <textarea class="ai-input" id="chatInput" rows="1" placeholder="输入问题，例如：分析 SW-Core-02 热降频的影响范围…"></textarea>
+            <button class="ai-send-btn" id="sendBtn">
+              <span class="material-symbols-rounded">send</span>
+            </button>
+          </div>
+          <span class="ai-input-hint">Enter 发送 · Shift+Enter 换行</span>
+        </div>
+      </div>
+
+      <!-- 右：摘要面板 -->
+      <div class="ai-summary-panel">
+        <div class="asp-header">
+          <span class="material-symbols-rounded" style="color:#6E40C9;font-size:16px;font-variation-settings:'FILL' 1">monitoring</span>
+          <span class="asp-title">网络健康摘要</span>
+        </div>
+        <div class="asp-body">
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">受影响链路</div>
+            <div class="asp-stat-value red">3 条</div>
+            <div class="asp-stat-sub">共监控 24 条链路</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">互联网出口利用率</div>
+            <div class="asp-stat-value yellow">84%</div>
+            <div class="asp-stat-sub">WAN-01 · 预测 48h 达 91%</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">平均包转发延迟</div>
+            <div class="asp-stat-value yellow">18 ms</div>
+            <div class="asp-stat-sub">正常基线 &lt; 5ms</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">设备可用率</div>
+            <div class="asp-stat-value green">97.4%</div>
+            <div class="asp-stat-sub">1 台严重故障</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#1F2328;padding:4px 0 2px">活跃告警</div>
+          <div class="asp-alert-list">
+            <div class="asp-alert-item" data-scenario="sw-core-02">
+              <div class="asp-alert-dot crit"></div>
+              <div class="asp-alert-content">
+                <div class="asp-alert-device">SW-Core-02</div>
+                <div class="asp-alert-desc">热降频 · CPU 效能 60%</div>
+              </div>
+            </div>
+            <div class="asp-alert-item" data-scenario="wan-01">
+              <div class="asp-alert-dot warn"></div>
+              <div class="asp-alert-content">
+                <div class="asp-alert-device">WAN-01</div>
+                <div class="asp-alert-desc">带宽 84% · 接近阈值</div>
+              </div>
+            </div>
+            <div class="asp-alert-item" data-scenario="vlan100">
+              <div class="asp-alert-dot warn"></div>
+              <div class="asp-alert-content">
+                <div class="asp-alert-device">VLAN100</div>
+                <div class="asp-alert-desc">东西向延迟 18ms</div>
+              </div>
+            </div>
+            <div class="asp-alert-item" data-scenario="iscsi">
+              <div class="asp-alert-dot warn"></div>
+              <div class="asp-alert-content">
+                <div class="asp-alert-device">iSCSI-02</div>
+                <div class="asp-alert-desc">存储链路 76%</div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#1F2328;padding:4px 0 2px">AI 建议</div>
+          <div style="background:#FFF8C5;border:1px solid #D09B00;border-radius:8px;padding:10px 12px;font-size:12px;color:#6A4800;line-height:1.6">
+            <strong>⚡ 立即操作：</strong>对 SW-Core-02 降低工作时钟或迁移关键 VLAN 至 SW-Core-01，恢复转发能力。
+          </div>
+          <div style="background:#DDF4FF;border:1px solid #0969DA;border-radius:8px;padding:10px 12px;font-size:12px;color:#0550AE;line-height:1.6">
+            <strong>📊 中期优化：</strong>建议开启 SD-WAN 流量调度策略，将超量流量分流至 WAN-02 备用链路。
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ai-page-layout -->
+  </main>
+</div>
+
+<script>
+// ── 分析报告数据 ────────────────────────────────────────
+var SCENARIOS = {
+  'sw-core-02': {
+    title: 'SW-Core-02 热降频根因分析报告',
+    icon: 'crisis_alert',
+    question: 'SW-Core-02 热降频的根因是什么，如何快速恢复？',
+    answer: `根据 SNMP 采集数据，<strong>SW-Core-02</strong> 于 <strong>14:03</strong> 触发热降频保护机制，CPU 工作频率下降至额定值的 60%。\n\n<strong>根因分析：</strong>\n• 机柜进风口温度 42°C（阈值 40°C），原因是精密空调 CRAC-B2 制冷能力于 13:50 降低 30%\n• CPU 温度传感器读数 78°C，触发 BIOS 热保护降频\n• 受影响 VLAN：100、200、300，东西向延迟从 3ms 升至 18ms\n\n<strong>处置建议：</strong>\n1. 立即检查 CRAC-B2 制冷单元，临时开启备用 CRAC-B3\n2. 将 VLAN 100/200 流量迁移至 SW-Core-01（当前负载 62%，有余量）\n3. 预计恢复时间：15-30 分钟`,
+    kpis: [
+      { label: 'CPU 效能', value: '60%', color: 'red', sub: '热降频中' },
+      { label: '机柜温度', value: '42°C', color: 'red', sub: '阈值 40°C' },
+      { label: '影响 VLAN', value: '3 个', color: 'yellow', sub: '100/200/300' },
+      { label: '延迟增幅', value: '+500%', color: 'red', sub: '3ms → 18ms' }
+    ],
+    timeline: [
+      { time: '13:50', text: 'CRAC-B2 制冷单元制冷能力下降 30%，机柜温度开始上升', sev: 'warn' },
+      { time: '13:58', text: 'SW-Core-02 CPU 温度达到 72°C，触发第一级温控告警', sev: 'warn' },
+      { time: '14:03', text: 'CPU 温度达 78°C，BIOS 热保护触发，降频至 60%', sev: 'crit' },
+      { time: '14:05', text: 'VLAN 100/200 东西向延迟从 3ms 升至 18ms，引发下游告警', sev: 'crit' },
+      { time: '14:08', text: 'AI 系统检测到关联告警链，自动生成本分析报告', sev: 'info' }
+    ],
+    showTopo: true
+  },
+  'wan-01': {
+    title: 'WAN-01 流量容量分析报告',
+    icon: 'stacked_line_chart',
+    question: 'WAN-01 带宽告警如何处理，有哪些调度建议？',
+    answer: `<strong>WAN-01</strong> 互联网出口当前带宽利用率 <strong>84%</strong>，基于过去 30 天趋势，AI 预测 <strong>48 小时内将达 91%</strong>，超过触发服务降级的阈值（90%）。\n\n<strong>流量构成（Top 3）：</strong>\n• HTTPS 业务流量：48%（正常增长）\n• VM-Prod-047 DNS 查询异常：21%（疑似 APT C2，已单独告警）\n• BACKUP-SRV rsync 备份：12%（占用过高，建议限速）\n\n<strong>建议措施：</strong>\n1. 立即：对 BACKUP-SRV rsync 实施 QoS 限速（限制 200Mbps），可释放约 8% 带宽\n2. 短期：开启 SD-WAN 策略，将 HTTPS 非关键业务分流至 WAN-02\n3. 紧急：隔离 VM-Prod-047 的异常 DNS 流量（安全团队跟进）`,
+    kpis: [
+      { label: '当前利用率', value: '84%', color: 'yellow', sub: '阈值 90%' },
+      { label: '48h 预测', value: '91%', color: 'red', sub: '将超阈值' },
+      { label: '异常流量', value: '21%', color: 'red', sub: 'DNS 隧道疑似' },
+      { label: '可释放带宽', value: '~8%', color: 'green', sub: 'QoS 限速后' }
+    ],
+    timeline: [
+      { time: '昨日 09:00', text: '带宽利用率开始持续上升，偏离历史基线', sev: 'info' },
+      { time: '13:45', text: '利用率突破 80% 阈值，触发告警。AI 识别 VM-Prod-047 DNS 异常流量', sev: 'warn' },
+      { time: '14:10', text: 'AI 预测分析完成，预计 48h 后达 91%，生成本报告', sev: 'warn' },
+      { time: '建议操作', text: '对 BACKUP-SRV rsync 实施 QoS 限速 200Mbps，并开启 SD-WAN 分流', sev: 'ok' }
+    ],
+    showTopo: false
+  },
+  'topo': {
+    title: '全网拓扑状态报告',
+    icon: 'account_tree',
+    question: '显示全网拓扑，标注当前故障节点',
+    answer: `当前全网共监控 <strong>87 台</strong>设备，分布于主数据中心（DC-A）、灾备中心（DC-B）、边缘节点（PoP-C）。\n\n<strong>健康状态概览：</strong>\n• 正常：82 台（94.3%）\n• 告警：4 台（4.6%）\n• 严重故障：1 台（1.1%）— SW-Core-02\n\n<strong>拓扑变化：</strong>AI 自动发现 AGG-04、AP-305 两台新接入设备，已纳入监控体系。DC-A ↔ DC-B 骨干链路（MPLS 100G）状态正常，延迟 3.2ms。`,
+    kpis: [
+      { label: '在线设备', value: '87台', color: '', sub: '主数据中心' },
+      { label: '严重故障', value: '1台', color: 'red', sub: 'SW-Core-02' },
+      { label: '告警设备', value: '4台', color: 'yellow', sub: '' },
+      { label: '骨干链路', value: '100G', color: 'green', sub: 'DC-A ↔ DC-B' }
+    ],
+    timeline: [
+      { time: '14:08', text: 'AI 发现新设备 AGG-04（接入层），已自动纳入监控', sev: 'info' },
+      { time: '14:05', text: 'SW-Core-02 热降频，拓扑图节点变为严重状态（红色）', sev: 'crit' },
+      { time: '13:45', text: 'WAN-01 带宽告警，边界路由器节点变为警告状态（黄色）', sev: 'warn' },
+      { time: '07:30', text: '每日巡检完成，全网拓扑基线已更新', sev: 'ok' }
+    ],
+    showTopo: true
+  },
+  'vlan100': {
+    title: 'VLAN100 延迟关联分析报告',
+    icon: 'timeline',
+    question: 'VLAN100 延迟与 SW-Core-02 故障的关联分析',
+    answer: `AI 关联分析确认：<strong>VLAN100 延迟升高（3ms → 18ms）</strong>与 <strong>SW-Core-02 热降频</strong>高度相关（相关系数 0.97）。\n\n<strong>影响链路：</strong>\n• VLAN100（生产服务器区）→ SW-Core-02 → iSCSI-SAN：延迟 18ms\n• VLAN200（虚拟化平台）→ SW-Core-02 → WAN-01：延迟 14ms\n\n<strong>建议：</strong>将 VLAN100 流量迁移至 SW-Core-01 处理，预计延迟可恢复至 4ms 以内。`,
+    kpis: [
+      { label: 'VLAN100 延迟', value: '18ms', color: 'red', sub: '正常 < 5ms' },
+      { label: '关联系数', value: '0.97', color: 'red', sub: '与 SW-Core-02' },
+      { label: '影响 IP 数', value: '156', color: 'yellow', sub: '10.100.x.x/24' },
+      { label: '恢复预期', value: '4ms', color: 'green', sub: '迁移后' }
+    ],
+    timeline: [
+      { time: '14:03', text: 'SW-Core-02 热降频触发', sev: 'crit' },
+      { time: '14:05', text: 'VLAN100 延迟从 3ms 升至 18ms（+500%）', sev: 'crit' },
+      { time: '14:07', text: '下游 APP-SRV-01 响应时间从 120ms 升至 340ms', sev: 'warn' },
+      { time: '建议', text: '迁移 VLAN100 至 SW-Core-01，解除与故障设备的耦合', sev: 'ok' }
+    ],
+    showTopo: false
+  },
+  'iscsi': {
+    title: 'iSCSI-02 存储链路分析报告',
+    icon: 'storage',
+    question: 'iSCSI-02 存储链路过载如何优化？',
+    answer: `<strong>iSCSI-02</strong> 存储网络当前利用率 <strong>76%</strong>，超过 30 天历史均值（52%）。主要由以下因素导致：\n\n• BACKUP-SRV 夜间备份任务提前至白天运行（原因：策略配置错误）\n• VM-Prod-047 异常 I/O 写入（可能与安全事件相关）\n\n<strong>建议：</strong>\n1. 修正 BACKUP-SRV 备份调度策略，恢复至 00:00-06:00 时间窗\n2. 对 VM-Prod-047 实施存储 I/O QoS 限制，待安全确认后解除\n3. 建议启用存储链路 MPIO 多路径，提升冗余度`,
+    kpis: [
+      { label: 'iSCSI 利用率', value: '76%', color: 'yellow', sub: '均值 52%' },
+      { label: '主要贡献', value: 'rsync', color: 'yellow', sub: 'BACKUP-SRV' },
+      { label: 'I/O 延迟', value: '8ms', color: 'yellow', sub: '正常 < 3ms' },
+      { label: '冗余路径', value: '×1', color: 'red', sub: '建议 MPIO×2' }
+    ],
+    timeline: [
+      { time: '11:00', text: 'BACKUP-SRV rsync 任务提前启动（策略配置错误）', sev: 'warn' },
+      { time: '13:20', text: 'iSCSI-02 利用率超 75% 阈值，触发告警', sev: 'warn' },
+      { time: '建议1', text: '立即：修正备份调度策略至 00:00-06:00 时间窗', sev: 'ok' },
+      { time: '建议2', text: '短期：启用 MPIO 多路径，提升存储链路冗余', sev: 'info' }
+    ],
+    showTopo: false
+  },
+  'capacity': {
+    title: '网络容量预测报告（未来 30 天）',
+    icon: 'analytics',
+    question: '未来 30 天网络容量预测如何？',
+    answer: `基于过去 90 天流量趋势，AI 预测以下容量瓶颈将在 <strong>30 天内出现</strong>：\n\n<strong>风险项目：</strong>\n• <strong>WAN-01（高风险）</strong>：48h 内达 91%，30 天内将满载\n• <strong>iSCSI-02（中风险）</strong>：数据增长率 15%/月，60 天内需扩容\n• <strong>SW-Core-02（低风险）</strong>：故障恢复后，建议进行固件升级以优化散热管理\n\n<strong>建议采购/配置计划：</strong>\n1. WAN-01 升级至 2Gbps 或启用 SD-WAN（预算参考：2.4万元/年）\n2. iSCSI 扩容一块 20TB SAS 磁盘（预算：1.8万元）\n3. 为 SW-Core-02 机柜增加辅助散热（预算：0.3万元）`,
+    kpis: [
+      { label: 'WAN-01 风险', value: '高', color: 'red', sub: '48h 内超阈值' },
+      { label: 'iSCSI 风险', value: '中', color: 'yellow', sub: '60d 内需扩容' },
+      { label: '预算估算', value: '4.5万', color: '', sub: '综合优化方案' },
+      { label: 'AI 置信度', value: '89%', color: 'green', sub: '基于 90d 数据' }
+    ],
+    timeline: [
+      { time: '48h 后', text: 'WAN-01 带宽预测达 91%，建议本周完成 QoS 限速配置', sev: 'crit' },
+      { time: '7d 后', text: '若未干预，WAN-01 将影响关键业务 SLA', sev: 'warn' },
+      { time: '30d 后', text: 'iSCSI-02 增长趋势下需扩容，建议提前采购', sev: 'warn' },
+      { time: '60d 后', text: 'iSCSI-02 容量将接近满载，严重影响备份和虚机 I/O', sev: 'crit' }
+    ],
+    showTopo: false
+  }
+};
+
+// ── G6 拓扑（简化版） ────────────────────────────────────
+function renderReportTopo(containerId) {
+  var container = document.getElementById(containerId);
+  if (!container || typeof G6 === 'undefined') return;
+  container.innerHTML = '';
+  var W = container.offsetWidth || 520, H = 240;
+
+  var nodes = [
+    { id: 'wan1', x: W*0.12, y: H*0.35, label: 'WAN-01', status: 'warn', type: 'router' },
+    { id: 'wan2', x: W*0.12, y: H*0.65, label: 'WAN-02', status: 'ok',   type: 'router' },
+    { id: 'core1', x: W*0.38, y: H*0.35, label: 'SW-Core-01', status: 'ok',   type: 'switch' },
+    { id: 'core2', x: W*0.38, y: H*0.65, label: 'SW-Core-02', status: 'crit', type: 'switch' },
+    { id: 'agg1',  x: W*0.62, y: H*0.25, label: 'AGG-01', status: 'ok',   type: 'switch' },
+    { id: 'agg2',  x: W*0.62, y: H*0.75, label: 'AGG-02', status: 'ok',   type: 'switch' },
+    { id: 'srv',   x: W*0.88, y: H*0.35, label: 'SRV区',  status: 'ok',   type: 'server' },
+    { id: 'san',   x: W*0.88, y: H*0.65, label: 'iSCSI',  status: 'warn', type: 'storage' }
+  ];
+  var colorMap = { ok:'#1A7F37', warn:'#D09B00', crit:'#CF222E' };
+  nodes.forEach(function(n) {
+    n.style = {
+      fill: n.status==='crit' ? '#FFEBE9' : n.status==='warn' ? '#FFF8C5' : '#DAFBE1',
+      stroke: colorMap[n.status], lineWidth: 2, r: 18
+    };
+    n.labelCfg = { style: { fontSize: 10, fill: '#E6EDF3', fontFamily:'Inter' } };
+    n.size = 36;
+    n.type = 'circle';
+  });
+  var edges = [
+    { source:'wan1', target:'core1' }, { source:'wan2', target:'core1' },
+    { source:'wan2', target:'core2' }, { source:'core1', target:'core2', label:'互联' },
+    { source:'core1', target:'agg1' }, { source:'core2', target:'agg2', style:{stroke:'#CF222E',lineDash:[4,3]} },
+    { source:'agg1',  target:'srv'  }, { source:'agg2',  target:'san'  }
+  ];
+  edges.forEach(function(e) {
+    if (!e.style) e.style = { stroke:'#58A6FF', lineWidth:1.5, opacity:0.7 };
+    e.labelCfg = { style: { fontSize:9, fill:'#8B949E' } };
+  });
+
+  var g = new G6.Graph({
+    container: containerId, width: W, height: H, renderer: 'svg', fitView: false,
+    modes: { default: [] }, minZoom: 1, maxZoom: 1,
+    defaultNode: { type:'circle' },
+    defaultEdge: { type:'line' },
+    nodeStateStyles: {}, edgeStateStyles: {}
+  });
+  g.data({ nodes: nodes, edges: edges });
+  g.render();
+}
+
+// ── 渲染分析报告 ──────────────────────────────────────────
+function renderReport(key) {
+  var s = SCENARIOS[key];
+  if (!s) return;
+  var chatArea = document.getElementById('chatArea');
+
+  // 用户消息
+  var userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.innerHTML = '<div class="chat-avatar user-av"><span class="material-symbols-rounded">person</span></div><div class="chat-bubble user-bubble">' + s.question + '</div>';
+  chatArea.appendChild(userMsg);
+
+  // AI 回答
+  var aiMsg = document.createElement('div');
+  aiMsg.className = 'chat-msg';
+  aiMsg.innerHTML = '<div class="chat-avatar ai-av"><span class="material-symbols-rounded" style="font-variation-settings:\'FILL\' 1">psychology</span></div><div class="chat-bubble ai-bubble typing-cursor" id="aiTyping"></div>';
+  chatArea.appendChild(aiMsg);
+  chatArea.scrollTop = chatArea.scrollHeight;
+
+  var typingEl = document.getElementById('aiTyping');
+  var fullText = s.answer;
+  var idx = 0;
+  function typeNext() {
+    if (idx < fullText.length) {
+      typingEl.innerHTML = fullText.slice(0, idx + 1).replace(/\n/g, '<br>') + '<span class="typing-cursor"></span>';
+      idx += 3;
+      setTimeout(typeNext, 18);
+    } else {
+      typingEl.innerHTML = fullText.replace(/\n/g, '<br>');
+      renderFullReport(key, chatArea);
+    }
+  }
+  setTimeout(typeNext, 300);
+}
+
+function renderFullReport(key, chatArea) {
+  var s = SCENARIOS[key];
+  var rpt = document.createElement('div');
+  rpt.className = 'analysis-report';
+
+  // Header
+  var kpiHtml = s.kpis.map(function(k){
+    return '<div class="report-kpi"><div class="rkpi-label">'+k.label+'</div><div class="rkpi-value '+k.color+'">'+k.value+'</div><div class="rkpi-sub">'+k.sub+'</div></div>';
+  }).join('');
+
+  // Timeline
+  var tlHtml = s.timeline.map(function(t, i){
+    var isLast = i === s.timeline.length - 1;
+    return '<div class="rtl-item"><div class="rtl-line"><div class="rtl-dot '+t.sev+'"></div>'+(isLast?'':'<div class="rtl-connector"></div>')+'</div><div class="rtl-body"><div class="rtl-time">'+t.time+'</div><div class="rtl-text">'+t.text+'</div></div></div>';
+  }).join('');
+
+  // Topo section
+  var topoId = 'repTopo_' + Date.now();
+  var topoHtml = s.showTopo ? '<div class="report-divider"></div><div style="font-size:12px;font-weight:700;color:#1F2328;margin-bottom:8px">网络拓扑（实时状态）</div><div class="report-topo-container" id="'+topoId+'"></div>' : '';
+
+  rpt.innerHTML = '<div class="report-header"><span class="material-symbols-rounded report-icon" style="font-variation-settings:\'FILL\' 1">'+s.icon+'</span><span class="report-title">'+s.title+'</span><span class="report-timestamp">生成于 '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+'</span></div>'
+    + '<div class="report-kpi-row">'+kpiHtml+'</div>'
+    + '<div class="report-divider"></div>'
+    + '<div style="font-size:12px;font-weight:700;color:#1F2328;margin-bottom:8px">事件时间线</div>'
+    + '<div class="report-timeline">'+tlHtml+'</div>'
+    + topoHtml;
+
+  chatArea.appendChild(rpt);
+  chatArea.scrollTop = chatArea.scrollHeight;
+
+  if (s.showTopo) {
+    setTimeout(function(){ renderReportTopo(topoId); }, 100);
+  }
+}
+
+// ── 事件绑定 ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  // 快捷场景按钮
+  document.querySelectorAll('.ai-scenario-btn[data-scenario]').forEach(function(btn){
+    btn.addEventListener('click', function(){ renderReport(this.dataset.scenario); });
+  });
+  // 事件卡片问题
+  document.querySelectorAll('.ec-q[data-q]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var q = this.dataset.q;
+      var card = this.closest('[data-scenario]');
+      var scenario = card ? card.dataset.scenario : null;
+      if (scenario) renderReport(scenario);
+    });
+  });
+  // 右侧摘要告警
+  document.querySelectorAll('.asp-alert-item[data-scenario]').forEach(function(el){
+    el.addEventListener('click', function(){ renderReport(this.dataset.scenario); });
+  });
+  // 输入框
+  var chatInput = document.getElementById('chatInput');
+  var sendBtn = document.getElementById('sendBtn');
+  function sendMessage(){
+    var q = chatInput.value.trim();
+    if (!q) return;
+    chatInput.value = '';
+    // 简单关键词匹配
+    var key = 'sw-core-02';
+    if (/wan|带宽|流量/.test(q)) key='wan-01';
+    else if (/拓扑|全网/.test(q)) key='topo';
+    else if (/vlan|延迟/.test(q)) key='vlan100';
+    else if (/iscsi|存储/.test(q)) key='iscsi';
+    else if (/容量|预测/.test(q)) key='capacity';
+    renderReport(key);
+  }
+  sendBtn.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keydown', function(e){
+    if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); }
+  });
+  // 自动调整高度
+  chatInput.addEventListener('input', function(){
+    this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px';
+  });
+});
+</script>
+</body>
+</html>

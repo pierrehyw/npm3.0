@@ -1,0 +1,324 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>NGPM · 策略管理</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="ai-page.css">
+<style>
+.page-tabs{display:flex;gap:0;padding:0 20px;background:#fff;border-bottom:1px solid #D0D7DE;flex-shrink:0}
+.page-tab{height:42px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:13px;color:#636C76;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s;text-decoration:none}
+.page-tab:hover{color:#1F2328}
+.page-tab.active{color:#6E40C9;border-bottom-color:#6E40C9;font-weight:600}
+.page-tab .material-symbols-rounded{font-size:15px}
+/* 策略规则表格 */
+.policy-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px}
+.policy-table th{text-align:left;padding:4px 8px;background:#F6F8FA;color:#636C76;font-weight:600;border-bottom:1px solid #D0D7DE;white-space:nowrap}
+.policy-table td{padding:5px 8px;border-bottom:1px solid #F0F3F6;color:#1F2328;font-family:'Geist Mono',monospace;font-size:10px}
+.policy-table tr:last-child td{border-bottom:none}
+.ptag{display:inline-flex;align-items:center;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;text-transform:uppercase;font-family:Inter,sans-serif}
+.ptag.allow{background:#DAFBE1;color:#1A7F37}
+.ptag.deny{background:#FFEBE9;color:#CF222E}
+.ptag.conflict{background:#FFF8C5;color:#8B6400}
+.ptag.redundant{background:#E8F3FF;color:#0550AE}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo-row"><span class="material-symbols-rounded logo-icon">hub</span><span class="logo-text">NGPM</span></div>
+    <div class="sidebar-divider"></div>
+    <nav class="nav-list">
+      <a href="dashboard.html" class="nav-item"><span class="material-symbols-rounded">dashboard</span><span>总览</span></a>
+      <a href="network.html" class="nav-item"><span class="material-symbols-rounded">account_tree</span><span>网络</span></a>
+      <a href="app.html" class="nav-item"><span class="material-symbols-rounded">apps</span><span>应用</span></a>
+      <a href="security.html" class="nav-item"><span class="material-symbols-rounded">security</span><span>安全</span></a>
+      <a href="assets.html" class="nav-item"><span class="material-symbols-rounded">inventory_2</span><span>资产</span></a>
+      <a href="policy.html" class="nav-item active"><span class="material-symbols-rounded">bolt</span><span>策略</span></a>
+    </nav>
+    <div class="nav-spacer"></div>
+    <a href="#" class="nav-item nav-settings"><span class="material-symbols-rounded">settings</span><span>设置</span></a>
+  </aside>
+
+  <main class="main">
+    <header class="top-header">
+      <span class="material-symbols-rounded page-icon">bolt</span>
+      <span class="page-title">策略管理</span>
+      <div class="header-spacer"></div>
+      <button class="btn-secondary time-btn"><span class="material-symbols-rounded">schedule</span><span>今日</span><span class="material-symbols-rounded">expand_more</span></button>
+      <button class="btn-bell"><span class="material-symbols-rounded">notifications</span><span class="bell-badge">3</span></button>
+      <button class="btn-ai"><span class="material-symbols-rounded ai-spark">psychology</span><span>AI Copilot</span></button>
+    </header>
+
+    <div class="page-tabs">
+      <a href="policy.html" class="page-tab active"><span class="material-symbols-rounded">psychology</span>AI 策略助手</a>
+      <a href="policy.html" class="page-tab"><span class="material-symbols-rounded">local_fire_department</span>防火墙策略</a>
+      <a href="policy.html" class="page-tab"><span class="material-symbols-rounded">tune</span>QoS 策略</a>
+      <a href="policy.html" class="page-tab"><span class="material-symbols-rounded">manage_history</span>变更审计</a>
+    </div>
+
+    <div class="ai-page-layout">
+
+      <div class="ai-event-panel">
+        <div class="aep-header">
+          <span class="material-symbols-rounded" style="color:#D09B00;font-size:16px;font-variation-settings:'FILL' 1">warning</span>
+          <span class="aep-title">策略告警事项</span>
+          <span class="aep-badge" style="background:#D09B00">3</span>
+        </div>
+        <div class="aep-body">
+
+          <div class="ai-event-card severity-crit" data-scenario="conflict">
+            <div class="ec-top"><span class="ec-sev crit">冲突</span><span class="ec-device">NGFW-EXT-02</span><span class="ec-time">检测</span></div>
+            <div class="ec-desc">AI 检测到 ACL 规则 Rule#1042 与 Rule#1068 存在逻辑冲突，可能导致合规流量被误拦截。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="conflict"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">详细说明规则冲突内容和修复建议</span></div>
+              <div class="ec-q" data-scenario="conflict"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">当前冲突规则是否已影响业务？</span></div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-warn" data-scenario="qos">
+            <div class="ec-top"><span class="ec-sev warn">优化</span><span class="ec-device">QoS 策略</span><span class="ec-time">建议</span></div>
+            <div class="ec-desc">当前 WAN-01 QoS 策略未将 BACKUP-SRV rsync 流量标记为低优先级，导致占用过高带宽影响关键业务。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="qos"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">生成 WAN-01 QoS 优化配置方案</span></div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-info" data-scenario="audit">
+            <div class="ec-top"><span class="ec-sev info">审计</span><span class="ec-device">变更记录</span><span class="ec-time">今日</span></div>
+            <div class="ec-desc">今日共发生 3 次策略变更，其中 1 次未经审批流程（NGFW-EXT-02 Rule#1068 直接推送）。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="audit"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">今日策略变更审计报告</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="ai-main-panel">
+        <div class="ai-chat-area" id="chatArea">
+          <div class="ai-welcome">
+            <span class="material-symbols-rounded ai-welcome-icon">psychology</span>
+            <div class="ai-welcome-content">
+              <div class="ai-welcome-title">策略 AI 助手已就绪</div>
+              <div class="ai-welcome-desc">
+                我已接入防火墙策略库、QoS 配置、ACL 规则、变更管理系统，可自动检测规则冲突和冗余、生成 QoS 优化建议，并提供完整的策略变更审计链。<br><br>
+                <strong>当前关注：</strong>NGFW-EXT-02 规则冲突（严重）、WAN-01 QoS 优化建议（告警）、未审批变更 1 次
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-quick-scenarios">
+          <button class="ai-scenario-btn" data-scenario="conflict"><span class="material-symbols-rounded">gpp_bad</span>规则冲突检测</button>
+          <button class="ai-scenario-btn" data-scenario="qos"><span class="material-symbols-rounded">tune</span>QoS 优化建议</button>
+          <button class="ai-scenario-btn" data-scenario="redundant"><span class="material-symbols-rounded">content_copy</span>冗余规则清理</button>
+          <button class="ai-scenario-btn" data-scenario="audit"><span class="material-symbols-rounded">history</span>变更审计报告</button>
+        </div>
+
+        <div class="ai-input-bar">
+          <div class="ai-input-wrap">
+            <textarea class="ai-input" id="chatInput" rows="1" placeholder="输入问题，例如：当前防火墙策略是否有安全漏洞？"></textarea>
+            <button class="ai-send-btn" id="sendBtn"><span class="material-symbols-rounded">send</span></button>
+          </div>
+          <span class="ai-input-hint">Enter 发送 · Shift+Enter 换行</span>
+        </div>
+      </div>
+
+      <div class="ai-summary-panel">
+        <div class="asp-header">
+          <span class="material-symbols-rounded" style="color:#6E40C9;font-size:16px;font-variation-settings:'FILL' 1">bolt</span>
+          <span class="asp-title">策略健康概览</span>
+        </div>
+        <div class="asp-body">
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">规则冲突</div>
+            <div class="asp-stat-value red">1 处</div>
+            <div class="asp-stat-sub">NGFW-EXT-02</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">冗余规则</div>
+            <div class="asp-stat-value yellow">12 条</div>
+            <div class="asp-stat-sub">建议清理</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">今日变更</div>
+            <div class="asp-stat-value yellow">3 次</div>
+            <div class="asp-stat-sub">1 次未审批</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">策略合规率</div>
+            <div class="asp-stat-value green">94.2%</div>
+            <div class="asp-stat-sub">共 486 条规则</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#1F2328;padding:4px 0 2px">待处理事项</div>
+          <div class="asp-alert-list">
+            <div class="asp-alert-item" data-scenario="conflict">
+              <div class="asp-alert-dot crit"></div>
+              <div class="asp-alert-content"><div class="asp-alert-device">规则冲突</div><div class="asp-alert-desc">NGFW-EXT-02 #1042↔#1068</div></div>
+            </div>
+            <div class="asp-alert-item" data-scenario="qos">
+              <div class="asp-alert-dot warn"></div>
+              <div class="asp-alert-content"><div class="asp-alert-device">QoS 优化</div><div class="asp-alert-desc">WAN-01 rsync 未限速</div></div>
+            </div>
+            <div class="asp-alert-item" data-scenario="audit">
+              <div class="asp-alert-dot warn"></div>
+              <div class="asp-alert-content"><div class="asp-alert-device">未审批变更</div><div class="asp-alert-desc">Rule#1068 直接推送</div></div>
+            </div>
+          </div>
+          <div style="background:#EEF0FF;border:1px solid #C8B8FA;border-radius:8px;padding:10px 12px;font-size:12px;color:#3730A3;line-height:1.6">
+            <strong>💡 AI 建议：</strong>本周内修复 NGFW-EXT-02 规则冲突，并配置 WAN-01 QoS 限制 rsync 带宽，可改善网络性能约 8%。
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+var SCENARIOS = {
+  'conflict': {
+    title: '防火墙规则冲突检测报告',
+    icon: 'gpp_bad',
+    question: '详细说明规则冲突内容和修复建议',
+    answer: `AI 分析 NGFW-EXT-02 全量 486 条 ACL 规则，发现 <strong>1 处逻辑冲突</strong>：\n\n<strong>冲突详情：</strong>\n• Rule#1042（优先级高）：允许 10.10.0.0/16 → ANY:443 PERMIT\n• Rule#1068（优先级低）：拒绝 10.10.2.0/24 → 203.x.x.x:443 DENY\n• 冲突原因：Rule#1068 永远不会被命中（被 #1042 先匹配），导致对 10.10.2.0/24 段的出口 HTTPS 限制形同虚设\n\n<strong>业务影响：</strong>\n当前冲突导致 10.10.2.0/24（含 VM-Prod-047）的 HTTPS 出口不受限制，这可能助长了 APT C2 隐蔽通信。\n\n<strong>修复建议：</strong>\n方案 A：将 Rule#1068 的优先级调整至高于 Rule#1042（推荐）\n方案 B：合并两条规则，明确 DENY 范围（需审批，建议在变更窗口操作）`,
+    kpis: [
+      { label: '冲突规则数', value: '1处', color: 'red', sub: '#1042 ↔ #1068' },
+      { label: '业务影响', value: '高', color: 'red', sub: 'APT 相关' },
+      { label: '冗余规则', value: '12条', color: 'yellow', sub: '可安全清理' },
+      { label: '策略合规率', value: '94.2%', color: 'yellow', sub: '' }
+    ],
+    timeline: [
+      { time: '3天前', text: 'Rule#1068 直接推送（未走审批流程），覆盖了原有策略结构', sev: 'crit' },
+      { time: '今日 08:00', text: 'AI 每日策略审计完成，检测到逻辑冲突', sev: 'warn' },
+      { time: '今日 14:12', text: 'VM-Prod-047 APT 事件与该规则冲突关联，升级为严重', sev: 'crit' },
+      { time: '建议', text: '调整 Rule#1068 优先级高于 Rule#1042，在变更窗口执行', sev: 'ok' }
+    ],
+    showRules: true
+  },
+  'qos': {
+    title: 'WAN-01 QoS 策略优化方案',
+    icon: 'tune',
+    question: '生成 WAN-01 QoS 优化配置方案',
+    answer: `当前 WAN-01 出口无 QoS 分类策略，所有流量共享 1Gbps 带宽，导致 BACKUP-SRV rsync 备份流量（2.1Gbps 峰值，出口占 21%）与关键业务竞争带宽。\n\n<strong>建议 QoS 策略（4级分类）：</strong>\n• 优先级 1 - EF（实时）：VoIP、视频会议 → 保障带宽 20%\n• 优先级 2 - AF41（关键业务）：ERP、OA、数据库同步 → 保障带宽 40%\n• 优先级 3 - AF21（普通业务）：HTTPS、邮件 → 可用带宽 30%\n• 优先级 4 - BE（尽力而为）：rsync 备份、FTP、P2P → 最大带宽 10%（硬上限 100Mbps）\n\n<strong>预期效果：</strong>限制 rsync 后，WAN-01 利用率从 84% 降至约 76%，关键业务延迟改善 25-30%。`,
+    kpis: [
+      { label: '当前利用率', value: '84%', color: 'red', sub: 'rsync 占 21%' },
+      { label: '优化后预测', value: '76%', color: 'green', sub: 'rsync 限 10%' },
+      { label: '关键业务延迟', value: '-30%', color: 'green', sub: '预期改善' },
+      { label: '配置变更风险', value: '低', color: 'green', sub: '不影响拓扑' }
+    ],
+    timeline: [
+      { time: '步骤1', text: '在 WAN-01 入口创建 traffic-class，按 DSCP/端口分类流量', sev: 'info' },
+      { time: '步骤2', text: '配置 policy-map：EF→bandwidth 20%，AF41→40%，AF21→30%，BE→10%', sev: 'info' },
+      { time: '步骤3', text: '对 BACKUP-SRV（10.10.x.60）专门配置 police rate 100Mbps', sev: 'warn' },
+      { time: '步骤4', text: '将 policy-map 应用到 WAN-01 出口接口（service-policy output）', sev: 'info' },
+      { time: '验证', text: '观察 15 分钟，确认 rsync 降速且关键业务恢复正常', sev: 'ok' }
+    ],
+    showRules: false
+  },
+  'redundant': {
+    title: '冗余规则清理分析报告',
+    icon: 'content_copy',
+    question: '检测当前防火墙策略中的冗余规则',
+    answer: `AI 分析发现 NGFW-EXT-02 和 NGFW-INT-01 共 <strong>12 条冗余规则</strong>，分 3 类：\n\n<strong>类型1 - 被遮蔽规则（5条）：</strong>\n被更高优先级规则完全覆盖，永远不会被匹配。可直接删除，不影响任何业务。\n\n<strong>类型2 - 重复规则（4条）：</strong>\n与其他规则逻辑完全相同，仅描述注释不同。合并后可简化策略树。\n\n<strong>类型3 - 已失效规则（3条）：</strong>\n对应的源/目标 IP 已不再使用（服务器已下线），规则对象已成为僵尸资产。\n\n<strong>建议：</strong>清理 12 条冗余规则可将策略匹配效率提升约 8-12%，同时降低误操作风险。`,
+    kpis: [
+      { label: '冗余规则总数', value: '12条', color: 'yellow', sub: '建议清理' },
+      { label: '可直接删除', value: '8条', color: 'green', sub: '无业务影响' },
+      { label: '需确认后删', value: '4条', color: 'yellow', sub: '需业务确认' },
+      { label: '效率提升', value: '+8-12%', color: 'green', sub: '清理后' }
+    ],
+    timeline: [
+      { time: '类型1', text: '5条被遮蔽规则（Rule#203, #217, #318, #392, #451）→ 可立即删除', sev: 'info' },
+      { time: '类型2', text: '4条重复规则（Rule#105/#108, Rule#224/#229）→ 合并后删除', sev: 'warn' },
+      { time: '类型3', text: '3条僵尸规则（目标 IP 已下线）→ 向业务确认后删除', sev: 'warn' },
+      { time: '建议', text: '建议在下次变更窗口统一清理，并在 CMDB 中关联更新策略文档', sev: 'ok' }
+    ],
+    showRules: true
+  },
+  'audit': {
+    title: '策略变更审计日志报告',
+    icon: 'history',
+    question: '今日策略变更审计报告',
+    answer: `今日共发生 <strong>3 次策略变更</strong>，其中 1 次存在合规问题：\n\n<strong>变更 1（合规）：10:15</strong>\n操作人：ops_zhang@corp | 设备：SW-Core-01\n内容：VLAN 200 新增 IP 10.10.200.150，更新 ACE 条目\n审批单：CHG-2024-0429-001 ✅\n\n<strong>变更 2（合规）：13:32</strong>\n操作人：ops_li@corp | 设备：NGFW-INT-01\n内容：开放 APP-SRV-03 → DB-SRV-02:5432 访问\n审批单：CHG-2024-0429-002 ✅\n\n<strong>变更 3（⚠️ 违规）：13:48</strong>\n操作人：ops_wang@corp | 设备：NGFW-EXT-02\n内容：新增 Rule#1068（DENY 10.10.2.0/24 出口）\n审批单：无 ❌（直接通过 SSH 推送）\n违规原因：绕过变更管理流程，且与 Rule#1042 产生逻辑冲突`,
+    kpis: [
+      { label: '今日变更次数', value: '3次', color: '', sub: '' },
+      { label: '违规变更', value: '1次', color: 'red', sub: '未经审批' },
+      { label: '相关人员', value: 'ops_wang', color: 'red', sub: '需通报' },
+      { label: '合规变更', value: '2次', color: 'green', sub: '流程正常' }
+    ],
+    timeline: [
+      { time: '10:15', text: '变更 CHG-0429-001：SW-Core-01 VLAN 200 更新（合规）', sev: 'ok' },
+      { time: '13:32', text: '变更 CHG-0429-002：NGFW-INT-01 开放 DB 访问（合规）', sev: 'ok' },
+      { time: '13:48', text: '⚠️ 违规：ops_wang 直接 SSH 推送 NGFW-EXT-02 Rule#1068（无审批单）', sev: 'crit' },
+      { time: '建议', text: '对 ops_wang 发出合规警告；启用防火墙 SSH 访问二次认证', sev: 'warn' }
+    ],
+    showRules: false
+  }
+};
+
+var RULES_DATA = [
+  { id:'#1042', src:'10.10.0.0/16', dst:'ANY', port:'443', action:'allow', note:'问题规则', flag:'conflict' },
+  { id:'#1068', src:'10.10.2.0/24', dst:'203.x.x.x', port:'443', action:'deny', note:'被遮蔽，永远不命中', flag:'conflict' },
+  { id:'#1035', src:'10.10.5.0/24', dst:'DB-SRV', port:'5432', action:'allow', note:'正常规则', flag:'' },
+  { id:'#0892', src:'ANY', dst:'10.10.0.0/8', port:'ANY', action:'deny', note:'兜底拒绝', flag:'' },
+  { id:'#0203', src:'10.20.1.0/24', dst:'10.20.1.0/24', port:'ANY', action:'allow', note:'被 Rule#0201 遮蔽', flag:'redundant' },
+];
+
+function renderReport(key){
+  var s=SCENARIOS[key]; if(!s)return;
+  var ca=document.getElementById('chatArea');
+  var um=document.createElement('div'); um.className='chat-msg user';
+  um.innerHTML='<div class="chat-avatar user-av"><span class="material-symbols-rounded">person</span></div><div class="chat-bubble user-bubble">'+s.question+'</div>';
+  ca.appendChild(um);
+  var tid='pt_'+Date.now();
+  var am=document.createElement('div'); am.className='chat-msg';
+  am.innerHTML='<div class="chat-avatar ai-av"><span class="material-symbols-rounded" style="font-variation-settings:\'FILL\' 1">psychology</span></div><div class="chat-bubble ai-bubble" id="'+tid+'"></div>';
+  ca.appendChild(am); ca.scrollTop=ca.scrollHeight;
+  var el=document.getElementById(tid),idx=0,text=s.answer;
+  function type(){if(idx<text.length){el.innerHTML=text.slice(0,idx+1).replace(/\n/g,'<br>')+'<span class="typing-cursor"></span>';idx+=3;setTimeout(type,15);}else{el.innerHTML=text.replace(/\n/g,'<br>');renderFull(key,ca);}}
+  setTimeout(type,300);
+}
+
+function renderFull(key,ca){
+  var s=SCENARIOS[key];
+  var r=document.createElement('div'); r.className='analysis-report';
+  var kpi=s.kpis.map(function(k){return '<div class="report-kpi"><div class="rkpi-label">'+k.label+'</div><div class="rkpi-value '+k.color+'">'+k.value+'</div><div class="rkpi-sub">'+k.sub+'</div></div>';}).join('');
+  var tl=s.timeline.map(function(t,i){var l=i===s.timeline.length-1;return '<div class="rtl-item"><div class="rtl-line"><div class="rtl-dot '+t.sev+'"></div>'+(l?'':'<div class="rtl-connector"></div>')+'</div><div class="rtl-body"><div class="rtl-time">'+t.time+'</div><div class="rtl-text">'+t.text+'</div></div></div>';}).join('');
+  var rulesHtml='';
+  if(s.showRules){
+    rulesHtml='<div class="report-divider"></div><div style="font-size:12px;font-weight:700;color:#1F2328;margin-bottom:8px">相关规则详情</div>'
+      +'<table class="policy-table"><thead><tr><th>规则ID</th><th>源</th><th>目标</th><th>端口</th><th>动作</th><th>备注</th></tr></thead><tbody>'
+      +RULES_DATA.map(function(r){
+        var flag=r.flag?'<span class="ptag '+r.flag+'">'+r.flag+'</span> ':' ';
+        return '<tr><td><strong>'+r.id+'</strong></td><td>'+r.src+'</td><td>'+r.dst+'</td><td>'+r.port+'</td><td><span class="ptag '+r.action+'">'+r.action+'</span></td><td>'+flag+r.note+'</td></tr>';
+      }).join('')
+      +'</tbody></table>';
+  }
+  r.innerHTML='<div class="report-header"><span class="material-symbols-rounded report-icon" style="font-variation-settings:\'FILL\' 1">'+s.icon+'</span><span class="report-title">'+s.title+'</span><span class="report-timestamp">'+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+'</span></div>'
+    +'<div class="report-kpi-row">'+kpi+'</div><div class="report-divider"></div>'
+    +'<div style="font-size:12px;font-weight:700;color:#1F2328;margin-bottom:8px">处置时间线</div>'
+    +'<div class="report-timeline">'+tl+'</div>'+rulesHtml;
+  ca.appendChild(r); ca.scrollTop=ca.scrollHeight;
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.ai-scenario-btn[data-scenario]').forEach(function(b){b.addEventListener('click',function(){renderReport(this.dataset.scenario);});});
+  document.querySelectorAll('.ec-q[data-scenario]').forEach(function(e){e.addEventListener('click',function(){renderReport(this.dataset.scenario);});});
+  document.querySelectorAll('.asp-alert-item[data-scenario]').forEach(function(e){e.addEventListener('click',function(){renderReport(this.dataset.scenario);});});
+  var ci=document.getElementById('chatInput'),sb=document.getElementById('sendBtn');
+  function send(){var q=ci.value.trim();if(!q)return;ci.value='';
+    var k='conflict';
+    if(/qos|带宽|限速/.test(q))k='qos';
+    else if(/冗余|重复|清理/.test(q))k='redundant';
+    else if(/审计|变更|日志/.test(q))k='audit';
+    renderReport(k);}
+  sb.addEventListener('click',send);
+  ci.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+  ci.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';});
+});
+</script>
+</body>
+</html>

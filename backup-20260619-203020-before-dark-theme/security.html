@@ -1,0 +1,356 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>NGPM · 安全分析</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="ai-page.css">
+<style>
+.page-tabs{display:flex;gap:0;padding:0 20px;background:#fff;border-bottom:1px solid #D0D7DE;flex-shrink:0}
+.page-tab{height:42px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:13px;color:#636C76;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s;text-decoration:none}
+.page-tab:hover{color:#1F2328}
+.page-tab.active{color:#6E40C9;border-bottom-color:#6E40C9;font-weight:600}
+.page-tab .material-symbols-rounded{font-size:15px}
+/* 攻击路径可视化 */
+.attack-path{display:flex;align-items:center;gap:0;padding:12px;background:#0D1117;border-radius:8px;overflow-x:auto;margin-bottom:10px}
+.ap-node{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:90px}
+.ap-icon{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.ap-icon.internet{background:#1a2535;color:#58A6FF}
+.ap-icon.entry{background:#3a0c0c;color:#F85149}
+.ap-icon.lateral{background:#3a2e00;color:#E3B341}
+.ap-icon.target{background:#1a0c3a;color:#D2A8FF}
+.ap-label{font-size:10px;color:#8B949E;text-align:center;font-family:'Geist Mono',monospace}
+.ap-arrow{color:#484F58;font-size:22px;padding:0 4px;flex-shrink:0;margin-top:-18px}
+/* MITRE ATT&CK 矩阵简化版 */
+.mitre-matrix{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.mitre-tactic{background:#1a2535;border:1px solid #30363D;border-radius:6px;padding:6px 8px;min-width:100px}
+.mitre-tactic-name{font-size:10px;color:#58A6FF;font-weight:700;margin-bottom:4px;font-family:'Geist Mono',monospace}
+.mitre-technique{font-size:10px;color:#8B949E;padding:2px 4px;border-radius:3px;margin-bottom:2px}
+.mitre-technique.active{background:#3a0c0c;color:#F85149;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar secondary-rail">
+    <div class="secondary-rail-title" aria-hidden="true"><span class="material-symbols-rounded">subdirectory_arrow_right</span></div>
+    <div class="page-tabs">
+      <a href="security.html" class="page-tab active"><span class="material-symbols-rounded">psychology</span>AI 安全助手</a>
+      <a href="security.html" class="page-tab"><span class="material-symbols-rounded">gpp_bad</span>威胁检测</a>
+      <a href="security.html" class="page-tab"><span class="material-symbols-rounded">timeline</span>攻击溯源</a>
+      <a href="security.html" class="page-tab"><span class="material-symbols-rounded">policy</span>合规评估</a>
+    </div>
+  </aside>
+<main class="main">
+    <header class="top-header">
+      <a class="header-brand" href="dashboard.html">
+        <span class="material-symbols-rounded logo-icon">hub</span>
+        <span class="logo-text">NGPM</span>
+      </a>
+      <nav class="top-primary-nav">
+        <div class="nav-list">
+          <a href="dashboard.html" class="nav-item"><span class="material-symbols-rounded">dashboard</span><span>总览</span></a>
+          <a href="network.html" class="nav-item"><span class="material-symbols-rounded">account_tree</span><span>网络</span></a>
+          <a href="app.html" class="nav-item"><span class="material-symbols-rounded">apps</span><span>应用</span></a>
+          <a href="security.html" class="nav-item active"><span class="material-symbols-rounded">security</span><span>安全</span></a>
+          <a href="assets.html" class="nav-item"><span class="material-symbols-rounded">inventory_2</span><span>资产</span></a>
+          <a href="policy.html" class="nav-item"><span class="material-symbols-rounded">bolt</span><span>策略</span></a>
+          <a href="#" class="nav-item nav-settings"><span class="material-symbols-rounded">settings</span><span>设置</span></a>
+        </div>
+      </nav>
+      <div class="header-divider"></div>
+      <span class="material-symbols-rounded page-icon">security</span>
+      <span class="page-title">安全分析</span>
+      <div class="header-spacer"></div>
+      <button class="btn-secondary time-btn"><span class="material-symbols-rounded">schedule</span><span>今日</span><span class="material-symbols-rounded">expand_more</span></button>
+      <button class="btn-bell"><span class="material-symbols-rounded">notifications</span><span class="bell-badge">4</span></button>
+      <button class="btn-ai"><span class="material-symbols-rounded ai-spark">psychology</span><span>AI Copilot</span></button>
+    </header>
+<div class="ai-page-layout">
+
+      <!-- 左：事件 -->
+      <div class="ai-event-panel">
+        <div class="aep-header">
+          <span class="material-symbols-rounded" style="color:#CF222E;font-size:16px;font-variation-settings:'FILL' 1">warning</span>
+          <span class="aep-title">安全威胁事件</span>
+          <span class="aep-badge">4</span>
+        </div>
+        <div class="aep-body">
+
+          <div class="ai-event-card severity-crit" data-scenario="apt">
+            <div class="ec-top"><span class="ec-sev crit">CRIT</span><span class="ec-device">VM-Prod-047</span><span class="ec-time">14:10</span></div>
+            <div class="ec-desc">DNS 隧道外连，420次/分 DNS 查询命中 APT C2 威胁情报，AI 置信度 93%。已隔离。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="apt"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">APT C2 攻击链路完整溯源分析</span></div>
+              <div class="ec-q" data-scenario="apt"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">VM-Prod-047 被感染的初始入侵向量是什么？</span></div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-warn" data-scenario="backup-anomaly">
+            <div class="ec-top"><span class="ec-sev warn">WARN</span><span class="ec-device">BACKUP-SRV</span><span class="ec-time">09:03</span></div>
+            <div class="ec-desc">异常大流量外联，rsync 占出口带宽 21%，与预期窗口不符，AI 疑似数据外泄或未授权备份。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="backup-anomaly"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">BACKUP-SRV 异常流量是否存在数据泄露风险？</span></div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-warn" data-scenario="lateral">
+            <div class="ec-top"><span class="ec-sev warn">WARN</span><span class="ec-device">内网横移</span><span class="ec-time">14:05</span></div>
+            <div class="ec-desc">VM-Prod-047 → APP-SRV-03 异常 SMB 连接，可能存在横向移动行为，已触发 EDR 告警。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="lateral"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">分析内网横移的完整攻击路径</span></div>
+            </div>
+          </div>
+
+          <div class="ai-event-card severity-info" data-scenario="compliance">
+            <div class="ec-top"><span class="ec-sev info">INFO</span><span class="ec-device">合规扫描</span><span class="ec-time">08:00</span></div>
+            <div class="ec-desc">每日 CIS Benchmark 扫描完成，发现 7 个高风险配置项（未打补丁 3 台、弱密码策略 2 台）。</div>
+            <div class="ec-questions">
+              <div class="ec-q" data-scenario="compliance"><span class="material-symbols-rounded">help_outline</span><span class="ec-q-text">生成合规评估报告，列出所有高风险项</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 中：对话 -->
+      <div class="ai-main-panel">
+        <div class="ai-chat-area" id="chatArea">
+          <div class="ai-welcome">
+            <span class="material-symbols-rounded ai-welcome-icon">psychology</span>
+            <div class="ai-welcome-content">
+              <div class="ai-welcome-title">安全 AI 助手已就绪</div>
+              <div class="ai-welcome-desc">
+                我已接入 NDR（网络流量分析）、EDR、威胁情报、日志审计等数据源，可分析 APT 攻击链路、数据泄露风险、合规差距，并提供可执行的应急处置方案。<br><br>
+                <strong>当前焦点：</strong>VM-Prod-047 疑似 APT C2 通信（严重，已隔离）、BACKUP-SRV 异常大流量（告警）
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-quick-scenarios">
+          <button class="ai-scenario-btn" data-scenario="apt"><span class="material-symbols-rounded">gpp_bad</span>APT 攻击溯源</button>
+          <button class="ai-scenario-btn" data-scenario="lateral"><span class="material-symbols-rounded">swap_horiz</span>横向移动分析</button>
+          <button class="ai-scenario-btn" data-scenario="backup-anomaly"><span class="material-symbols-rounded">cloud_off</span>数据泄露评估</button>
+          <button class="ai-scenario-btn" data-scenario="compliance"><span class="material-symbols-rounded">policy</span>合规评估报告</button>
+        </div>
+
+        <div class="ai-input-bar">
+          <div class="ai-input-wrap">
+            <textarea class="ai-input" id="chatInput" rows="1" placeholder="输入问题，例如：VM-Prod-047 是如何被感染的？"></textarea>
+            <button class="ai-send-btn" id="sendBtn"><span class="material-symbols-rounded">send</span></button>
+          </div>
+          <span class="ai-input-hint">Enter 发送 · Shift+Enter 换行</span>
+        </div>
+      </div>
+
+      <!-- 右：摘要 -->
+      <div class="ai-summary-panel">
+        <div class="asp-header">
+          <span class="material-symbols-rounded" style="color:#CF222E;font-size:16px;font-variation-settings:'FILL' 1">shield</span>
+          <span class="asp-title">安全态势摘要</span>
+        </div>
+        <div class="asp-body">
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">高危威胁事件</div>
+            <div class="asp-stat-value red">1 起</div>
+            <div class="asp-stat-sub">APT C2 疑似通信</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">已隔离主机</div>
+            <div class="asp-stat-value yellow">1 台</div>
+            <div class="asp-stat-sub">VM-Prod-047</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">合规风险项</div>
+            <div class="asp-stat-value yellow">7 项</div>
+            <div class="asp-stat-sub">CIS Benchmark</div>
+          </div>
+          <div class="asp-stat-block">
+            <div class="asp-stat-label">安全评分</div>
+            <div class="asp-stat-value yellow">67 / 100</div>
+            <div class="asp-stat-sub">较昨日 ↓8分</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#1F2328;padding:4px 0 2px">威胁事件</div>
+          <div class="asp-alert-list">
+            <div class="asp-alert-item" data-scenario="apt">
+              <div class="asp-alert-dot crit"></div>
+              <div class="asp-alert-content"><div class="asp-alert-device">APT C2 通信</div><div class="asp-alert-desc">VM-Prod-047 · 已隔离</div></div>
+            </div>
+            <div class="asp-alert-item" data-scenario="backup-anomaly">
+              <div class="asp-alert-dot warn"></div>
+              <div class="asp-alert-content"><div class="asp-alert-device">异常数据外传</div><div class="asp-alert-desc">BACKUP-SRV · rsync</div></div>
+            </div>
+            <div class="asp-alert-item" data-scenario="lateral">
+              <div class="asp-alert-dot warn"></div>
+              <div class="asp-alert-content"><div class="asp-alert-device">内网横移告警</div><div class="asp-alert-desc">SMB → APP-SRV-03</div></div>
+            </div>
+          </div>
+          <div style="background:#FFEBE9;border:1px solid #CF222E;border-radius:8px;padding:10px 12px;font-size:12px;color:#82071E;line-height:1.6">
+            <strong>🚨 立即操作：</strong>对 VM-Prod-047 进行取证镜像，阻断其所有出站连接，并排查同网段主机是否受影响。
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+var SCENARIOS = {
+  'apt': {
+    title: 'APT C2 攻击链路溯源报告',
+    icon: 'gpp_bad',
+    question: 'APT C2 攻击链路完整溯源分析',
+    answer: `AI 关联 NDR、DNS 日志、威胁情报，确认 <strong>VM-Prod-047（10.10.2.47）</strong>于 <strong>14:10</strong> 开始向外部 C2 服务器（APT 组织 TA-473）发送 DNS 隧道流量，置信度 93%。\n\n<strong>攻击链路（MITRE ATT&CK）：</strong>\n• T1190 初始入侵：3天前 Web 应用漏洞利用（Log4Shell 变种）\n• T1105 工具下载：下载加密 Payload，绕过静态检测\n• T1071.004 C2通信：通过 DNS 隧道与 C2 通信（每分钟 420 次查询）\n• T1048 数据外泄：疑似通过 DNS 分批外传数据\n\n<strong>已采取措施：</strong>VM-Prod-047 已自动隔离，C2 域名已加入 DNS RPZ 黑名单。\n\n<strong>建议后续：</strong>\n1. 对 VM-Prod-047 进行取证镜像（保全证据）\n2. 排查同 VLAN 主机是否存在横向移动\n3. 审计 VM-Prod-047 近 7 天访问的内网资源`,
+    kpis: [
+      { label: 'AI 置信度', value: '93%', color: 'red', sub: 'APT TA-473' },
+      { label: 'DNS 查询/分', value: '420次', color: 'red', sub: 'C2 通信特征' },
+      { label: '初始入侵', value: '3天前', color: 'red', sub: 'Log4Shell 变种' },
+      { label: '已隔离', value: '是', color: 'green', sub: '自动响应' }
+    ],
+    timeline: [
+      { time: '3天前 11:24', text: 'Web 应用收到异常 HTTP 请求，触发 Log4Shell 变种漏洞', sev: 'crit' },
+      { time: '3天前 11:26', text: '攻击者下载加密 Dropper（绕过 AV 静态扫描）', sev: 'crit' },
+      { time: '2天前', text: '恶意软件建立持久化（计划任务），开始内网信息收集', sev: 'warn' },
+      { time: '今日 14:10', text: 'DNS 隧道 C2 通信启动，NDR 检测到异常 DNS 流量模式', sev: 'crit' },
+      { time: '今日 14:12', text: 'AI 关联威胁情报，置信度达 93%，自动隔离主机', sev: 'info' }
+    ],
+    showAttackPath: true
+  },
+  'lateral': {
+    title: '内网横向移动攻击路径分析',
+    icon: 'swap_horiz',
+    question: '分析内网横移的完整攻击路径',
+    answer: `检测到 <strong>VM-Prod-047</strong> 于隔离前尝试横向移动至 <strong>APP-SRV-03（10.10.5.103）</strong>，使用 SMB 协议（445 端口）进行文件共享访问，疑似 Pass-the-Hash 攻击。\n\n<strong>横移路径：</strong>\nVM-Prod-047 → APP-SRV-03（SMB）→ 未成功\nVM-Prod-047 → APP-SRV-01（SSH）→ 未成功（已隔离前 3 次尝试）\n\n<strong>判断依据：</strong>\n• SMB 流量出现在非工作时间（14:05，无正常业务访问）\n• 源主机（VM-Prod-047）已被确认为 APT 受控主机\n• 目标主机访问模式与已知 Pass-the-Hash 特征匹配\n\n<strong>建议：</strong>\n1. 检查 APP-SRV-03 和 APP-SRV-01 是否有异常进程或文件变更\n2. 重置可能被盗取的 AD 账号凭据\n3. 启用网络微分段，限制服务器间非必要横向通信`,
+    kpis: [
+      { label: '横移尝试次数', value: '5次', color: 'red', sub: '已全部阻断' },
+      { label: '目标主机', value: '2台', color: 'yellow', sub: 'APP-SRV-01/03' },
+      { label: '攻击手法', value: 'PtH', color: 'red', sub: 'Pass-the-Hash' },
+      { label: '成功渗透', value: '否', color: 'green', sub: '隔离及时' }
+    ],
+    timeline: [
+      { time: '14:03', text: 'VM-Prod-047 CPU 出现可疑进程 mimikatz 特征（内存 Dump）', sev: 'crit' },
+      { time: '14:05', text: '向 APP-SRV-03:445 发起 SMB 连接（Pass-the-Hash 特征）', sev: 'crit' },
+      { time: '14:06', text: '向 APP-SRV-01:22 发起 SSH 暴力尝试（3次，失败）', sev: 'warn' },
+      { time: '14:12', text: 'VM-Prod-047 隔离完成，横向移动尝试中断', sev: 'ok' }
+    ],
+    showAttackPath: false
+  },
+  'backup-anomaly': {
+    title: 'BACKUP-SRV 异常流量分析报告',
+    icon: 'cloud_off',
+    question: 'BACKUP-SRV 异常流量是否存在数据泄露风险？',
+    answer: `<strong>BACKUP-SRV</strong> 于 09:03 开始产生异常 rsync 外传流量（2.1Gbps），占出口带宽 21%，目标 IP 为外部 IP（非备份目标）。\n\n<strong>初步评估：</strong>\n• 目标 IP（103.x.x.x）未在备份策略白名单中\n• rsync 进程由 root 账户启动（与正常备份账户 backup_svc 不符）\n• 传输数据量：已传输约 48GB（09:03 至 10:30）\n\n<strong>风险判断：</strong>中-高风险。可能是 APT 攻击者利用已入侵的备份服务器作为数据出口，与 VM-Prod-047 C2 事件存在关联。\n\n<strong>建议：</strong>\n1. 立即终止该 rsync 进程，阻断目标 IP\n2. 检查 BACKUP-SRV 是否也存在恶意文件（关联 APT 事件调查）\n3. 审计近期备份数据访问权限记录`,
+    kpis: [
+      { label: '异常外传量', value: '48 GB', color: 'red', sub: '09:03-10:30' },
+      { label: '带宽占用', value: '21%', color: 'red', sub: '2.1Gbps rsync' },
+      { label: '目标 IP', value: '未授权', color: 'red', sub: '非备份策略' },
+      { label: '关联事件', value: 'APT', color: 'red', sub: 'VM-Prod-047' }
+    ],
+    timeline: [
+      { time: '09:03', text: 'root 账户启动 rsync 进程，目标为未知外部 IP', sev: 'crit' },
+      { time: '09:15', text: 'NTA 检测到异常外传大流量（2.1Gbps），超出基线 10 倍', sev: 'warn' },
+      { time: '10:30', text: '已累计外传 48GB 数据（约为单日备份量的 3 倍）', sev: 'crit' },
+      { time: '建议', text: '立即终止进程并阻断目标 IP，开展取证调查', sev: 'ok' }
+    ],
+    showAttackPath: false
+  },
+  'compliance': {
+    title: 'CIS Benchmark 合规评估报告',
+    icon: 'policy',
+    question: '生成合规评估报告，列出所有高风险项',
+    answer: `今日自动合规扫描发现 <strong>7 个高风险配置项</strong>，覆盖 3 个合规控制域。\n\n<strong>高风险项（H=高/M=中）：</strong>\n• H - APP-SRV-01/02/03：未安装 2024年10月安全补丁（CVE-2024-38094 RCE）\n• H - DB-SRV-01：root 账户允许远程 SSH 登录（违反最小权限原则）\n• H - BACKUP-SRV：服务账户密码未轮换（超 365 天）\n• M - NGFW-EXT-02：管理界面 HTTPS 证书即将过期（7天内）\n• M - AGG-02：SNMP Community String 使用默认值 "public"\n\n<strong>整体合规分：67/100</strong>（目标 ≥ 85）`,
+    kpis: [
+      { label: '合规评分', value: '67/100', color: 'yellow', sub: '目标 ≥ 85' },
+      { label: '高风险项', value: '4项', color: 'red', sub: '需立即修复' },
+      { label: '中风险项', value: '3项', color: 'yellow', sub: '7天内修复' },
+      { label: '未打补丁', value: '3台', color: 'red', sub: 'RCE 漏洞' }
+    ],
+    timeline: [
+      { time: '高风险', text: 'APP-SRV 3台未打 CVE-2024-38094 补丁（远程代码执行漏洞）', sev: 'crit' },
+      { time: '高风险', text: 'DB-SRV-01 root 账户允许远程 SSH，违反最小权限原则', sev: 'crit' },
+      { time: '高风险', text: 'BACKUP-SRV 服务账户密码 365 天未轮换', sev: 'crit' },
+      { time: '中风险', text: 'NGFW-EXT-02 HTTPS 证书 7 天后到期，需立即更新', sev: 'warn' },
+      { time: '中风险', text: 'AGG-02 SNMP 使用默认 Community "public"，存在信息泄露', sev: 'warn' }
+    ],
+    showAttackPath: false
+  }
+};
+
+function renderReport(key) {
+  var s = SCENARIOS[key]; if (!s) return;
+  var chatArea = document.getElementById('chatArea');
+  var userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.innerHTML = '<div class="chat-avatar user-av"><span class="material-symbols-rounded">person</span></div><div class="chat-bubble user-bubble">'+s.question+'</div>';
+  chatArea.appendChild(userMsg);
+  var tid = 'aiT_'+Date.now();
+  var aiMsg = document.createElement('div');
+  aiMsg.className = 'chat-msg';
+  aiMsg.innerHTML = '<div class="chat-avatar ai-av"><span class="material-symbols-rounded" style="font-variation-settings:\'FILL\' 1">psychology</span></div><div class="chat-bubble ai-bubble" id="'+tid+'"></div>';
+  chatArea.appendChild(aiMsg);
+  chatArea.scrollTop = chatArea.scrollHeight;
+  var el = document.getElementById(tid), idx=0, text=s.answer;
+  function type(){
+    if(idx<text.length){el.innerHTML=text.slice(0,idx+1).replace(/\n/g,'<br>')+'<span class="typing-cursor"></span>';idx+=3;setTimeout(type,15);}
+    else{el.innerHTML=text.replace(/\n/g,'<br>');renderFull(key,chatArea);}
+  }
+  setTimeout(type,300);
+}
+
+function renderFull(key,chatArea){
+  var s=SCENARIOS[key];
+  var rpt=document.createElement('div'); rpt.className='analysis-report';
+  var kpiHtml=s.kpis.map(function(k){return '<div class="report-kpi"><div class="rkpi-label">'+k.label+'</div><div class="rkpi-value '+k.color+'">'+k.value+'</div><div class="rkpi-sub">'+k.sub+'</div></div>';}).join('');
+  var tlHtml=s.timeline.map(function(t,i){var l=i===s.timeline.length-1;return '<div class="rtl-item"><div class="rtl-line"><div class="rtl-dot '+t.sev+'"></div>'+(l?'':'<div class="rtl-connector"></div>')+'</div><div class="rtl-body"><div class="rtl-time">'+t.time+'</div><div class="rtl-text">'+t.text+'</div></div></div>';}).join('');
+  var pathHtml = s.showAttackPath ? '<div class="report-divider"></div><div style="font-size:12px;font-weight:700;color:#1F2328;margin-bottom:8px">攻击路径可视化</div>'
+    + '<div class="attack-path">'
+    + '<div class="ap-node"><div class="ap-icon internet"><span class="material-symbols-rounded" style="font-variation-settings:\'FILL\' 1">public</span></div><div class="ap-label">互联网<br>攻击者</div></div>'
+    + '<span class="ap-arrow">→</span>'
+    + '<div class="ap-node"><div class="ap-icon entry"><span class="material-symbols-rounded" style="font-variation-settings:\'FILL\' 1">web</span></div><div class="ap-label">Web 应用<br>Log4Shell</div></div>'
+    + '<span class="ap-arrow">→</span>'
+    + '<div class="ap-node"><div class="ap-icon entry"><span class="material-symbols-rounded" style="font-variation-settings:\'FILL\' 1">computer</span></div><div class="ap-label">VM-Prod-047<br>已控制</div></div>'
+    + '<span class="ap-arrow">→</span>'
+    + '<div class="ap-node"><div class="ap-icon lateral"><span class="material-symbols-rounded" style="font-variation-settings:\'FILL\' 1">swap_horiz</span></div><div class="ap-label">内网横移<br>SMB/SSH</div></div>'
+    + '<span class="ap-arrow">→</span>'
+    + '<div class="ap-node"><div class="ap-icon target"><span class="material-symbols-rounded" style="font-variation-settings:\'FILL\' 1">dns</span></div><div class="ap-label">DNS 隧道<br>C2 通信</div></div>'
+    + '</div>'
+    + '<div style="font-size:12px;font-weight:700;color:#1F2328;margin:8px 0">MITRE ATT&CK 战术覆盖</div>'
+    + '<div class="mitre-matrix">'
+    + '<div class="mitre-tactic"><div class="mitre-tactic-name">TA0001 初始访问</div><div class="mitre-technique active">T1190 漏洞利用</div></div>'
+    + '<div class="mitre-tactic"><div class="mitre-tactic-name">TA0002 执行</div><div class="mitre-technique active">T1105 远程下载</div></div>'
+    + '<div class="mitre-tactic"><div class="mitre-tactic-name">TA0003 持久化</div><div class="mitre-technique active">T1053 计划任务</div></div>'
+    + '<div class="mitre-tactic"><div class="mitre-tactic-name">TA0008 横向移动</div><div class="mitre-technique active">T1550 PtH攻击</div></div>'
+    + '<div class="mitre-tactic"><div class="mitre-tactic-name">TA0011 C2</div><div class="mitre-technique active">T1071.004 DNS隧道</div></div>'
+    + '<div class="mitre-tactic"><div class="mitre-tactic-name">TA0010 数据外泄</div><div class="mitre-technique active">T1048 外部通道</div></div>'
+    + '</div>' : '';
+  rpt.innerHTML='<div class="report-header"><span class="material-symbols-rounded report-icon" style="font-variation-settings:\'FILL\' 1">'+s.icon+'</span><span class="report-title">'+s.title+'</span><span class="report-timestamp">'+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+'</span></div>'
+    +'<div class="report-kpi-row">'+kpiHtml+'</div>'
+    +'<div class="report-divider"></div>'
+    +'<div style="font-size:12px;font-weight:700;color:#1F2328;margin-bottom:8px">攻击时间线</div>'
+    +'<div class="report-timeline">'+tlHtml+'</div>'
+    +pathHtml;
+  chatArea.appendChild(rpt);
+  chatArea.scrollTop=chatArea.scrollHeight;
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.ai-scenario-btn[data-scenario]').forEach(function(b){b.addEventListener('click',function(){renderReport(this.dataset.scenario);});});
+  document.querySelectorAll('.ec-q[data-scenario]').forEach(function(e){e.addEventListener('click',function(){renderReport(this.dataset.scenario);});});
+  document.querySelectorAll('.asp-alert-item[data-scenario]').forEach(function(e){e.addEventListener('click',function(){renderReport(this.dataset.scenario);});});
+  var ci=document.getElementById('chatInput'),sb=document.getElementById('sendBtn');
+  function send(){var q=ci.value.trim();if(!q)return;ci.value='';
+    var k='apt';
+    if(/横移|smb|lateral/.test(q))k='lateral';
+    else if(/backup|备份|泄露/.test(q))k='backup-anomaly';
+    else if(/合规|cis|benchmark/.test(q))k='compliance';
+    renderReport(k);}
+  sb.addEventListener('click',send);
+  ci.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+  ci.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';});
+});
+</script>
+</body>
+</html>

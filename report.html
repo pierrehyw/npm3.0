@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NGPM · 报表报告</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="dark-theme.css">
+<script src="theme-toggle.js"></script>
+<style>
+.report-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+}
+.placeholder-card {
+  width: min(760px, calc(100% - 48px));
+  background: #ffffff;
+  border: 1px solid #d0d7de;
+  border-radius: 12px;
+  padding: 28px 30px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+.placeholder-title {
+  margin: 0 0 8px;
+  font-size: 24px;
+  line-height: 1.3;
+  color: #1f2328;
+}
+.placeholder-desc {
+  margin: 0;
+  font-size: 14px;
+  color: #57606a;
+  line-height: 1.8;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="main" style="margin-left:0; width:100%;">
+    <header class="top-header">
+      <a class="header-brand" href="dashboard.html">
+        <span class="material-symbols-rounded logo-icon">hub</span>
+        <span class="logo-text">NGPM</span>
+      </a>
+      <nav class="top-primary-nav">
+        <div class="nav-list">
+          <a href="dashboard.html" class="nav-item"><span class="material-symbols-rounded">dashboard</span><span>总览</span></a>
+          <a href="network.html" class="nav-item"><span class="material-symbols-rounded">account_tree</span><span>数据分析</span></a>
+          <a href="app.html" class="nav-item"><span class="material-symbols-rounded">apps</span><span>应用</span></a>
+          <a href="topology.html" class="nav-item"><span class="material-symbols-rounded">location_on</span><span>数字地图</span></a>
+          <a href="report.html" class="nav-item active"><span class="material-symbols-rounded">area_chart</span><span>报表报告</span></a>
+          <a href="ai-agent.html" class="nav-item"><span class="material-symbols-rounded">smart_toy</span><span>AI Agent</span></a>
+        </div>
+      </nav>
+      <div class="header-divider"></div>
+      <span class="material-symbols-rounded page-icon">description</span>
+      <span class="page-title">报表报告</span>
+      <div class="header-spacer"></div>
+      <button class="btn-theme-toggle" type="button" onclick="toggleNgpmTheme()" title="切换深色科技主题" aria-label="切换主题" aria-pressed="false">
+        <span class="material-symbols-rounded">dark_mode</span>
+      </button>
+    </header>
+    <section class="report-placeholder">
+      <div class="placeholder-card">
+        <h1 class="placeholder-title">报表报告模块预留中</h1>
+        <p class="placeholder-desc">当前页面先留空，后续将在这里建设报表中心内容（定时报表、趋势对比、导出与订阅）。</p>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

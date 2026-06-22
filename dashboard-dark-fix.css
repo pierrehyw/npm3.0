@@ -1,0 +1,1507 @@
+/* Dashboard role views dark-theme fix: executive / ops / security */
+html[data-theme="dark"] body #view-executive,
+html[data-theme="dark"] body #view-ops,
+html[data-theme="dark"] body #view-security {
+  --dash-dark-panel: rgba(10, 21, 36, 0.92);
+  --dash-dark-panel-soft: rgba(10, 21, 36, 0.74);
+  --dash-dark-panel-deep: rgba(7, 16, 28, 0.94);
+  --dash-dark-line: rgba(77, 212, 255, 0.20);
+  --dash-dark-line-strong: rgba(77, 212, 255, 0.34);
+  color: var(--dark-fg-body) !important;
+  background: transparent !important;
+}
+
+/* Inline light blocks across all three dashboard role views */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#fff"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #fff"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#FFF"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #FFF"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#F6F8FA"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #F6F8FA"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#FAFBFC"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #FAFBFC"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#F0F3F6"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #F0F3F6"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background:#FF"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="background: #FF"] {
+  background: var(--dash-dark-panel) !important;
+  background-color: var(--dash-dark-panel) !important;
+  border-color: var(--dash-dark-line) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="border"] {
+  border-color: var(--dash-dark-line) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color:#1"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color: #1"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color:#2"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color: #2"] {
+  color: var(--dark-fg-title) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color:#6"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color: #6"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color:#8"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) [style*="color: #8"] {
+  color: var(--dark-fg-subtle) !important;
+}
+
+/* Broad dashboard role surfaces */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(
+  .card,.score-card,.exec-kpi-card,.exec-bottom,.exec-top-row,.exec-kpi-col,
+  .ehs-card,.ehs-score-card,.ehs-kpi,.ehs-ai-brief,.ehs-domain-pill,.ehs-risk-item,.ehs-action-item,
+  .cs-deduct-list,.cs-deduct-item,.cs-action-btn,.av-card,.av-note,
+  .ops-net-strip,.ops-page,.ops-pages,.ons-score-block,.ons-mini-kpi,.ops-map-card,.ops-top-card,.ops-fault-card,.ops-traffic-card,.ops-inventory-card,.ops-capacity-card,
+  .sec-page,.sec-kpi,.sec-card,.sec-map-panel,.sec-panel,.sec-event-card,.sec-compliance-card,.sec-ai-card,.sec-table-wrap,
+  .role-dropdown,.role-hint,.rdrop-item,.btn-secondary,.btn-bell,.ai-progress-bar,.apb-track
+) {
+  background: var(--dash-dark-panel) !important;
+  border-color: var(--dash-dark-line) !important;
+  color: var(--dark-fg-body) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+}
+
+/* Header-ish bands inside dashboard cards */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(
+  .card-header,.ehs-header,.sec-card-header,.ops-card-header,.ops-section-header,.sec-panel-hd,.sec-table th,
+  .cs-di-left,.cs-di-right,.rdrop-item:hover
+) {
+  background: var(--dash-dark-panel-deep) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+/* Tables and chart containers */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(table,thead,tbody,tr,th,td) {
+  background-color: transparent !important;
+  border-color: rgba(77,212,255,0.14) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+/* Text */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(
+  h1,h2,h3,h4,.card-title,.page-title,.rdrop-name,.cs-di-title,.ehs-title,.ehs-kpi-value,.ehs-score-num,
+  .sec-kpi-num,.sec-title,.sec-event-title,.ops-title,.ons-score-num,.ons-kpi-val,.av-title,.av-mini-num,
+  .ds-val,.ekc-value,.score-value,.role-label
+) {
+  color: var(--dark-fg-title) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(
+  .card-subtitle,.rdrop-desc,.cs-di-desc,.cs-di-dim,.ehs-sub,.ehs-kpi-label,.ehs-domain-label,
+  .sec-kpi-label,.sec-sub,.sec-event-desc,.ops-sub,.ons-kpi-label,.av-desc,.av-mini-label,
+  .ds-name,.ekc-label,.score-sub,.role-caret,.sec-legend-item
+) {
+  color: var(--dark-fg-subtle) !important;
+}
+
+/* Semantic pastel blocks -> dark semantic blocks */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(.cs-deduct-high,.sec-high,.risk-high,.crit,.red,[class*="danger"],[class*="high"]) {
+  background: rgba(244,63,94,0.16) !important;
+  border-color: rgba(244,63,94,0.36) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(.cs-deduct-med,.sec-med,.risk-med,.warn,.yellow,[class*="warn"],[class*="medium"]) {
+  background: rgba(245,158,11,0.16) !important;
+  border-color: rgba(245,158,11,0.34) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(.ok,.green,[class*="ok"],[class*="success"],[class*="resolved"]) {
+  border-color: rgba(34,197,94,0.32) !important;
+}
+
+/* Buttons / chips */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(button,.chip,.badge,.tag,.pill,.cs-action-btn,.sab-btn,.ehs-btn,.sec-btn,.ops-btn) {
+  background: rgba(7,16,28,0.90) !important;
+  border-color: var(--dash-dark-line) !important;
+  color: var(--dark-fg-subtle) !important;
+}
+
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(button:hover,.cs-action-btn:hover,.sab-btn:hover,.ehs-btn:hover,.sec-btn:hover,.ops-btn:hover) {
+  background: rgba(77,212,255,0.12) !important;
+  border-color: var(--dash-dark-line-strong) !important;
+  color: var(--dark-fg-title) !important;
+}
+
+/* Inputs */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(input,select,textarea) {
+  background: rgba(5,13,24,0.92) !important;
+  border-color: var(--dash-dark-line) !important;
+  color: var(--dark-fg-title) !important;
+}
+
+/* SVG chart readability */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) svg text { fill: var(--dark-fg-subtle) !important; }
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) svg line,
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) svg path[stroke="#D0D7DE"],
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) svg path[stroke="#E4E8EE"] { stroke: rgba(77,212,255,0.24) !important; }
+
+/* Keep active/primary actions visually strong */
+html[data-theme="dark"] body :is(#view-executive,#view-ops,#view-security) :is(.active,.primary,.btn-primary) {
+  border-color: var(--dash-dark-line-strong) !important;
+}
+
+
+/* User-reported dashboard misses: business cards, role dropdown, chart grid lines */
+html[data-theme="dark"] body .role-selector,
+html[data-theme="dark"] body .role-dropdown,
+html[data-theme="dark"] body .role-dropdown .rdrop-item,
+html[data-theme="dark"] body .role-hint {
+  background: rgba(7, 16, 28, 0.98) !important;
+  border-color: rgba(77, 212, 255, 0.28) !important;
+  color: var(--dark-fg-body) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+}
+html[data-theme="dark"] body .role-dropdown .rdrop-item:hover,
+html[data-theme="dark"] body .role-dropdown .rdrop-item.active {
+  background: rgba(77, 212, 255, 0.12) !important;
+  color: var(--dark-fg-title) !important;
+}
+html[data-theme="dark"] body .role-label,
+html[data-theme="dark"] body .rdrop-name { color: var(--dark-fg-title) !important; }
+html[data-theme="dark"] body .rdrop-desc,
+html[data-theme="dark"] body .role-caret { color: var(--dark-fg-subtle) !important; }
+
+html[data-theme="dark"] body .biz-health-card,
+html[data-theme="dark"] body .biz-health-card .card-body,
+html[data-theme="dark"] body .biz-grid,
+html[data-theme="dark"] body .biz-item,
+html[data-theme="dark"] body .biz-footer {
+  background: rgba(10, 21, 36, 0.94) !important;
+  border-color: rgba(77, 212, 255, 0.22) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .biz-item.biz-warn {
+  background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(10,21,36,0.94) 62%) !important;
+  border-color: rgba(245,158,11,0.36) !important;
+}
+html[data-theme="dark"] body .biz-name,
+html[data-theme="dark"] body .biz-score { color: var(--dark-fg-title) !important; }
+html[data-theme="dark"] body .biz-score:not(.biz-score-warn) { color: #7BEEB3 !important; }
+html[data-theme="dark"] body .biz-score.biz-score-warn { color: #FFD67A !important; }
+html[data-theme="dark"] body .biz-metric,
+html[data-theme="dark"] body .biz-footer { color: var(--dark-fg-subtle) !important; }
+html[data-theme="dark"] body .biz-indicator.ind-green,
+html[data-theme="dark"] body .ind-green { box-shadow: 0 0 0 3px rgba(34,197,94,0.16) !important; }
+html[data-theme="dark"] body .biz-indicator.ind-yellow,
+html[data-theme="dark"] body .ind-yellow { box-shadow: 0 0 0 3px rgba(245,158,11,0.18) !important; }
+
+/* Chart canvases are raster drawings; invert only bright grid/background while preserving colored bars/lines reasonably. */
+html[data-theme="dark"] body #view-executive canvas,
+html[data-theme="dark"] body #view-ops canvas,
+html[data-theme="dark"] body #view-security canvas {
+  filter: invert(0.92) hue-rotate(180deg) saturate(1.15) contrast(0.92) brightness(0.95) !important;
+  mix-blend-mode: screen;
+  opacity: 0.86;
+}
+html[data-theme="dark"] body .chart-body,
+html[data-theme="dark"] body .trend-card,
+html[data-theme="dark"] body .trend-card .card-body {
+  background: rgba(7, 16, 28, 0.92) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+
+/* Extra dashboard class families not covered by exact names */
+html[data-theme="dark"] body [class^="exec-"],
+html[data-theme="dark"] body [class*=" exec-"],
+html[data-theme="dark"] body [class^="ehs-"],
+html[data-theme="dark"] body [class*=" ehs-"],
+html[data-theme="dark"] body [class^="ops-"],
+html[data-theme="dark"] body [class*=" ops-"],
+html[data-theme="dark"] body [class^="sec-"],
+html[data-theme="dark"] body [class*=" sec-"],
+html[data-theme="dark"] body [class^="cs-"],
+html[data-theme="dark"] body [class*=" cs-"] {
+  border-color: rgba(77,212,255,0.18) !important;
+}
+
+html[data-theme="dark"] body [class^="exec-"][style*="background"],
+html[data-theme="dark"] body [class*=" exec-"][style*="background"],
+html[data-theme="dark"] body [class^="ehs-"][style*="background"],
+html[data-theme="dark"] body [class*=" ehs-"][style*="background"],
+html[data-theme="dark"] body [class^="ops-"][style*="background"],
+html[data-theme="dark"] body [class*=" ops-"][style*="background"],
+html[data-theme="dark"] body [class^="sec-"][style*="background"],
+html[data-theme="dark"] body [class*=" sec-"][style*="background"],
+html[data-theme="dark"] body [class^="cs-"][style*="background"],
+html[data-theme="dark"] body [class*=" cs-"][style*="background"] {
+  background: rgba(10,21,36,0.92) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+
+/* Chart.js is now theme-aware; do not filter it globally. */
+html[data-theme="dark"] body #view-executive canvas,
+html[data-theme="dark"] body #view-ops canvas,
+html[data-theme="dark"] body #view-security canvas {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+}
+
+
+/* Security posture hover rows + event report drawer */
+html[data-theme="dark"] body .sec-posture-card .spc-event-list {
+  border-top-color: rgba(77,212,255,0.16) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   网络运维处视图 (view-ops) — 深色主题全面修复
+   目标：消除所有浅色背景色块，统一为深色调
+══════════════════════════════════════════════════════════════ */
+
+/* ── 网络健康概要条 ────────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .ons-score-block {
+  background: rgba(180,140,0,0.14) !important;
+  border: 1px solid rgba(212,163,44,0.32) !important;
+}
+html[data-theme="dark"] body #view-ops .ons-score-num { color: #FFD67A !important; }
+html[data-theme="dark"] body #view-ops .ons-score-label { color: #FFD67A !important; }
+html[data-theme="dark"] body #view-ops .ons-ai-row {
+  background: rgba(110,64,201,0.14) !important;
+  border: 1px solid rgba(139,92,246,0.28) !important;
+}
+html[data-theme="dark"] body #view-ops .ons-ai-icon { color: #A78BFA !important; }
+html[data-theme="dark"] body #view-ops .ons-ai-title { color: #C4B5FD !important; }
+html[data-theme="dark"] body #view-ops .ons-ai-desc { color: #9DB0CA !important; }
+html[data-theme="dark"] body #view-ops .ons-divider { background: rgba(77,212,255,0.2) !important; }
+html[data-theme="dark"] body #view-ops .ons-kval { color: #EAF2FF !important; }
+html[data-theme="dark"] body #view-ops .ons-kval.red { color: #FF8AA2 !important; }
+html[data-theme="dark"] body #view-ops .ons-kval.yellow { color: #FFD67A !important; }
+html[data-theme="dark"] body #view-ops .ons-kval.green { color: #7BEEB3 !important; }
+html[data-theme="dark"] body #view-ops .ons-kval.purple { color: #C4B5FD !important; }
+html[data-theme="dark"] body #view-ops .ons-klbl { color: #7A94B2 !important; }
+
+/* ── 侧边栏数据源状态 chips ─────────────────────────── */
+html[data-theme="dark"] body .dashboard-subrail .osn-chip,
+html[data-theme="dark"] body .dashboard-subrail .src-ok,
+html[data-theme="dark"] body .dashboard-subrail .src-warn {
+  background: rgba(10,21,36,0.85) !important;
+  border: 1px solid rgba(77,212,255,0.22) !important;
+}
+html[data-theme="dark"] body .dashboard-subrail .src-ok { color: #7BEEB3 !important; }
+html[data-theme="dark"] body .dashboard-subrail .src-warn { color: #FFD67A !important; }
+/* rail-status-grid layout */
+html[data-theme="dark"] body .dashboard-subrail .rail-status-grid { background: transparent !important; }
+
+/* ── 拓扑快照 & 告警 chips ──────────────────────────── */
+html[data-theme="dark"] body #view-ops .otf-chip {
+  background: rgba(10,21,36,0.88) !important;
+  border: 1px solid rgba(77,212,255,0.22) !important;
+}
+html[data-theme="dark"] body #view-ops .otf-red { color: #FF8AA2 !important; border-color: rgba(244,63,94,0.36) !important; background: rgba(244,63,94,0.14) !important; }
+html[data-theme="dark"] body #view-ops .otf-yellow { color: #FFD67A !important; border-color: rgba(245,158,11,0.36) !important; background: rgba(245,158,11,0.14) !important; }
+
+/* ── AI根因分析卡 ───────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .rca-item {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .rca-item:hover { background: rgba(20,36,58,0.92) !important; }
+html[data-theme="dark"] body #view-ops .rca-root {
+  background: rgba(244,63,94,0.12) !important;
+  border-left-color: #FF6B85 !important;
+  border-color: rgba(244,63,94,0.28) !important;
+}
+html[data-theme="dark"] body #view-ops .rca-warn {
+  background: rgba(245,158,11,0.10) !important;
+  border-left-color: #FFB347 !important;
+  border-color: rgba(245,158,11,0.26) !important;
+}
+html[data-theme="dark"] body #view-ops .rca-title { color: #EAF2FF !important; }
+html[data-theme="dark"] body #view-ops .rca-conf,
+html[data-theme="dark"] body #view-ops .rca-chain,
+html[data-theme="dark"] body #view-ops .rca-impact { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .rca-badge {
+  background: rgba(244,63,94,0.18) !important;
+  color: #FF8AA2 !important;
+}
+html[data-theme="dark"] body #view-ops .rca-badge { border: none !important; }
+
+/* ── 多源数据融合卡 ─────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .ofl-item {
+  background: rgba(10,21,36,0.86) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .ofl-src-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .ofl-src-vendor,
+html[data-theme="dark"] body #view-ops .ofl-coverage { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .ofl-metric {
+  background: rgba(77,212,255,0.08) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .ofl-ok-text { color: #7BEEB3 !important; background: rgba(34,197,94,0.14) !important; }
+html[data-theme="dark"] body #view-ops .ofl-warn-text { color: #FFD67A !important; background: rgba(245,158,11,0.14) !important; }
+html[data-theme="dark"] body #view-ops .ofl-ai-note {
+  background: rgba(110,64,201,0.14) !important;
+  border-color: rgba(139,92,246,0.28) !important;
+  color: #C4B5FD !important;
+}
+html[data-theme="dark"] body #view-ops .ofl-ai-note .material-symbols-rounded { color: #A78BFA !important; }
+
+/* ── 关键链路状态 badges ────────────────────────────── */
+html[data-theme="dark"] body #view-ops .oll-ok {
+  background: rgba(34,197,94,0.14) !important; color: #7BEEB3 !important;
+}
+html[data-theme="dark"] body #view-ops .oll-warn {
+  background: rgba(245,158,11,0.14) !important; color: #FFD67A !important;
+}
+html[data-theme="dark"] body #view-ops .oll-red-status {
+  background: rgba(244,63,94,0.14) !important; color: #FF8AA2 !important;
+}
+html[data-theme="dark"] body #view-ops .oll-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .oll-pct { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .oll-pct.oll-red { color: #FF8AA2 !important; }
+html[data-theme="dark"] body #view-ops .oll-bw { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .oll-bar-wrap { background: rgba(77,212,255,0.1) !important; }
+
+/* ── 拓扑页面：侧边树 / 面包屑 / 图例栏 ─────────────── */
+html[data-theme="dark"] body #view-ops .topo-tree-sidebar {
+  background: rgba(7,16,28,0.96) !important;
+  border-right-color: rgba(77,212,255,0.20) !important;
+}
+html[data-theme="dark"] body #view-ops .tts-header { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .tts-dc-item { color: #9DB0CA !important; }
+html[data-theme="dark"] body #view-ops .tts-dc-item:hover { background: rgba(77,212,255,0.08) !important; }
+html[data-theme="dark"] body #view-ops .tts-dc-item.active {
+  background: rgba(9,105,218,0.14) !important;
+  border-left-color: #43D9FF !important;
+}
+html[data-theme="dark"] body #view-ops .tts-dc-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .tts-dc-meta { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .tts-room-item { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .tts-room-item:hover { background: rgba(77,212,255,0.08) !important; color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .tts-room-item.active {
+  background: rgba(9,105,218,0.14) !important; color: #7DE7FF !important;
+}
+
+html[data-theme="dark"] body #view-ops .topo-breadcrumb {
+  background: rgba(7,16,28,0.92) !important;
+  border-bottom-color: rgba(77,212,255,0.18) !important;
+  color: #7A94B2 !important;
+}
+html[data-theme="dark"] body #view-ops .tbc-item:hover { background: rgba(77,212,255,0.08) !important; }
+html[data-theme="dark"] body #view-ops .tbc-active { color: #D0E7FF !important; }
+
+html[data-theme="dark"] body #view-ops .topo-canvas-legend {
+  background: rgba(7,16,28,0.92) !important;
+  border-top-color: rgba(77,212,255,0.18) !important;
+  color: #7A94B2 !important;
+}
+
+html[data-theme="dark"] body #view-ops .topo-detail-panel {
+  background: rgba(7,16,28,0.95) !important;
+  border-left-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .tdp-placeholder { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .tdp-ap-header {
+  color: #9DB0CA !important;
+  border-bottom-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .tdp-ap-empty { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .tdp-dc-item {
+  background: rgba(10,21,36,0.75) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .tdp-dc-item:hover { background: rgba(20,36,58,0.9) !important; }
+html[data-theme="dark"] body #view-ops .tdp-dc-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .tdp-dc-meta { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .tdp-dc-bar-wrap { background: rgba(77,212,255,0.1) !important; }
+html[data-theme="dark"] body #view-ops .tdp-dc-header { color: #D0E7FF !important; }
+
+/* DC hover tooltip */
+html[data-theme="dark"] body .topo-dc-tooltip {
+  background: rgba(7,16,28,0.97) !important;
+  border-color: rgba(77,212,255,0.28) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5) !important;
+}
+html[data-theme="dark"] body .tdc-header {
+  background: rgba(4,12,24,0.88) !important;
+  border-bottom-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body .tdc-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body .tdc-stats { border-bottom-color: rgba(77,212,255,0.14) !important; }
+html[data-theme="dark"] body .tdc-stat-val { color: #EAF2FF !important; }
+html[data-theme="dark"] body .tdc-stat-lbl { color: #7A94B2 !important; }
+html[data-theme="dark"] body .tdc-stat-sep { background: rgba(77,212,255,0.2) !important; }
+html[data-theme="dark"] body .tdc-metrics { border-bottom-color: rgba(77,212,255,0.12) !important; }
+html[data-theme="dark"] body .tdc-metric-row { color: #7A94B2 !important; }
+html[data-theme="dark"] body .tdc-metric-val { color: #D0E7FF !important; }
+html[data-theme="dark"] body .tdc-issue {
+  background: rgba(110,64,201,0.14) !important;
+  border-bottom-color: rgba(139,92,246,0.22) !important;
+  color: #C4B5FD !important;
+}
+html[data-theme="dark"] body .tdc-hint { color: #7DE7FF !important; }
+html[data-theme="dark"] body .tdc-badge-ok { background: rgba(34,197,94,0.16) !important; color: #7BEEB3 !important; }
+html[data-theme="dark"] body .tdc-badge-warn { background: rgba(245,158,11,0.16) !important; color: #FFD67A !important; }
+html[data-theme="dark"] body .tdc-badge-crit { background: rgba(244,63,94,0.16) !important; color: #FF8AA2 !important; }
+
+/* 拓扑模式栏、搜索栏、过滤栏 */
+html[data-theme="dark"] body #view-ops .topo-mode-bar {
+  background: rgba(7,16,28,0.94) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .tmb-btn {
+  color: #9DB0CA !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+}
+html[data-theme="dark"] body #view-ops .tmb-btn:hover {
+  background: rgba(77,212,255,0.08) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #D0E7FF !important;
+}
+html[data-theme="dark"] body #view-ops .tmb-btn.tmb-active {
+  background: rgba(67,217,255,0.16) !important;
+  border-color: rgba(67,217,255,0.36) !important;
+  color: #7DE7FF !important;
+}
+html[data-theme="dark"] body #view-ops .topo-search-wrap {
+  background: rgba(4,12,24,0.9) !important;
+  border: 1px solid rgba(77,212,255,0.22) !important;
+  border-radius: 6px !important;
+}
+html[data-theme="dark"] body #view-ops .topo-search-input {
+  background: transparent !important;
+  color: #D0E7FF !important;
+  border: none !important;
+}
+html[data-theme="dark"] body #view-ops .topo-search-icon { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .topo-search-dropdown {
+  background: rgba(7,16,28,0.98) !important;
+  border-color: rgba(77,212,255,0.24) !important;
+}
+
+/* 拓扑过滤栏 */
+html[data-theme="dark"] body #view-ops .topo-filter-bar {
+  background: rgba(7,16,28,0.9) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .tfb-btn {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .tfb-btn:hover { background: rgba(77,212,255,0.10) !important; color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .tfb-btn.tfb-active {
+  background: rgba(67,217,255,0.16) !important;
+  border-color: rgba(67,217,255,0.36) !important;
+  color: #7DE7FF !important;
+}
+html[data-theme="dark"] body #view-ops .tfb-label { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .tfb-div { background: rgba(77,212,255,0.18) !important; }
+
+/* ── 流量分析页 ──────────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .trf-header-bar {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-title { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-source { color: #7A94B2 !important; }
+
+html[data-theme="dark"] body #view-ops .trf-ai-strip {
+  background: rgba(110,64,201,0.14) !important;
+  border: 1px solid rgba(139,92,246,0.28) !important;
+  color: #C4B5FD !important;
+}
+html[data-theme="dark"] body #view-ops .trf-lh-section {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-lh-header {
+  background: rgba(4,12,24,0.6) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.14) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-lh-hdr-title { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-lh-hdr-hint { color: #5A7A9E !important; }
+
+/* 链路卡片 */
+html[data-theme="dark"] body #view-ops .trf-link-card {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-link-card:hover { background: rgba(20,36,58,0.92) !important; }
+html[data-theme="dark"] body #view-ops .trf-link-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-link-util { color: #EAF2FF !important; }
+html[data-theme="dark"] body #view-ops .trf-link-bw { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .trf-link-bar-bg { background: rgba(77,212,255,0.1) !important; }
+html[data-theme="dark"] body #view-ops .trf-link-warn-tag {
+  background: rgba(245,158,11,0.14) !important;
+  color: #FFD67A !important;
+}
+html[data-theme="dark"] body #view-ops .trf-ai-pred-badge {
+  background: rgba(110,64,201,0.14) !important;
+  border-color: rgba(139,92,246,0.28) !important;
+  color: #C4B5FD !important;
+}
+html[data-theme="dark"] body #view-ops .trf-link-tabs .trf-ltab {
+  color: #7A94B2 !important;
+  background: rgba(10,21,36,0.7) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-link-tabs .trf-ltab.active {
+  background: rgba(67,217,255,0.16) !important;
+  border-color: rgba(67,217,255,0.36) !important;
+  color: #7DE7FF !important;
+}
+html[data-theme="dark"] body #view-ops .trf-anom-badge {
+  background: rgba(244,63,94,0.18) !important;
+  color: #FF8AA2 !important;
+}
+html[data-theme="dark"] body #view-ops .trf-anomaly-item {
+  background: rgba(10,21,36,0.82) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .trf-cap-item {
+  background: rgba(10,21,36,0.82) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+
+/* Top hosts */
+html[data-theme="dark"] body #view-ops .trf-top-row {
+  border-bottom-color: rgba(77,212,255,0.12) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-top-host { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-top-val { color: #EAF2FF !important; }
+html[data-theme="dark"] body #view-ops .trf-top-bar-bg { background: rgba(77,212,255,0.1) !important; }
+
+/* ── 故障分析页 ──────────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .fault-event-list .fault-ev-item {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .fault-ev-item:hover { background: rgba(20,36,58,0.92) !important; }
+html[data-theme="dark"] body #view-ops .fault-ev-item.active {
+  background: rgba(110,64,201,0.18) !important;
+  border-left-color: #A78BFA !important;
+}
+html[data-theme="dark"] body #view-ops .fault-conf-badge {
+  background: rgba(110,64,201,0.16) !important;
+  color: #C4B5FD !important;
+  border: 1px solid rgba(139,92,246,0.28) !important;
+}
+html[data-theme="dark"] body #view-ops .fault-rca-body .rca-node {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+
+/* 影响范围条目 */
+html[data-theme="dark"] body #view-ops .fault-impact-item {
+  background: rgba(10,21,36,0.82) !important;
+  border-color: rgba(77,212,255,0.14) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .fault-action-body .fault-step {
+  background: rgba(10,21,36,0.82) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .fault-action-gen-btn {
+  background: rgba(110,64,201,0.18) !important;
+  color: #C4B5FD !important;
+  border: 1px solid rgba(139,92,246,0.32) !important;
+}
+
+/* ── 设备台账页 ──────────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .inv-toolbar {
+  background: rgba(7,16,28,0.92) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .inv-search {
+  background: rgba(4,12,24,0.9) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #D0E7FF !important;
+}
+html[data-theme="dark"] body #view-ops .ops-select {
+  background: rgba(4,12,24,0.9) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #D0E7FF !important;
+}
+html[data-theme="dark"] body #view-ops .inv-count { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .inv-table-wrap {
+  background: rgba(7,16,28,0.88) !important;
+}
+html[data-theme="dark"] body #view-ops .inv-table thead tr,
+html[data-theme="dark"] body #view-ops .inv-table th {
+  background: rgba(4,12,24,0.88) !important;
+  color: #7A94B2 !important;
+  border-bottom-color: rgba(77,212,255,0.2) !important;
+}
+html[data-theme="dark"] body #view-ops .inv-table td {
+  border-bottom-color: rgba(77,212,255,0.1) !important;
+  color: #C0D7EF !important;
+}
+html[data-theme="dark"] body #view-ops .inv-table tr:hover td {
+  background: rgba(77,212,255,0.05) !important;
+}
+
+/* 台账健康状态 badges */
+html[data-theme="dark"] body #view-ops .inv-health-ok {
+  background: rgba(34,197,94,0.16) !important; color: #7BEEB3 !important;
+}
+html[data-theme="dark"] body #view-ops .inv-health-warn {
+  background: rgba(245,158,11,0.16) !important; color: #FFD67A !important;
+}
+html[data-theme="dark"] body #view-ops .inv-health-crit {
+  background: rgba(244,63,94,0.16) !important; color: #FF8AA2 !important;
+}
+html[data-theme="dark"] body #view-ops .inv-cpu-bar-bg { background: rgba(77,212,255,0.1) !important; }
+
+/* ── 容量规划页 ──────────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .cap-kpi {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .cap-kpi-num { color: #EAF2FF !important; }
+html[data-theme="dark"] body #view-ops .cap-kpi-num.cap-red { color: #FF8AA2 !important; }
+html[data-theme="dark"] body #view-ops .cap-kpi-num.cap-yellow { color: #FFD67A !important; }
+html[data-theme="dark"] body #view-ops .cap-kpi-num.cap-green { color: #7BEEB3 !important; }
+html[data-theme="dark"] body #view-ops .cap-kpi-label { color: #9DB0CA !important; }
+html[data-theme="dark"] body #view-ops .cap-kpi-sub { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .cap-action-list .cap-act-item {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .cap-act-item.cap-act-high {
+  background: rgba(244,63,94,0.12) !important;
+  border-left-color: #FF6B85 !important;
+}
+html[data-theme="dark"] body #view-ops .cap-act-item.cap-act-med {
+  background: rgba(245,158,11,0.10) !important;
+  border-left-color: #FFB347 !important;
+}
+html[data-theme="dark"] body #view-ops .cap-act-title { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .cap-act-desc { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .cap-port-item {
+  background: rgba(10,21,36,0.82) !important;
+  border-color: rgba(77,212,255,0.14) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-legend { color: #7A94B2 !important; }
+
+/* 容量预测图 - 警戒线badge */
+html[data-theme="dark"] body #view-ops [style*="background:#FFEBE9"],
+html[data-theme="dark"] body #view-ops [style*="background: #FFEBE9"],
+html[data-theme="dark"] body #view-ops [style*="background:#FFF8C5"],
+html[data-theme="dark"] body #view-ops [style*="background: #FFF8C5"],
+html[data-theme="dark"] body #view-ops [style*="background:#F5F0FF"],
+html[data-theme="dark"] body #view-ops [style*="background: #F5F0FF"],
+html[data-theme="dark"] body #view-ops [style*="background:#EEF0FF"],
+html[data-theme="dark"] body #view-ops [style*="background: #EEF0FF"],
+html[data-theme="dark"] body #view-ops [style*="background:#F6F8FA"],
+html[data-theme="dark"] body #view-ops [style*="background: #F6F8FA"],
+html[data-theme="dark"] body #view-ops [style*="background:#FFF5F5"],
+html[data-theme="dark"] body #view-ops [style*="background: #FFF5F5"],
+html[data-theme="dark"] body #view-ops [style*="background:#F0F6FF"],
+html[data-theme="dark"] body #view-ops [style*="background: #F0F6FF"] {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+
+/* ── 通用 ops semantic class 背景替换 ───────────────── */
+html[data-theme="dark"] body #view-ops .trend-annotation {
+  background: rgba(110,64,201,0.14) !important;
+  border: none !important;
+  color: #C4B5FD !important;
+}
+html[data-theme="dark"] body #view-ops .event-root {
+  background: rgba(244,63,94,0.12) !important;
+  border-color: rgba(244,63,94,0.30) !important;
+}
+html[data-theme="dark"] body #view-ops .event-impact {
+  background: rgba(188,76,0,0.12) !important;
+  border-color: rgba(188,76,0,0.30) !important;
+}
+html[data-theme="dark"] body #view-ops .event-impact-minor {
+  background: rgba(212,167,44,0.10) !important;
+  border-color: rgba(212,167,44,0.28) !important;
+}
+html[data-theme="dark"] body #view-ops .event-title { color: #EAF2FF !important; }
+html[data-theme="dark"] body #view-ops .event-conf,
+html[data-theme="dark"] body #view-ops .chain-step { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .chain-active { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .ef-btn {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .ef-btn:hover { background: rgba(77,212,255,0.10) !important; color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .em-tag {
+  background: rgba(110,64,201,0.18) !important;
+  color: #C4B5FD !important;
+}
+
+/* 数据源指示器：ops-src-legend 图例 */
+html[data-theme="dark"] body #view-ops .osl-item { color: #7A94B2 !important; }
+
+/* 告警抽屉内部 ops-specific items */
+html[data-theme="dark"] body .aie-root {
+  background: rgba(244,63,94,0.12) !important;
+  border-color: rgba(244,63,94,0.30) !important;
+}
+html[data-theme="dark"] body .aie-impact {
+  background: rgba(212,167,44,0.10) !important;
+  border-color: rgba(212,167,44,0.28) !important;
+}
+html[data-theme="dark"] body .aie-info {
+  background: rgba(10,21,36,0.86) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body .aie-title { color: #EAF2FF !important; }
+html[data-theme="dark"] body .aie-chain-step { color: #7A94B2 !important; }
+html[data-theme="dark"] body .aie-impact-label { color: #7A94B2 !important; }
+
+/* ── 拓扑路径追踪面板 ───────────────────────────────── */
+html[data-theme="dark"] body #view-ops .topo-path-panel {
+  background: rgba(7,16,28,0.96) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.20) !important;
+}
+html[data-theme="dark"] body #view-ops .tpp-tabs {
+  background: rgba(4,12,24,0.8) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .tpp-tab {
+  color: #7A94B2 !important;
+  background: transparent !important;
+}
+html[data-theme="dark"] body #view-ops .tpp-tab:hover { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .tpp-tab.tpp-tab-active {
+  background: rgba(67,217,255,0.14) !important;
+  color: #7DE7FF !important;
+  border-bottom-color: #43D9FF !important;
+}
+html[data-theme="dark"] body #view-ops .tpp-body { background: rgba(7,16,28,0.94) !important; }
+html[data-theme="dark"] body #view-ops .tpp-input {
+  background: rgba(4,12,24,0.88) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #D0E7FF !important;
+}
+html[data-theme="dark"] body #view-ops .tpp-select {
+  background: rgba(4,12,24,0.88) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #D0E7FF !important;
+}
+html[data-theme="dark"] body #view-ops .tpp-form-label { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .tpp-form-sep { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .tpp-hint { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .tpp-trace-btn {
+  background: rgba(67,217,255,0.16) !important;
+  border-color: rgba(67,217,255,0.36) !important;
+  color: #7DE7FF !important;
+}
+html[data-theme="dark"] body #view-ops .tpp-clear-btn {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #9DB0CA !important;
+}
+
+/* ── AI节点气泡 & 全量分析模态 ──────────────────────── */
+html[data-theme="dark"] body .ai-node-bubble .anb-body {
+  background: rgba(7,16,28,0.97) !important;
+  border: 1px solid rgba(77,212,255,0.28) !important;
+}
+html[data-theme="dark"] body .anb-title { color: #D0E7FF !important; }
+html[data-theme="dark"] body .anb-summary { color: #9DB0CA !important; }
+html[data-theme="dark"] body .anb-detail-btn {
+  background: rgba(67,217,255,0.16) !important;
+  color: #7DE7FF !important;
+}
+
+html[data-theme="dark"] body .aia-panel {
+  background: rgba(7,16,28,0.97) !important;
+  border: 1px solid rgba(77,212,255,0.22) !important;
+}
+html[data-theme="dark"] body .aia-hdr {
+  background: rgba(4,12,24,0.88) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body .aia-section {
+  background: transparent !important;
+  border-top: 1px solid rgba(77,212,255,0.10) !important;
+}
+html[data-theme="dark"] body .aia-sec-title { color: #9DB0CA !important; }
+html[data-theme="dark"] body .aia-root-cause { color: #D0E7FF !important; }
+html[data-theme="dark"] body .aia-conf-bar-track { background: rgba(77,212,255,0.12) !important; }
+html[data-theme="dark"] body .aia-timeline .aia-tl-item {
+  border-bottom-color: rgba(77,212,255,0.10) !important;
+}
+
+/* ── 接入层云展开面板 ────────────────────────────────── */
+html[data-theme="dark"] body .acc-cloud-panel {
+  background: rgba(7,16,28,0.97) !important;
+  border: 1px solid rgba(77,212,255,0.24) !important;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5) !important;
+}
+html[data-theme="dark"] body .acp-header {
+  background: rgba(4,12,24,0.9) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body .acp-title { color: #D0E7FF !important; }
+html[data-theme="dark"] body .acp-subtitle { color: #7A94B2 !important; }
+html[data-theme="dark"] body .acp-btn {
+  background: rgba(77,212,255,0.1) !important;
+  border-color: rgba(77,212,255,0.24) !important;
+  color: #7DE7FF !important;
+}
+
+/* ── 变更历史 / Diff弹窗 ─────────────────────────────── */
+html[data-theme="dark"] body .change-history-panel {
+  background: rgba(7,16,28,0.95) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body .cdm-dialog {
+  background: rgba(7,16,28,0.98) !important;
+  border: 1px solid rgba(77,212,255,0.24) !important;
+}
+html[data-theme="dark"] body .cdm-hdr {
+  background: rgba(4,12,24,0.88) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.18) !important;
+  color: #D0E7FF !important;
+}
+html[data-theme="dark"] body .cdm-body { color: #9DB0CA !important; }
+html[data-theme="dark"] body .cdm-close-btn {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #9DB0CA !important;
+}
+
+/* ── 全局 ops-specific light-背景 class 覆盖 ────────── */
+html[data-theme="dark"] body #view-ops .predict-warn {
+  background: rgba(245,158,11,0.10) !important;
+  border-color: rgba(212,163,44,0.30) !important;
+}
+html[data-theme="dark"] body #view-ops .predict-device {
+  background: rgba(10,21,36,0.82) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .pi-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .pi-sub { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .metric-bar-wrap { background: rgba(77,212,255,0.1) !important; }
+html[data-theme="dark"] body #view-ops .metric-name { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .metric-val { color: #D0E7FF !important; }
+
+/* ops-select 全局 */
+html[data-theme="dark"] body #ops-traffic .ops-select,
+html[data-theme="dark"] body #ops-inventory .ops-select,
+html[data-theme="dark"] body #ops-capacity .ops-select {
+  background: rgba(4,12,24,0.9) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #D0E7FF !important;
+}
+
+/* ── 设备台账侧滑抽屉 ───────────────────────────────── */
+html[data-theme="dark"] body .inv-dev-drawer {
+  background: rgba(7,16,28,0.98) !important;
+  border-left: 1px solid rgba(77,212,255,0.24) !important;
+}
+html[data-theme="dark"] body .inv-dd-header {
+  background: rgba(4,12,24,0.88) !important;
+  border-bottom: 1px solid rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #invDevTitle { color: #D0E7FF !important; }
+html[data-theme="dark"] body #invDevSubtitle { color: #7A94B2 !important; }
+html[data-theme="dark"] body .inv-dd-body { color: #9DB0CA !important; }
+html[data-theme="dark"] body .inv-dd-body .inv-dev-section {
+  background: rgba(10,21,36,0.82) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body .inv-dd-body .inv-dev-kpi {
+  background: rgba(10,21,36,0.82) !important;
+  border-color: rgba(77,212,255,0.14) !important;
+}
+
+/* ── btn-link (查看全图 → 等) ─────────────────────────── */
+html[data-theme="dark"] body #view-ops .btn-link,
+html[data-theme="dark"] body #view-ops .osn-nav-btn {
+  color: #7DE7FF !important;
+  background: transparent !important;
+  border: none !important;
+}
+html[data-theme="dark"] body #view-ops .btn-link:hover { color: #43D9FF !important; }
+
+/* ── 容量图标注 (警戒线 badge) ─────────────────────── */
+html[data-theme="dark"] body #view-ops #capForecastChart + div [style*="background:#FFEBE9"],
+html[data-theme="dark"] body #view-ops .trf-dot { filter: brightness(1.2) !important; }
+
+/* ── 容量行动卡头部 ─────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .cap-actions-card,
+html[data-theme="dark"] body #view-ops .cap-port-card,
+html[data-theme="dark"] body #view-ops .cap-forecast-card {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+
+/* ── 二级导航子菜单 (ops-subnav header-level override) ── */
+html[data-theme="dark"] body .ops-subnav {
+  background: transparent !important;
+  border-bottom-color: rgba(77,212,255,0.14) !important;
+}
+html[data-theme="dark"] body .osn-btn { color: #9DB0CA !important; }
+html[data-theme="dark"] body .osn-btn:hover { background: rgba(77,212,255,0.08) !important; color: #D0E7FF !important; }
+html[data-theme="dark"] body .osn-btn.active { background: #1F2328 !important; color: #fff !important; }
+
+/* ── 全部修正：所有残留白色、浅灰色 CSS-class 背景 ──── */
+html[data-theme="dark"] body #view-ops .rca-badge { border: 1px solid rgba(244,63,94,0.32) !important; }
+html[data-theme="dark"] body #view-ops .card-badge.badge-green {
+  background: rgba(34,197,94,0.16) !important; color: #7BEEB3 !important;
+}
+html[data-theme="dark"] body #view-ops .card-badge.badge-red {
+  background: rgba(244,63,94,0.16) !important; color: #FF8AA2 !important;
+}
+html[data-theme="dark"] body #view-ops .event-count-badge {
+  background: rgba(110,64,201,0.18) !important; color: #C4B5FD !important;
+}
+html[data-theme="dark"] body #view-ops .predict-badge {
+  background: rgba(110,64,201,0.18) !important; color: #C4B5FD !important;
+}
+html[data-theme="dark"] body #view-ops .em-tag {
+  background: rgba(110,64,201,0.18) !important; color: #C4B5FD !important;
+}
+html[data-theme="dark"] body #view-ops .dc-tab-badge-red {
+  background: rgba(244,63,94,0.18) !important; color: #FF8AA2 !important;
+}
+html[data-theme="dark"] body #view-ops .dc-tab-badge-orange {
+  background: rgba(245,158,11,0.18) !important; color: #FFD67A !important;
+}
+
+/* 容量图例 dot */
+html[data-theme="dark"] body #view-ops .trf-dot { opacity: 1 !important; }
+html[data-theme="dark"] body .sec-posture-card .spc-ev {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.12) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .sec-posture-card .spc-ev.ev-clickable:hover {
+  background: rgba(77,212,255,0.10) !important;
+  color: var(--dark-fg-title) !important;
+  opacity: 1 !important;
+}
+html[data-theme="dark"] body .sec-posture-card .spc-ev-title {
+  color: var(--dark-fg-title) !important;
+}
+html[data-theme="dark"] body .sec-posture-card .spc-ev-desc,
+html[data-theme="dark"] body .sec-posture-card .spc-ev-arrow {
+  color: var(--dark-fg-subtle) !important;
+}
+html[data-theme="dark"] body .sec-posture-card .stag-red {
+  background: rgba(244,63,94,0.18) !important;
+  border: 1px solid rgba(244,63,94,0.34) !important;
+  color: #FFC2D1 !important;
+}
+html[data-theme="dark"] body .sec-posture-card .stag-yellow {
+  background: rgba(245,158,11,0.18) !important;
+  border: 1px solid rgba(245,158,11,0.34) !important;
+  color: #FFE2A0 !important;
+}
+html[data-theme="dark"] body .sec-posture-card .stag-gray {
+  background: rgba(77,212,255,0.10) !important;
+  border: 1px solid rgba(77,212,255,0.22) !important;
+  color: var(--dark-fg-subtle) !important;
+}
+
+html[data-theme="dark"] body .ev-overlay.open {
+  background: rgba(2,8,16,0.76) !important;
+  backdrop-filter: blur(3px) !important;
+}
+html[data-theme="dark"] body .ev-drawer {
+  background: linear-gradient(180deg, rgba(8,18,32,0.99), rgba(7,15,26,0.99)) !important;
+  border-left: 1px solid rgba(77,212,255,0.26) !important;
+  color: var(--dark-fg-body) !important;
+  box-shadow: -18px 0 44px rgba(0,0,0,0.40), 0 0 34px rgba(77,212,255,0.08) !important;
+}
+html[data-theme="dark"] body .ev-drawer-header,
+html[data-theme="dark"] body .ev-drawer-footer {
+  background: rgba(7,16,28,0.96) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .ev-drawer-body {
+  background: radial-gradient(circle at 14% 0%, rgba(77,212,255,0.08), transparent 32%), rgba(7,15,26,0.98) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .ev-title,
+html[data-theme="dark"] body .ev-tl-label,
+html[data-theme="dark"] body .ev-stat-num,
+html[data-theme="dark"] body .ev-kv-val,
+html[data-theme="dark"] body .ev-ai-label,
+html[data-theme="dark"] body .ev-section-title {
+  color: var(--dark-fg-title) !important;
+}
+html[data-theme="dark"] body .ev-meta,
+html[data-theme="dark"] body .ev-tl-time,
+html[data-theme="dark"] body .ev-tl-desc,
+html[data-theme="dark"] body .ev-stat-label,
+html[data-theme="dark"] body .ev-kv-key,
+html[data-theme="dark"] body .ev-footer-note {
+  color: var(--dark-fg-subtle) !important;
+}
+html[data-theme="dark"] body .ev-stat-card,
+html[data-theme="dark"] body .ev-ai-block,
+html[data-theme="dark"] body .ev-impact-tag,
+html[data-theme="dark"] body .ev-progress-bar,
+html[data-theme="dark"] body .ev-tl-dot,
+html[data-theme="dark"] body .ev-btn-secondary,
+html[data-theme="dark"] body .ev-btn-danger,
+html[data-theme="dark"] body .ev-close {
+  background: rgba(10,21,36,0.92) !important;
+  border-color: rgba(77,212,255,0.20) !important;
+  color: var(--dark-fg-body) !important;
+}
+html[data-theme="dark"] body .ev-ai-text {
+  color: #CDE3FB !important;
+}
+html[data-theme="dark"] body .ev-tl-item:not(:last-child)::after {
+  background: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body .tl-dot-red,
+html[data-theme="dark"] body .stat-red {
+  background: rgba(244,63,94,0.18) !important;
+  color: #FFC2D1 !important;
+}
+html[data-theme="dark"] body .tl-dot-yellow,
+html[data-theme="dark"] body .stat-yellow {
+  background: rgba(245,158,11,0.18) !important;
+  color: #FFE2A0 !important;
+}
+html[data-theme="dark"] body .tl-dot-green,
+html[data-theme="dark"] body .stat-green {
+  background: rgba(34,197,94,0.16) !important;
+  color: #A8F6C8 !important;
+}
+html[data-theme="dark"] body .tl-dot-blue,
+html[data-theme="dark"] body .stat-blue {
+  background: rgba(59,130,246,0.16) !important;
+  color: #B9EBFF !important;
+}
+html[data-theme="dark"] body .tl-dot-gray {
+  background: rgba(77,212,255,0.10) !important;
+  color: var(--dark-fg-subtle) !important;
+}
+html[data-theme="dark"] body .ev-close:hover,
+html[data-theme="dark"] body .ev-btn-secondary:hover {
+  background: rgba(77,212,255,0.12) !important;
+  color: var(--dark-fg-title) !important;
+}
+html[data-theme="dark"] body .ev-btn-danger:hover {
+  background: rgba(244,63,94,0.16) !important;
+  color: #FFC2D1 !important;
+}
+
+
+/* Colorful timeline emphasis in dark event drawer */
+html[data-theme="dark"] body .ev-timeline {
+  gap: 4px;
+}
+html[data-theme="dark"] body .ev-tl-item:not(:last-child)::after {
+  left: 13px;
+  top: 31px;
+  width: 2px;
+  height: calc(100% - 8px);
+  background: linear-gradient(180deg, rgba(77,212,255,0.42), rgba(140,99,255,0.18)) !important;
+  box-shadow: 0 0 10px rgba(77,212,255,0.18);
+}
+html[data-theme="dark"] body .ev-tl-dot {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  box-shadow: 0 0 0 4px rgba(77,212,255,0.06), 0 8px 20px rgba(0,0,0,0.26) !important;
+}
+html[data-theme="dark"] body .ev-tl-dot .material-symbols-rounded {
+  color: currentColor !important;
+  font-size: 15px !important;
+}
+html[data-theme="dark"] body .tl-dot-red {
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.22), transparent 30%), linear-gradient(135deg, rgba(255,77,109,0.95), rgba(127,29,49,0.88)) !important;
+  color: #FFE4EA !important;
+  box-shadow: 0 0 0 4px rgba(244,63,94,0.16), 0 0 18px rgba(244,63,94,0.38) !important;
+}
+html[data-theme="dark"] body .tl-dot-yellow {
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.22), transparent 30%), linear-gradient(135deg, rgba(255,208,103,0.98), rgba(180,83,9,0.9)) !important;
+  color: #281500 !important;
+  box-shadow: 0 0 0 4px rgba(245,158,11,0.16), 0 0 18px rgba(245,158,11,0.35) !important;
+}
+html[data-theme="dark"] body .tl-dot-green {
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.22), transparent 30%), linear-gradient(135deg, rgba(99,232,157,0.98), rgba(22,101,52,0.9)) !important;
+  color: #022411 !important;
+  box-shadow: 0 0 0 4px rgba(34,197,94,0.14), 0 0 18px rgba(34,197,94,0.30) !important;
+}
+html[data-theme="dark"] body .tl-dot-blue {
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.22), transparent 30%), linear-gradient(135deg, rgba(130,213,255,0.98), rgba(30,64,175,0.92)) !important;
+  color: #031B3D !important;
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.14), 0 0 18px rgba(59,130,246,0.32) !important;
+}
+html[data-theme="dark"] body .tl-dot-gray {
+  background: linear-gradient(135deg, rgba(148,163,184,0.5), rgba(51,65,85,0.9)) !important;
+  color: #EAF5FF !important;
+}
+html[data-theme="dark"] body .ev-tl-content {
+  padding: 1px 0 18px 0;
+  border-bottom: 1px dashed rgba(77,212,255,0.12);
+}
+html[data-theme="dark"] body .ev-tl-item:last-child .ev-tl-content {
+  border-bottom: none;
+}
+html[data-theme="dark"] body .ev-tl-time {
+  display: inline-flex;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(77,212,255,0.08) !important;
+  border: 1px solid rgba(77,212,255,0.16);
+  color: #9EDCFF !important;
+  font-size: 10.5px;
+  font-weight: 800;
+}
+html[data-theme="dark"] body .ev-tl-label {
+  margin-top: 5px;
+  font-size: 13.5px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+html[data-theme="dark"] body .ev-tl-item:has(.tl-dot-red) .ev-tl-label { color: #FFADC1 !important; }
+html[data-theme="dark"] body .ev-tl-item:has(.tl-dot-yellow) .ev-tl-label { color: #FFE2A0 !important; }
+html[data-theme="dark"] body .ev-tl-item:has(.tl-dot-green) .ev-tl-label { color: #A8F6C8 !important; }
+html[data-theme="dark"] body .ev-tl-item:has(.tl-dot-blue) .ev-tl-label { color: #B9EBFF !important; }
+html[data-theme="dark"] body .ev-tl-desc {
+  margin-top: 5px;
+  color: #BCD3EE !important;
+  line-height: 1.62;
+}
+html[data-theme="dark"] body .ev-tl-desc b,
+html[data-theme="dark"] body .ev-tl-desc strong {
+  color: #EAF5FF !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   网络运维处视图 — 补充遗漏的具体 class 暗色覆盖
+══════════════════════════════════════════════════════════════ */
+
+/* ── ops-rca-item（AI根因分析卡内部条目）─────────────── */
+html[data-theme="dark"] body #view-ops .ops-rca-item {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .rca-top .rca-title { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .rca-conf { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .rca-root { color: #9DB0CA !important; }
+html[data-theme="dark"] body #view-ops .rca-pri.rca-p1 {
+  background: rgba(244,63,94,0.18) !important; color: #FF8AA2 !important;
+}
+html[data-theme="dark"] body #view-ops .rca-pri.rca-p2 {
+  background: rgba(245,158,11,0.18) !important; color: #FFD67A !important;
+}
+html[data-theme="dark"] body #view-ops .rca-pri.rca-p3 {
+  background: rgba(77,212,255,0.10) !important; color: #7A94B2 !important;
+}
+html[data-theme="dark"] body #view-ops .rca-src-chip {
+  background: rgba(77,212,255,0.10) !important; color: #7A94B2 !important;
+}
+
+/* ── ofl-item（多源数据融合列表）───────────────────────── */
+html[data-theme="dark"] body #view-ops .ofl-item {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .ofl-icon { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .ofl-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .ofl-desc { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .ofl-count { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .ofl-status.ofl-ok { color: #7BEEB3 !important; }
+html[data-theme="dark"] body #view-ops .ofl-status.ofl-warn { color: #FFD67A !important; }
+
+/* ── opl-item（关键链路利用率列表）────────────────────── */
+html[data-theme="dark"] body #view-ops .opl-item {
+  border-bottom-color: rgba(77,212,255,0.10) !important;
+}
+html[data-theme="dark"] body #view-ops .opl-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .opl-bar-wrap { background: rgba(77,212,255,0.10) !important; }
+html[data-theme="dark"] body #view-ops .opl-util-ok { color: #7BEEB3 !important; }
+html[data-theme="dark"] body #view-ops .opl-util-warn { color: #FFD67A !important; }
+html[data-theme="dark"] body #view-ops .opl-util-crit { color: #FF8AA2 !important; }
+html[data-theme="dark"] body #view-ops .opl-cap { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .opl-ai { color: #C4B5FD !important; }
+
+/* ── trf-top-item（流量Top主机列表）────────────────────── */
+html[data-theme="dark"] body #view-ops .trf-top-item {
+  border-bottom-color: rgba(77,212,255,0.10) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-top-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-top-ip { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .trf-top-proto { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .trf-rank { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .trf-rank-top { color: #7DE7FF !important; }
+
+/* ── tts-site-item（拓扑站点树）────────────────────────── */
+html[data-theme="dark"] body #view-ops .tts-site-item {
+  color: #9DB0CA !important;
+  border-left-color: transparent !important;
+}
+html[data-theme="dark"] body #view-ops .tts-site-item:hover {
+  background: rgba(77,212,255,0.08) !important;
+  color: #D0E7FF !important;
+}
+html[data-theme="dark"] body #view-ops .tts-site-item.tts-active {
+  background: rgba(9,105,218,0.14) !important;
+  border-left-color: #43D9FF !important;
+  color: #7DE7FF !important;
+}
+html[data-theme="dark"] body #view-ops .tts-site-icon { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .tts-badge {
+  background: rgba(77,212,255,0.10) !important; color: #7A94B2 !important;
+}
+html[data-theme="dark"] body #view-ops .tts-badge-warn {
+  background: rgba(245,158,11,0.14) !important; color: #FFD67A !important;
+}
+html[data-theme="dark"] body #view-ops .tts-badge-crit {
+  background: rgba(244,63,94,0.14) !important; color: #FF8AA2 !important;
+}
+
+/* ── 左侧 dashboard-subrail 数据源 chip 全局覆盖 ──────── */
+html[data-theme="dark"] body .dashboard-subrail .osn-chip {
+  background: rgba(10,21,36,0.85) !important;
+  border: 1px solid rgba(77,212,255,0.20) !important;
+  color: #9DB0CA !important;
+  border-radius: 7px !important;
+}
+html[data-theme="dark"] body .dashboard-subrail .src-ok {
+  background: rgba(34,197,94,0.12) !important;
+  color: #7BEEB3 !important;
+  border-color: rgba(34,197,94,0.28) !important;
+}
+html[data-theme="dark"] body .dashboard-subrail .src-warn {
+  background: rgba(245,158,11,0.12) !important;
+  color: #FFD67A !important;
+  border-color: rgba(245,158,11,0.28) !important;
+}
+
+/* ── 容量图 badge（警戒线）覆盖 ─────────────────────── */
+html[data-theme="dark"] body #view-ops #ops-capacity [style*="background:#FFEBE9"] {
+  background: rgba(244,63,94,0.16) !important;
+  border-color: rgba(207,34,46,0.36) !important;
+  color: #FF8AA2 !important;
+}
+
+/* ── 设备台账 inv-table 行 hover ──────────────────────── */
+html[data-theme="dark"] body #view-ops .inv-table tbody tr:hover td {
+  background: rgba(77,212,255,0.05) !important;
+}
+
+/* ── 流量分析 anomaly & capacity items ────────────────── */
+html[data-theme="dark"] body #view-ops .trf-anom-item {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-anom-device { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-anom-desc { color: #9DB0CA !important; }
+html[data-theme="dark"] body #view-ops .trf-anom-sev-crit {
+  background: rgba(244,63,94,0.18) !important; color: #FF8AA2 !important;
+}
+html[data-theme="dark"] body #view-ops .trf-anom-sev-warn {
+  background: rgba(245,158,11,0.18) !important; color: #FFD67A !important;
+}
+html[data-theme="dark"] body #view-ops .trf-cap-item-title { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-cap-item-desc { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .trf-cap-item-badge {
+  background: rgba(110,64,201,0.18) !important; color: #C4B5FD !important;
+}
+
+/* ── dc-tab 导航（AI决策中心标签页）─────────────────── */
+html[data-theme="dark"] body #view-ops .dc-tab {
+  color: #7A94B2 !important;
+  background: transparent !important;
+}
+html[data-theme="dark"] body #view-ops .dc-tab:hover { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .dc-tab.active {
+  color: #7DE7FF !important;
+  border-bottom-color: #43D9FF !important;
+}
+html[data-theme="dark"] body #view-ops .dc-tabs {
+  border-bottom-color: rgba(77,212,255,0.16) !important;
+  background: transparent !important;
+}
+
+/* ── ffc-btn（故障分析过滤器）──────────────────────────── */
+html[data-theme="dark"] body #view-ops .ffc-btn {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .ffc-btn:hover { background: rgba(77,212,255,0.10) !important; color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .ffc-btn.active {
+  background: rgba(67,217,255,0.16) !important;
+  border-color: rgba(67,217,255,0.36) !important;
+  color: #7DE7FF !important;
+}
+
+/* ── 台账过滤器 ffc-btn hack ───────────────────────────── */
+html[data-theme="dark"] body #view-ops .fault-filter-chips .ffc-btn {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .fault-filter-chips .ffc-btn.active {
+  background: rgba(67,217,255,0.16) !important; color: #7DE7FF !important;
+}
+
+/* ── frca-root-cause（故障分析根因文本）─────────────── */
+html[data-theme="dark"] body #view-ops .frca-root-cause { color: #9DB0CA !important; }
+
+/* ── capacity kpi 上方 source hint text ─────────────── */
+html[data-theme="dark"] body #view-ops .inv-toolbar [style*="color:#636C76"],
+html[data-theme="dark"] body #view-ops .inv-toolbar [style*="color: #636C76"] {
+  color: #7A94B2 !important;
+}
+
+/* ── 通用: 任何仍然浅色的 text 默认覆盖 ─────────────── */
+html[data-theme="dark"] body #view-ops .ons-kpi .ons-kval { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .ons-kpi .ons-klbl { color: #7A94B2 !important; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   流量分析、故障分析、容量规划等 light-bg 类覆盖
+══════════════════════════════════════════════════════════════ */
+
+/* ── 流量分析 AI摘要横幅卡片 ─────────────────────────── */
+html[data-theme="dark"] body #view-ops .trf-ai-card {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-ai-card-label { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .trf-ai-card-sub { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .trf-ai-card-val { color: #EAF2FF !important; }
+
+/* ── 链路健康全景卡片 ────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .trf-lh-card {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-lh-card:hover {
+  border-color: rgba(77,212,255,0.30) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-lh-selected {
+  border-color: rgba(67,217,255,0.50) !important;
+  background: rgba(67,217,255,0.10) !important;
+  box-shadow: 0 0 0 2px rgba(67,217,255,0.18) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-lh-name { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-lh-zone { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .trf-lh-bar-wrap { background: rgba(77,212,255,0.10) !important; }
+html[data-theme="dark"] body #view-ops .trf-lh-ainote { color: #C4B5FD !important; }
+
+/* ── 链路 tab 按钮 ───────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .trf-link-tab {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .trf-link-tab:hover {
+  background: rgba(77,212,255,0.10) !important; color: #D0E7FF !important;
+}
+html[data-theme="dark"] body #view-ops .trf-tab-active {
+  background: rgba(9,105,218,0.22) !important;
+  color: #7DE7FF !important;
+  border-color: rgba(67,217,255,0.40) !important;
+}
+
+/* ── 容量预测卡片 ─────────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .trf-cap-item {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .trf-cap-link { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-cap-util { color: #EAF2FF !important; }
+html[data-theme="dark"] body #view-ops .trf-cap-advice { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .trf-cap-btn {
+  background: rgba(110,64,201,0.18) !important;
+  border-color: rgba(139,92,246,0.34) !important;
+  color: #C4B5FD !important;
+}
+html[data-theme="dark"] body #view-ops .trf-cap-btn:hover {
+  background: rgba(110,64,201,0.28) !important; color: #EDE9FE !important;
+}
+html[data-theme="dark"] body #view-ops .trf-top-note {
+  background: rgba(245,158,11,0.14) !important; color: #FFD67A !important;
+}
+html[data-theme="dark"] body #view-ops .trf-action-proc {
+  background: rgba(9,105,218,0.14) !important; color: #7DE7FF !important;
+}
+
+/* ── 故障分析 fault-list-item ────────────────────────── */
+html[data-theme="dark"] body #view-ops .fault-list-item {
+  background: rgba(10,21,36,0.88) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+}
+html[data-theme="dark"] body #view-ops .fault-list-item:hover {
+  background: rgba(20,36,58,0.92) !important;
+}
+html[data-theme="dark"] body #view-ops .fault-list-item.fli-active {
+  background: rgba(9,105,218,0.14) !important;
+  border-color: rgba(67,217,255,0.36) !important;
+}
+html[data-theme="dark"] body #view-ops .fli-title { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .fli-time { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .fli-status-label { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .fli-tag {
+  background: rgba(77,212,255,0.10) !important; color: #7A94B2 !important;
+}
+html[data-theme="dark"] body #view-ops .flt-filter-chip {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.22) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .flt-filter-chip.ffc-active {
+  background: rgba(67,217,255,0.16) !important;
+  border-color: rgba(67,217,255,0.36) !important;
+  color: #7DE7FF !important;
+}
+
+/* ── 故障 RCA frca-* ─────────────────────────────────── */
+html[data-theme="dark"] body #view-ops .frca-root-cause {
+  background: rgba(10,21,36,0.88) !important;
+  border: 1px solid rgba(77,212,255,0.16) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .frca-conf-label { color: #7A94B2 !important; }
+html[data-theme="dark"] body #view-ops .frca-conf-pct { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .frca-conf-bar-wrap { background: rgba(77,212,255,0.10) !important; }
+html[data-theme="dark"] body #view-ops .frca-chain-title,
+html[data-theme="dark"] body #view-ops .frca-sources-title { color: #5A7A9E !important; }
+html[data-theme="dark"] body #view-ops .frca-chain-connector { color: rgba(77,212,255,0.3) !important; }
+html[data-theme="dark"] body #view-ops .frca-chain-content {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .frca-sev-crit .frca-chain-content {
+  background: rgba(244,63,94,0.12) !important;
+  border-color: rgba(244,63,94,0.30) !important;
+}
+html[data-theme="dark"] body #view-ops .frca-sev-warn .frca-chain-content {
+  background: rgba(245,158,11,0.10) !important;
+  border-color: rgba(212,163,44,0.28) !important;
+}
+
+/* ── 全局 light-bg 文本修正 ──────────────────────────── */
+html[data-theme="dark"] body #view-ops .trf-lh-hdr-title { color: #D0E7FF !important; }
+html[data-theme="dark"] body #view-ops .trf-lh-hdr-hint { color: #5A7A9E !important; }
+
+/* ── Top hosts bar-wrap ─────────────────────────────── */
+html[data-theme="dark"] body #view-ops .trf-top-bar-wrap { background: rgba(77,212,255,0.10) !important; }
+
+/* ── 异常检测 anomaly list ──────────────────────────── */
+html[data-theme="dark"] body #view-ops .trf-anomaly-item {
+  background: rgba(10,21,36,0.85) !important;
+  border-color: rgba(77,212,255,0.16) !important;
+  color: #9DB0CA !important;
+}
+html[data-theme="dark"] body #view-ops .trf-anom-badge {
+  background: rgba(244,63,94,0.16) !important; color: #FF8AA2 !important;
+}
+html[data-theme="dark"] body #view-ops .trf-anom-link { color: #5A7A9E !important; }

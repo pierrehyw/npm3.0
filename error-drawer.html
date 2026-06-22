@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>NGPM · 错误码详情抽屉</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="drawer.css">
+</head>
+<body>
+<div class="dim-bar">
+  <a href="index.html" class="back-link">
+    <span class="material-symbols-rounded">arrow_back</span>
+    <span>← HTTP 性能分析专项（主页）</span>
+  </a>
+</div>
+
+<div class="drawer-outer">
+  <div class="dim-side">
+    <span>← 返回主页查看全局视图</span>
+  </div>
+
+  <div class="drawer-panel">
+    <!-- Drawer Header -->
+    <div class="drw-hdr">
+      <span class="material-symbols-rounded drw-err-icon">error</span>
+      <div>
+        <div class="drw-title">错误码详情 · order-service</div>
+      </div>
+      <div class="spacer" style="flex:1"></div>
+      <a href="index.html" class="btn-close" title="关闭">
+        <span class="material-symbols-rounded" style="font-size:16px">close</span>
+      </a>
+    </div>
+
+    <!-- Filter Row -->
+    <div class="drw-filter">
+      <div class="filter-select" id="drawerTimeBtn">
+        <span class="material-symbols-rounded" style="font-size:13px">schedule</span>
+        <span id="drawerTimeLabel">过去 1h</span>
+        <span class="material-symbols-rounded" style="font-size:13px">expand_more</span>
+      </div>
+      <div class="filter-input">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" placeholder="搜索接口…" id="searchInput">
+      </div>
+      <div class="sort-btn" id="sortBtn">
+        <span class="material-symbols-rounded" style="font-size:13px">sort</span>
+        <span id="sortLabel">错误率 ↓</span>
+      </div>
+    </div>
+
+    <!-- Matrix Header -->
+    <div class="matrix-hdr">
+      <div class="mhdr-url">接口</div>
+      <div class="mhdr-cell">504</div>
+      <div class="mhdr-cell">500</div>
+      <div class="mhdr-cell">4xx</div>
+      <div class="mhdr-total">合计</div>
+      <div class="mhdr-trend">趋势 1h</div>
+    </div>
+
+    <!-- Matrix Body -->
+    <div class="matrix-body" id="matrixBody">
+      <!-- rows injected by JS -->
+    </div>
+
+    <!-- Footer -->
+    <div class="drw-footer">
+      <span class="footer-note">数据来源：APM Trace · 更新于 <span id="updateTime">15:02:34</span></span>
+      <button class="btn-export" id="exportBtn">
+        <span class="material-symbols-rounded" style="font-size:13px">download</span>
+        <span>导出 CSV</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Time Dropdown -->
+<div class="dropdown" id="drawerDropdown" style="position:fixed;z-index:100;display:none;background:#fff;border:1px solid #D0D7DE;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:140px;overflow:hidden;">
+  <div class="dropdown-item active" data-val="过去 1h" style="padding:8px 14px;font-size:13px;cursor:pointer;">过去 1h</div>
+  <div class="dropdown-item" data-val="过去 3h" style="padding:8px 14px;font-size:13px;cursor:pointer;">过去 3h</div>
+  <div class="dropdown-item" data-val="过去 6h" style="padding:8px 14px;font-size:13px;cursor:pointer;">过去 6h</div>
+  <div class="dropdown-item" data-val="过去 24h" style="padding:8px 14px;font-size:13px;cursor:pointer;">过去 24h</div>
+</div>
+
+<script>
+const DATA = [
+  { path: '/api/orders/{id}',        method: 'GET · HTTP/1.1', s504: '61%', s500: '7%',   s4xx: '—',  total: '68%', totalClass: 'total-red', trend: '↑↑ 急剧',  trendClass: 'trend-rise' },
+  { path: '/api/payment/confirm',    method: 'POST · HTTP/1.1',s504: '24%', s500: '—',   s4xx: '—',  total: '24%', totalClass: 'total-red', trend: '↑ 上升',   trendClass: 'trend-rise2' },
+  { path: '/api/users/{id}/profile', method: 'GET · HTTP/2',   s504: '—',   s500: '—',   s4xx: '3%', total: '3%',  totalClass: '',           trend: '→ 平稳',   trendClass: 'trend-flat' },
+  { path: '/api/search',             method: 'GET · HTTP/1.1', s504: '2%',  s500: '—',   s4xx: '—',  total: '2%',  totalClass: '',           trend: '→ 平稳',   trendClass: 'trend-flat' },
+  { path: '/api/inventory',          method: 'GET · HTTP/1.1', s504: '1%',  s500: '0.5%',s4xx: '—',  total: '1.5%',totalClass: '',           trend: '↑ 轻微',   trendClass: 'trend-slight' },
+  { path: '/api/cart',               method: 'GET · HTTP/1.1', s504: '0.5%',s500: '—',   s4xx: '—',  total: '0.5%',totalClass: '',           trend: '→ 平稳',   trendClass: 'trend-flat' },
+];
+const TOTAL_ROW = { path: '合计（所有接口）', method: '', s504: '34%', s500: '2%', s4xx: '0.5%', total: '36.5%', totalClass: 'total-red', trend: '—', trendClass: '' };
+
+let sortDir = -1; // -1 = desc by total
+
+function cellClass(v) {
+  if (v === '—') return 'cell-gray';
+  const n = parseFloat(v);
+  if (n >= 20) return 'cell-red';
+  if (n >= 5) return 'cell-orange';
+  return '';
+}
+
+function renderRows(rows) {
+  const body = document.getElementById('matrixBody');
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = rows.filter(r => r.path.toLowerCase().includes(q));
+  let html = filtered.map(r => `
+    <div class="mrow">
+      <div class="mrow-url">
+        <div class="mrow-path">${r.path}</div>
+        ${r.method ? `<div class="mrow-method">${r.method}</div>` : ''}
+      </div>
+      <div class="mrow-cell ${cellClass(r.s504)}">${r.s504}</div>
+      <div class="mrow-cell ${cellClass(r.s500)}">${r.s500}</div>
+      <div class="mrow-cell ${cellClass(r.s4xx)}">${r.s4xx}</div>
+      <div class="mrow-total"><span class="${r.totalClass}">${r.total}</span></div>
+      <div class="mrow-trend"><span class="trend-pill ${r.trendClass}">${r.trend}</span></div>
+    </div>
+  `).join('');
+  // divider
+  html += `<div style="height:1px;background:#D0D7DE"></div>`;
+  // total row
+  const t = TOTAL_ROW;
+  html += `
+    <div class="mrow total-row">
+      <div class="mrow-url"><div class="mrow-path">${t.path}</div></div>
+      <div class="mrow-cell ${cellClass(t.s504)}">${t.s504}</div>
+      <div class="mrow-cell ${cellClass(t.s500)}">${t.s500}</div>
+      <div class="mrow-cell ${cellClass(t.s4xx)}">${t.s4xx}</div>
+      <div class="mrow-total"><span class="${t.totalClass}">${t.total}</span></div>
+      <div class="mrow-trend">—</div>
+    </div>`;
+  body.innerHTML = html;
+}
+
+renderRows(DATA);
+
+document.getElementById('searchInput').addEventListener('input', () => renderRows(DATA));
+
+// Sort toggle
+let sortField = 'total';
+document.getElementById('sortBtn').addEventListener('click', () => {
+  sortDir *= -1;
+  document.getElementById('sortLabel').textContent = sortDir === -1 ? '错误率 ↓' : '错误率 ↑';
+  DATA.sort((a, b) => sortDir * (parseFloat(b.total) - parseFloat(a.total)));
+  renderRows(DATA);
+});
+
+// Time dropdown
+const drawerTimeBtn = document.getElementById('drawerTimeBtn');
+const drawerDropdown = document.getElementById('drawerDropdown');
+drawerTimeBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const r = drawerTimeBtn.getBoundingClientRect();
+  drawerDropdown.style.top = (r.bottom + 4) + 'px';
+  drawerDropdown.style.right = (window.innerWidth - r.right) + 'px';
+  drawerDropdown.style.left = 'auto';
+  drawerDropdown.style.display = drawerDropdown.style.display === 'block' ? 'none' : 'block';
+});
+drawerDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.getElementById('drawerTimeLabel').textContent = item.dataset.val;
+    drawerDropdown.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    drawerDropdown.style.display = 'none';
+  });
+});
+document.addEventListener('click', () => { drawerDropdown.style.display = 'none'; });
+
+// Export CSV
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const rows = [['接口', '方法', '504', '500', '4xx', '合计', '趋势']];
+  DATA.forEach(r => rows.push([r.path, r.method, r.s504, r.s500, r.s4xx, r.total, r.trend]));
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = 'error_codes.csv';
+  a.click();
+});
+
+// Update time ticker
+setInterval(() => {
+  const now = new Date();
+  document.getElementById('updateTime').textContent =
+    now.toTimeString().slice(0, 8);
+}, 1000);
+</script>
+</body>
+</html>

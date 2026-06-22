@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp app.html \"app.backup-$\\(date +%Y%m%d-%H%M%S\\)-before-unified-topo-theme.html\")",
+      "Bash(python -)",
+      "Bash(node --check d:/coding/ngpm_UI_design/ngpm-prototype/dashboard.js)",
+      "Bash(node --check d:/coding/ngpm_UI_design/ngpm-prototype/theme-toggle.js)"
+    ]
+  }
+}
