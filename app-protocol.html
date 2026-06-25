@@ -13556,13 +13556,13 @@ function _getServiceNameFromEntityId(entityId) {
 }
 
 
-// 快捷分析条（查看网络拓扑 / 下载调用链 / 查看通讯对）
+// 快捷分析条（查看网络拓扑 / 下钻调用链 / 查看通讯对）
 function _protoQuickBar() {
   return '<div class="proto-quick-bar">'
     + '<span class="proto-quick-label"><span class="material-symbols-rounded">bolt</span>快捷分析</span>'
     + '<div class="proto-quick-actions">'
     + '<button class="proto-quick-btn" onclick="protoQuickTopo()"><span class="material-symbols-rounded">account_tree</span>查看网络拓扑</button>'
-    + '<button class="proto-quick-btn" onclick="protoQuickDownloadTrace()"><span class="material-symbols-rounded">download</span>下载调用链</button>'
+    + '<button class="proto-quick-btn" onclick="protoQuickDrillTrace()"><span class="material-symbols-rounded">route</span>下钻调用链</button>'
     + '<button class="proto-quick-btn" onclick="protoQuickCommPairs()"><span class="material-symbols-rounded">swap_horiz</span>查看通讯对</button>'
     + '</div></div>';
 }
@@ -13571,38 +13571,8 @@ function protoQuickTopo() {
   window.location.href = 'topology.html?view=network';
 }
 
-function protoQuickDownloadTrace() {
-  var s = protoState.aiSummary || {};
-  var label = s.label || protoState.current || 'proto';
-  var payload = {
-    view: '按协议视角',
-    protocol: protoState.current,
-    entity: label,
-    rootCause: (s.title || '').replace(/<[^>]+>/g, ''),
-    summary: (s.desc || '').replace(/<[^>]+>/g, ''),
-    generatedAt: new Date().toISOString(),
-    callChain: []
-  };
-  try {
-    if (protoState.current === 'http') {
-      var d = HTTP_SVC_DATA[protoState.currentSvc];
-      if (d) payload.callChain = d.topUrls.map(function(u) {
-        return { service: label, method: u.method, path: u.path, p50: u.p50, p95: u.p95, p99: u.p99, rpm: u.rpm };
-      });
-    } else if (protoState.current === 'db') {
-      var d2 = PROTO_DATA['mysql'] || PROTO_DATA['redis'];
-      if (d2 && d2.slowQueries) payload.callChain = d2.slowQueries.map(function(q) {
-        return { cluster: label, sql: q.sql, p50: q.p50, p99: q.p99, count: q.count, scanRows: q.scanRows };
-      });
-    }
-  } catch (e) {}
-  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = 'callchain-' + String(label).replace(/[^\w.-]+/g, '_') + '.json';
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
+function protoQuickDrillTrace() {
+  window.location.href = 'app.html?tab=trace&ref=protocol';
 }
 
 function protoQuickCommPairs() {

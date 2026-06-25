@@ -2,45 +2,55 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=1440">
 <title>NGPM · 报表报告</title>
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="report.css">
 <link rel="stylesheet" href="dark-theme.css">
 <script src="theme-toggle.js"></script>
-<style>
-.report-placeholder {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-}
-.placeholder-card {
-  width: min(760px, calc(100% - 48px));
-  background: #ffffff;
-  border: 1px solid #d0d7de;
-  border-radius: 12px;
-  padding: 28px 30px;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
-}
-.placeholder-title {
-  margin: 0 0 8px;
-  font-size: 24px;
-  line-height: 1.3;
-  color: #1f2328;
-}
-.placeholder-desc {
-  margin: 0;
-  font-size: 14px;
-  color: #57606a;
-  line-height: 1.8;
-}
-</style>
 </head>
 <body>
 <div class="app">
-  <main class="main" style="margin-left:0; width:100%;">
+
+  <!-- ── Sidebar ─────────────────────────────────────────── -->
+  <aside class="sidebar secondary-rail">
+    <div class="secondary-rail-title" aria-hidden="true"><span class="material-symbols-rounded">description</span></div>
+
+    <button class="report-new-btn" onclick="openNewReportModal()">
+      <span class="material-symbols-rounded">add</span>新建报告
+    </button>
+    <div class="report-nav-divider"></div>
+
+    <!-- 我的报告（用户创建/保存） -->
+    <div class="report-nav-group">
+      <div class="report-nav-label">我的报告</div>
+      <div class="report-nav-item active" data-view="my-reports" data-role="my-reports-home">
+        <span class="material-symbols-rounded">folder_managed</span>
+        <span class="report-nav-item-text">我的报告</span>
+        <span class="report-nav-badge">全部</span>
+      </div>
+      <div class="report-nav-subhint">高频查看 / 最新生成（TOP5）</div>
+      <div id="myReportsTop5"></div>
+    </div>
+
+    <div class="report-nav-divider"></div>
+
+    <!-- 调度管理（独立视图） -->
+    <div class="report-nav-group">
+      <div class="report-nav-label">调度管理</div>
+      <div id="scheduleNavList"></div>
+      <div class="report-nav-add-schedule" onclick="openScheduleModal()">
+        <span class="material-symbols-rounded">add_circle_outline</span>
+        <span>添加调度任务</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <main class="report-main">
+
+    <!-- ── Top Header ──────────────────────────────────── -->
     <header class="top-header">
       <a class="header-brand" href="dashboard.html">
         <span class="material-symbols-rounded logo-icon">hub</span>
@@ -50,7 +60,6 @@
         <div class="nav-list">
           <a href="dashboard.html" class="nav-item"><span class="material-symbols-rounded">dashboard</span><span>总览</span></a>
           <a href="network.html" class="nav-item"><span class="material-symbols-rounded">account_tree</span><span>数据分析</span></a>
-          <a href="app.html" class="nav-item"><span class="material-symbols-rounded">apps</span><span>应用</span></a>
           <a href="topology.html" class="nav-item"><span class="material-symbols-rounded">location_on</span><span>数字地图</span></a>
           <a href="report.html" class="nav-item active"><span class="material-symbols-rounded">area_chart</span><span>报表报告</span></a>
           <a href="ai-agent.html" class="nav-item"><span class="material-symbols-rounded">smart_toy</span><span>AI Agent</span></a>
@@ -64,13 +73,2381 @@
         <span class="material-symbols-rounded">dark_mode</span>
       </button>
     </header>
-    <section class="report-placeholder">
-      <div class="placeholder-card">
-        <h1 class="placeholder-title">报表报告模块预留中</h1>
-        <p class="placeholder-desc">当前页面先留空，后续将在这里建设报表中心内容（定时报表、趋势对比、导出与订阅）。</p>
+
+    <!-- ── Report Content ──────────────────────────────── -->
+    <div class="report-content">
+
+      <!-- ══ View MyReports: 我的报告库 ═════════════════ -->
+      <div class="report-my-page" id="viewMyReports">
+        <div class="report-wall-header">
+          <div>
+            <div class="report-wall-title">我的报告</div>
+            <div class="report-wall-sub">统一管理你生成/保存的报告，可从模板库快速创建新报告</div>
+          </div>
+          <div class="report-wall-actions">
+            <button class="report-wall-btn" onclick="switchView('library')">
+              <span class="material-symbols-rounded">grid_view</span>报告模版
+            </button>
+            <button class="report-wall-btn" onclick="openNewReportModal()">
+              <span class="material-symbols-rounded">add</span>新建报告
+            </button>
+          </div>
+        </div>
+
+        <div class="report-empty report-hidden" id="myReportsEmpty">
+          <span class="material-symbols-rounded report-empty-icon">folder_open</span>
+          <div class="report-empty-title">还没有我的报告</div>
+          <div class="report-empty-desc">可通过“报告模版”快速生成首份报告，或使用“新建报告”进行 AI / 自定义创建。</div>
+          <div class="report-empty-actions">
+            <button class="report-empty-btn" onclick="switchView('library')">
+              <span class="material-symbols-rounded">grid_view</span>去报告模版
+            </button>
+            <button class="report-empty-btn ghost" onclick="openNewReportModal()">
+              <span class="material-symbols-rounded">add</span>新建报告
+            </button>
+          </div>
+        </div>
+
+        <div class="my-report-grid" id="myReportsList"></div>
       </div>
-    </section>
+
+      <!-- ══ View A: 报告模版库 ═══════════════════════ -->
+      <div class="report-wall report-hidden" id="viewLibrary">
+        <div class="report-wall-header">
+          <div>
+            <div class="report-wall-title">报告模版</div>
+            <div class="report-wall-sub">选择内置模版一键生成，并自动沉淀到“我的报告”</div>
+          </div>
+          <div class="report-wall-actions">
+            <button class="report-wall-btn" onclick="switchView('my-reports')">
+              <span class="material-symbols-rounded">folder_managed</span>我的报告
+            </button>
+            <button class="report-wall-btn" onclick="openModal('objModal')">
+              <span class="material-symbols-rounded">tune</span>筛选对象
+            </button>
+            <button class="report-wall-btn" onclick="openScheduleModal()">
+              <span class="material-symbols-rounded">schedule</span>调度管理
+            </button>
+          </div>
+        </div>
+
+        <div class="report-card-grid">
+          <!-- 流量分析报告 -->
+          <div class="report-type-card" onclick="openReport('traffic')">
+            <div class="rtc-icon-row">
+              <div class="rtc-icon purple"><span class="material-symbols-rounded">ssid_chart</span></div>
+              <span class="rtc-tag hot">热门</span>
+            </div>
+            <div class="rtc-title">流量分析报告</div>
+            <div class="rtc-desc">展示带宽利用率趋势、流量 TOP N、协议分布、异常流量检测等关键指标。</div>
+            <div class="rtc-actions">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('traffic')">
+                <span class="material-symbols-rounded">play_arrow</span>生成
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('traffic')">
+                <span class="material-symbols-rounded">schedule</span>调度
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openModal('shareModal')">
+                <span class="material-symbols-rounded">share</span>分享
+              </button>
+            </div>
+          </div>
+
+          <!-- 故障统计报告 -->
+          <div class="report-type-card" onclick="openReport('fault')">
+            <div class="rtc-icon-row">
+              <div class="rtc-icon red"><span class="material-symbols-rounded">bug_report</span></div>
+              <span class="rtc-tag new">新增</span>
+            </div>
+            <div class="rtc-title">故障统计报告</div>
+            <div class="rtc-desc">故障事件统计、MTTR/MTBF 分析、故障根因 TOP N、告警收敛趋势。</div>
+            <div class="rtc-actions">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('fault')">
+                <span class="material-symbols-rounded">play_arrow</span>生成
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('fault')">
+                <span class="material-symbols-rounded">schedule</span>调度
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openModal('shareModal')">
+                <span class="material-symbols-rounded">share</span>分享
+              </button>
+            </div>
+          </div>
+
+          <!-- 容量规划报告 -->
+          <div class="report-type-card" onclick="openReport('capacity')">
+            <div class="rtc-icon-row">
+              <div class="rtc-icon blue"><span class="material-symbols-rounded">bar_chart</span></div>
+            </div>
+            <div class="rtc-title">容量规划报告</div>
+            <div class="rtc-desc">链路容量使用率、增长趋势预测、扩容建议、资源瓶颈分析。</div>
+            <div class="rtc-actions">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('capacity')">
+                <span class="material-symbols-rounded">play_arrow</span>生成
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('capacity')">
+                <span class="material-symbols-rounded">schedule</span>调度
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openModal('shareModal')">
+                <span class="material-symbols-rounded">share</span>分享
+              </button>
+            </div>
+          </div>
+
+          <!-- 网络健康报告 -->
+          <div class="report-type-card" onclick="openReport('health')">
+            <div class="rtc-icon-row">
+              <div class="rtc-icon green"><span class="material-symbols-rounded">health_and_safety</span></div>
+            </div>
+            <div class="rtc-title">网络健康报告</div>
+            <div class="rtc-desc">网络可用性、丢包率/延迟趋势、设备健康评分、SLA 达标率统计。</div>
+            <div class="rtc-actions">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('health')">
+                <span class="material-symbols-rounded">play_arrow</span>生成
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('health')">
+                <span class="material-symbols-rounded">schedule</span>调度
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openModal('shareModal')">
+                <span class="material-symbols-rounded">share</span>分享
+              </button>
+            </div>
+          </div>
+
+          <!-- 设备巡检报告 -->
+          <div class="report-type-card" onclick="openReport('device')">
+            <div class="rtc-icon-row">
+              <div class="rtc-icon orange"><span class="material-symbols-rounded">inventory_2</span></div>
+            </div>
+            <div class="rtc-title">设备巡检报告</div>
+            <div class="rtc-desc">设备清单、版本信息、配置合规检查、端口使用率、CPU/内存趋势。</div>
+            <div class="rtc-actions">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('device')">
+                <span class="material-symbols-rounded">play_arrow</span>生成
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('device')">
+                <span class="material-symbols-rounded">schedule</span>调度
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openModal('shareModal')">
+                <span class="material-symbols-rounded">share</span>分享
+              </button>
+            </div>
+          </div>
+
+          <!-- AI 智能报告 -->
+          <div class="report-type-card" onclick="openReport('ai')">
+            <div class="rtc-icon-row">
+              <div class="rtc-icon teal"><span class="material-symbols-rounded">auto_awesome</span></div>
+              <span class="rtc-tag ai">AI</span>
+            </div>
+            <div class="rtc-title">AI 智能报告</div>
+            <div class="rtc-desc">通过自然语言对话，AI 自动分析数据并生成自定义报告，支持任意维度组合。</div>
+            <div class="rtc-actions">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('ai')">
+                <span class="material-symbols-rounded">smart_toy</span>对话创建
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ View B: 内置报告工作台 ═══════════════════ -->
+      <div class="report-workspace report-hidden" id="viewWorkbench">
+        <!-- 配置栏 -->
+        <div class="rw-config-bar">
+          <div class="rw-config-group">
+            <span class="rw-config-label">报告类型</span>
+            <select class="rw-config-select" id="wbReportType">
+              <option value="traffic" selected>流量分析报告</option>
+              <option value="fault">故障统计报告</option>
+              <option value="capacity">容量规划报告</option>
+              <option value="health">网络健康报告</option>
+              <option value="device">设备巡检报告</option>
+            </select>
+          </div>
+          <div class="rw-config-group">
+            <span class="rw-config-label">时间范围</span>
+            <select class="rw-config-select">
+              <option>最近 7 天</option>
+              <option selected>最近 30 天</option>
+              <option>最近 90 天</option>
+              <option>自定义...</option>
+            </select>
+          </div>
+          <div class="rw-config-group">
+            <span class="rw-config-label">监控对象</span>
+            <button class="rw-config-select" style="text-align:left;display:flex;align-items:center;gap:4px;min-width:160px;cursor:pointer" onclick="openModal('objModal')">
+              <span class="material-symbols-rounded" style="font-size:15px">add_circle</span>选择对象...
+            </button>
+          </div>
+        </div>
+
+        <!-- 报告预览主体 -->
+        <div class="rw-body">
+          <div class="rw-preview">
+            <div class="rw-preview-card">
+              <div class="rw-preview-title">流量分析报告</div>
+              <div class="rw-preview-meta">
+                <span><span class="material-symbols-rounded">calendar_today</span>2026-05-25 ~ 2026-06-24</span>
+                <span><span class="material-symbols-rounded">dns</span>全部监控对象</span>
+                <span><span class="material-symbols-rounded">update</span>生成于 10:30</span>
+              </div>
+
+              <!-- KPI 指标卡片 -->
+              <div class="rw-kpi-grid">
+                <div class="rw-kpi-card">
+                  <div class="rw-kpi-label">平均带宽利用率</div>
+                  <div class="rw-kpi-value">67.3%</div>
+                  <div class="rw-kpi-trend up"><span class="material-symbols-rounded" style="font-size:13px">trending_up</span>+2.1% vs 上期</div>
+                </div>
+                <div class="rw-kpi-card">
+                  <div class="rw-kpi-label">峰值流量</div>
+                  <div class="rw-kpi-value">8.7 Gbps</div>
+                  <div class="rw-kpi-trend up"><span class="material-symbols-rounded" style="font-size:13px">trending_up</span>+0.5G vs 上期</div>
+                </div>
+                <div class="rw-kpi-card">
+                  <div class="rw-kpi-label">异常流量事件</div>
+                  <div class="rw-kpi-value red">12</div>
+                  <div class="rw-kpi-trend down"><span class="material-symbols-rounded" style="font-size:13px">trending_down</span>-3 vs 上期</div>
+                </div>
+                <div class="rw-kpi-card">
+                  <div class="rw-kpi-label">链路健康率</div>
+                  <div class="rw-kpi-value green">98.6%</div>
+                  <div class="rw-kpi-trend up"><span class="material-symbols-rounded" style="font-size:13px">trending_up</span>+0.2% vs 上期</div>
+                </div>
+              </div>
+
+              <!-- 图表占位 -->
+              <div class="rw-chart-placeholder">
+                <span class="material-symbols-rounded">show_chart</span>
+                <span>带宽利用率趋势图（7天）</span>
+              </div>
+              <div class="rw-chart-placeholder">
+                <span class="material-symbols-rounded">donut_large</span>
+                <span>协议分布饼图</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 报告提示词编辑面板 -->
+          <div class="rw-prompt-panel" id="promptPanel" data-mode="editor">
+            <div class="rw-prompt-header">
+              <span class="material-symbols-rounded rw-prompt-icon">edit_note</span>
+              <span class="rw-prompt-title">报告提示词</span>
+              <button class="rw-prompt-mode-btn" id="promptModeBtn" onclick="togglePromptMode()" title="切换对话模式">
+                <span class="material-symbols-rounded">forum</span>
+              </button>
+              <button class="rw-prompt-reset-btn" id="promptResetBtn" onclick="resetPrompt()" title="恢复默认">
+                <span class="material-symbols-rounded">restart_alt</span>
+              </button>
+            </div>
+            <div class="rw-prompt-body">
+              <div class="rw-prompt-editor-view" id="promptEditorView">
+                <div class="rw-prompt-desc">当前报告由以下提示词驱动生成，可自由调整以定制报告内容：</div>
+
+                <textarea class="rw-prompt-editor" id="promptEditor" rows="10" spellcheck="false">分析 {{timeRange}} 内所有 {{targets}} 的流量数据。
+
+重点关注以下维度：
+1. 带宽利用率趋势及峰值分析
+2. 流量 TOP 10 源/目的 IP 排名
+3. 协议分布（HTTP/HTTPS/SSH/DNS/其他）
+4. 异常流量检测（突增/突降/突刺）
+5. 链路健康度评估
+
+输出格式要求：
+- 包含 KPI 概览卡片（平均利用率、峰值、异常事件数、健康率）
+- 趋势折线图（按天聚合）
+- 协议分布饼图
+- 异常事件时间轴</textarea>
+              </div>
+
+              <div class="rw-prompt-chat-view" id="promptChatView">
+                <div class="rw-prompt-chat">
+                  <div class="rw-prompt-chat-title">
+                    <span class="material-symbols-rounded">forum</span>自然语义改写
+                  </div>
+                  <div class="rw-prompt-chat-quick">
+                    <button class="rw-prompt-chat-chip" onclick="sendPromptQuick('帮我强化异常检测部分，重点突出突增流量和告警关联。')">强化异常检测</button>
+                    <button class="rw-prompt-chat-chip" onclick="sendPromptQuick('改成管理层看的摘要版本，减少技术细节，增加结论和建议。')">改成管理摘要</button>
+                    <button class="rw-prompt-chat-chip" onclick="sendPromptQuick('增加对比分析：本期 vs 上期，并给出变化原因。')">增加同比环比</button>
+                    <button class="rw-prompt-chat-chip" onclick="sendPromptQuick('对比新旧提示词')">对比新旧提示词</button>
+                  </div>
+                  <div class="rw-prompt-chat-log" id="promptChatLog">
+                    <div class="rw-prompt-chat-msg ai">你可以直接说："把这个提示词改得更偏运维决策"，我会保留结构并自动改写。</div>
+                  </div>
+                  <div class="rw-prompt-chat-input-row">
+                    <textarea class="rw-prompt-chat-input" id="promptChatInput" rows="2" placeholder="例如：增加 SLA 违约风险预测，并按区域输出风险等级..."></textarea>
+                    <button class="rw-prompt-chat-send" onclick="applyPromptByChat()">
+                      <span class="material-symbols-rounded">send</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 操作按钮（两种模式均保留） -->
+              <div class="rw-prompt-actions">
+                <button class="rw-prompt-btn preview" onclick="previewFromPrompt()">
+                  <span class="material-symbols-rounded">visibility</span>预览效果
+                </button>
+                <button class="rw-prompt-btn" id="promptSwitchBtn" onclick="togglePromptMode()">
+                  <span class="material-symbols-rounded">forum</span>对话改写
+                </button>
+                <button class="rw-prompt-btn save-template" onclick="openPromptDiffModal()">
+                  <span class="material-symbols-rounded">bookmark_add</span>保存为模板
+                </button>
+              </div>
+
+              <!-- 模板保存提示（默认隐藏） -->
+              <div class="rw-prompt-saved" id="promptSavedTip" style="display:none">
+                <span class="material-symbols-rounded">check_circle</span>
+                已保存到「我的报告」
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="rw-action-bar">
+          <button class="rw-action-btn" onclick="openScheduleWithType(document.getElementById('wbReportType').value)">
+            <span class="material-symbols-rounded">schedule</span>设置调度
+          </button>
+          <button class="rw-action-btn" onclick="openModal('shareModal')">
+            <span class="material-symbols-rounded">share</span>分享
+          </button>
+          <button class="rw-action-btn" onclick="openModal('shareModal')">
+            <span class="material-symbols-rounded">download</span>导出
+          </button>
+          <div style="flex:1"></div>
+          <button class="rw-action-btn" id="wizardBackToFlowBtn" onclick="wizardBackToFlow()" style="display:none">
+            <span class="material-symbols-rounded">arrow_back</span>返回新建流程
+          </button>
+          <button class="rw-action-btn" id="wbBackBtn" onclick="switchView('my-reports')">
+            <span class="material-symbols-rounded">arrow_back</span>返回我的报告
+          </button>
+          <button class="rw-action-btn primary" id="wbSaveBtn">
+            <span class="material-symbols-rounded">save</span>保存报告
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ View C: AI 自定义工作台 ═══════════════════ -->
+      <div class="report-ai-workspace report-hidden" id="viewAIWorkbench">
+        <!-- 对话面板 -->
+        <div class="raw-chat-panel">
+          <div class="raw-chat-header">
+            <span class="material-symbols-rounded" style="color:#6E40C9;font-size:20px;font-variation-settings:'FILL' 1">smart_toy</span>
+            <span class="raw-chat-title">AI 报告助手</span>
+            <span class="raw-chat-badge">GPT-4o</span>
+          </div>
+          <div class="raw-chat-body" id="aiChatBody">
+            <!-- 欢迎消息 -->
+            <div class="raw-msg ai">
+              <div class="raw-msg-avatar"><span class="material-symbols-rounded" style="font-size:16px">smart_toy</span></div>
+              <div>
+                <div class="raw-msg-bubble">
+                  👋 你好！我是 AI 报告助手。告诉我你想分析什么，我会自动从数据库提取数据并生成报告。<br><br>
+                  你可以这样说：<br>
+                  · "分析最近 30 天核心链路的流量趋势"<br>
+                  · "统计本月所有故障事件的根因分布"<br>
+                  · "对比 A 楼和 B 楼的网络健康评分"
+                </div>
+                <div class="raw-msg-time">10:30</div>
+              </div>
+            </div>
+            <!-- 快捷指令 -->
+            <div class="raw-quick-actions">
+              <button class="raw-quick-chip" onclick="sendQuickMsg('生成最近 30 天流量趋势分析')">
+                <span class="material-symbols-rounded">ssid_chart</span>流量趋势
+              </button>
+              <button class="raw-quick-chip" onclick="sendQuickMsg('统计本月故障事件和根因')">
+                <span class="material-symbols-rounded">bug_report</span>故障统计
+              </button>
+              <button class="raw-quick-chip" onclick="sendQuickMsg('分析设备健康评分排名')">
+                <span class="material-symbols-rounded">health_and_safety</span>健康评分
+              </button>
+              <button class="raw-quick-chip" onclick="sendQuickMsg('生成容量规划建议')">
+                <span class="material-symbols-rounded">bar_chart</span>容量规划
+              </button>
+            </div>
+          </div>
+          <div class="raw-chat-input-bar">
+            <textarea class="raw-chat-input" id="aiChatInput" rows="1" placeholder="描述你需要的报告内容..."></textarea>
+            <button class="raw-chat-send" onclick="sendChatMsg()">
+              <span class="material-symbols-rounded">send</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 预览面板 -->
+        <div class="raw-preview-panel" id="aiPreviewPanel">
+          <div class="raw-preview-header">
+            <span class="raw-preview-title">报告预览</span>
+            <div class="raw-preview-actions">
+              <button class="rw-action-btn" onclick="openModal('shareModal')">
+                <span class="material-symbols-rounded">share</span>分享
+              </button>
+              <button class="rw-action-btn" onclick="openModal('shareModal')">
+                <span class="material-symbols-rounded">download</span>导出
+              </button>
+              <button class="rw-action-btn primary">
+                <span class="material-symbols-rounded">save</span>保存
+              </button>
+            </div>
+          </div>
+
+          <!-- 空状态 -->
+          <div class="report-empty" id="aiEmptyState">
+            <span class="material-symbols-rounded report-empty-icon">auto_awesome</span>
+            <div class="report-empty-title">等待 AI 生成报告</div>
+            <div class="report-empty-desc">在左侧对话中描述你的需求，AI 将自动分析数据并在此处生成可视化报告。</div>
+          </div>
+
+          <!-- 生成后的预览（默认隐藏） -->
+          <div class="report-hidden" id="aiReportPreview">
+            <div class="rw-preview-card">
+              <div class="rw-preview-title">AI 自定义报告</div>
+              <div class="rw-preview-meta">
+                <span><span class="material-symbols-rounded">calendar_today</span>2026-05-25 ~ 2026-06-24</span>
+                <span><span class="material-symbols-rounded">smart_toy</span>AI 自动生成</span>
+              </div>
+              <div class="rw-kpi-grid">
+                <div class="rw-kpi-card">
+                  <div class="rw-kpi-label">分析维度</div>
+                  <div class="rw-kpi-value">4</div>
+                </div>
+                <div class="rw-kpi-card">
+                  <div class="rw-kpi-label">数据点</div>
+                  <div class="rw-kpi-value">2,847</div>
+                </div>
+                <div class="rw-kpi-card">
+                  <div class="rw-kpi-label">置信度</div>
+                  <div class="rw-kpi-value green">96.2%</div>
+                </div>
+                <div class="rw-kpi-card">
+                  <div class="rw-kpi-label">生成耗时</div>
+                  <div class="rw-kpi-value">3.2s</div>
+                </div>
+              </div>
+              <div class="rw-chart-placeholder">
+                <span class="material-symbols-rounded">auto_awesome</span>
+                <span>AI 生成的可视化图表</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ View D: 调度管理 ═══════════════════════════ -->
+      <div class="report-schedule-view report-hidden" id="viewSchedules">
+        <div class="rs-header">
+          <div>
+            <div class="rs-title">调度管理</div>
+            <div class="rs-sub">管理所有周期性报告任务，查看执行历史与运行状态</div>
+          </div>
+          <button class="rw-action-btn primary" onclick="openScheduleModal()">
+            <span class="material-symbols-rounded">add</span>新建调度
+          </button>
+        </div>
+
+        <!-- 调度任务表格 -->
+        <div class="rs-table-wrap">
+          <table class="rs-table">
+            <thead>
+              <tr>
+                <th>状态</th>
+                <th>调度名称</th>
+                <th>报告类型</th>
+                <th>执行频率</th>
+                <th>下次执行</th>
+                <th>上次执行</th>
+                <th>已执行</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="schedulesTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- 调度统计概览 -->
+        <div class="rs-stats-row" id="schedulesStatsRow"></div>
+      </div>
+
+      <!-- ══ View E: 报告查看器 ═══════════════════════ -->
+      <div class="report-viewer report-hidden" id="viewViewer">
+        <!-- 查看器工具栏 -->
+        <div class="rv-toolbar">
+          <div class="rv-toolbar-left">
+            <button class="rv-back-btn" onclick="switchView('my-reports')">
+              <span class="material-symbols-rounded">arrow_back</span>
+            </button>
+            <div class="rv-title-area">
+              <div class="rv-report-title" id="rvTitle">--</div>
+              <div class="rv-report-meta" id="rvMeta"></div>
+            </div>
+            <span class="rv-source-badge" id="rvSourceBadge"></span>
+          </div>
+          <div class="rv-toolbar-right">
+            <button class="rw-action-btn" onclick="editCurrentReport()">
+              <span class="material-symbols-rounded">edit</span>编辑
+            </button>
+            <button class="rw-action-btn" onclick="openScheduleWithType(currentViewingReport ? currentViewingReport.type : '')">
+              <span class="material-symbols-rounded">schedule</span>调度
+            </button>
+            <button class="rw-action-btn" onclick="openModal('shareModal')">
+              <span class="material-symbols-rounded">download</span>导出
+            </button>
+            <button class="rw-action-btn" onclick="openModal('shareModal')">
+              <span class="material-symbols-rounded">share</span>分享
+            </button>
+            <button class="rw-action-btn danger" onclick="deleteCurrentReport()">
+              <span class="material-symbols-rounded">delete</span>删除
+            </button>
+          </div>
+        </div>
+
+        <!-- 查看器主体 -->
+        <div class="rv-layout">
+          <!-- 报告内容 -->
+          <div class="rv-content" id="rvContent"></div>
+
+          <!-- 历史版本侧栏 -->
+          <div class="rv-history-panel">
+            <div class="rv-history-header">
+              <span class="material-symbols-rounded">history</span>
+              <span>历史版本</span>
+              <span class="rv-history-count" id="rvHistoryCount">0</span>
+            </div>
+            <div class="rv-history-list" id="rvHistoryList"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.report-content -->
   </main>
+</div><!-- /.app -->
+
+<!-- ══════════════════════════════════════════════════════
+     模态框：监控对象选择器
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay report-modal" id="objModal">
+  <div class="modal-panel" style="width:min(640px,95vw)">
+    <div class="modal-header">
+      <span class="modal-title">选择监控对象</span>
+      <button class="modal-close" onclick="closeModal('objModal')"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <div class="modal-body" style="padding:20px">
+      <div class="obj-search-bar">
+        <input type="text" class="obj-search-input" placeholder="搜索设备名称、IP 地址...">
+        <button class="report-wall-btn" style="flex-shrink:0"><span class="material-symbols-rounded">search</span></button>
+      </div>
+      <div class="obj-filter-row">
+        <button class="obj-filter-chip active">全部</button>
+        <button class="obj-filter-chip">核心交换机</button>
+        <button class="obj-filter-chip">汇聚交换机</button>
+        <button class="obj-filter-chip">接入交换机</button>
+        <button class="obj-filter-chip">路由器</button>
+        <button class="obj-filter-chip">防火墙</button>
+      </div>
+      <div class="obj-list">
+        <div class="obj-item selected" onclick="this.classList.toggle('selected')">
+          <div class="obj-check"></div>
+          <div class="obj-icon"><span class="material-symbols-rounded">dns</span></div>
+          <div class="obj-info">
+            <div class="obj-name">Core-SW-01</div>
+            <div class="obj-sub">10.1.1.1 · 核心交换机 · H3C S12500</div>
+          </div>
+        </div>
+        <div class="obj-item selected" onclick="this.classList.toggle('selected')">
+          <div class="obj-check"></div>
+          <div class="obj-icon"><span class="material-symbols-rounded">dns</span></div>
+          <div class="obj-info">
+            <div class="obj-name">Core-SW-02</div>
+            <div class="obj-sub">10.1.1.2 · 核心交换机 · H3C S12500</div>
+          </div>
+        </div>
+        <div class="obj-item" onclick="this.classList.toggle('selected')">
+          <div class="obj-check"></div>
+          <div class="obj-icon"><span class="material-symbols-rounded">dns</span></div>
+          <div class="obj-info">
+            <div class="obj-name">Agg-SW-A01</div>
+            <div class="obj-sub">10.1.2.1 · 汇聚交换机 · H3C S6800</div>
+          </div>
+        </div>
+        <div class="obj-item" onclick="this.classList.toggle('selected')">
+          <div class="obj-check"></div>
+          <div class="obj-icon"><span class="material-symbols-rounded">dns</span></div>
+          <div class="obj-info">
+            <div class="obj-name">Agg-SW-A02</div>
+            <div class="obj-sub">10.1.2.2 · 汇聚交换机 · H3C S6800</div>
+          </div>
+        </div>
+        <div class="obj-item" onclick="this.classList.toggle('selected')">
+          <div class="obj-check"></div>
+          <div class="obj-icon"><span class="material-symbols-rounded">router</span></div>
+          <div class="obj-info">
+            <div class="obj-name">Edge-RTR-01</div>
+            <div class="obj-sub">10.1.0.1 · 出口路由器 · H3C SR8800</div>
+          </div>
+        </div>
+        <div class="obj-item" onclick="this.classList.toggle('selected')">
+          <div class="obj-check"></div>
+          <div class="obj-icon"><span class="material-symbols-rounded">security</span></div>
+          <div class="obj-info">
+            <div class="obj-name">FW-01</div>
+            <div class="obj-sub">10.1.0.10 · 防火墙 · H3C F5000</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeModal('objModal')">取消</button>
+      <button class="modal-btn-primary" onclick="closeModal('objModal')">确认选择</button>
+    </div>
+  </div>
 </div>
+
+<!-- ══════════════════════════════════════════════════════
+     模态框：周期调度配置
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay report-modal" id="scheduleModal">
+  <div class="modal-panel" style="width:min(560px,95vw)">
+    <div class="modal-header">
+      <span class="modal-title">配置周期调度</span>
+      <button class="modal-close" onclick="closeModal('scheduleModal')"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <div class="modal-body" style="padding:20px">
+      <div class="schedule-config">
+        <input type="hidden" id="scheduleEditId" value="">
+        <div class="schedule-field">
+          <label>调度名称</label>
+          <input type="text" id="schName" placeholder="例如：周度流量分析报告">
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-field">
+            <label>报告类型</label>
+            <select id="schType">
+              <option value="traffic">流量分析报告</option>
+              <option value="fault">故障统计报告</option>
+              <option value="capacity">容量规划报告</option>
+              <option value="health">网络健康报告</option>
+              <option value="device">设备巡检报告</option>
+            </select>
+          </div>
+          <div class="schedule-field">
+            <label>执行频率</label>
+            <select id="schFreq">
+              <option value="daily">每天</option>
+              <option value="weekly">每周</option>
+              <option value="monthly">每月</option>
+              <option value="quarterly">每季度</option>
+            </select>
+          </div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-field">
+            <label>执行时间</label>
+            <input type="time" id="schTime" value="09:00">
+          </div>
+          <div class="schedule-field">
+            <label>时区</label>
+            <select>
+              <option selected>Asia/Shanghai (UTC+8)</option>
+            </select>
+          </div>
+        </div>
+        <div class="schedule-field">
+          <label>接收人邮箱</label>
+          <input type="text" id="schRecipients" placeholder="输入邮箱后回车添加，多个用逗号分隔">
+        </div>
+        <div class="schedule-field">
+          <label>输出格式</label>
+          <div style="display:flex;gap:8px;margin-top:4px" id="schFormatGroup">
+            <button class="obj-filter-chip active" type="button" onclick="toggleSchFormat(this)">PDF</button>
+            <button class="obj-filter-chip" type="button" onclick="toggleSchFormat(this)">Excel</button>
+            <button class="obj-filter-chip" type="button" onclick="toggleSchFormat(this)">HTML</button>
+          </div>
+        </div>
+
+        <!-- AI 调度建议 -->
+        <div class="schedule-ai-preview">
+          <div class="schedule-ai-title"><span class="material-symbols-rounded">auto_awesome</span>AI 调度建议</div>
+          <div class="schedule-ai-text">
+            基于您的报告使用习惯分析：建议将流量分析报告设置为<strong>每周一 09:00</strong>自动生成，这是您最常查看报告的时间。同时建议增加<strong>异常事件触发</strong>机制，当检测到流量突增 &gt;200% 时自动发送告警报告。
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeModal('scheduleModal')">取消</button>
+      <button class="modal-btn-primary" onclick="saveSchedule()">保存调度</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     模态框：调度历史报告
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay report-modal" id="scheduleHistoryModal">
+  <div class="modal-panel" style="width:min(680px,95vw)">
+    <div class="modal-header">
+      <span class="modal-title" id="scheduleHistoryTitle">历史报告</span>
+      <button class="modal-close" onclick="closeModal('scheduleHistoryModal')"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <div class="modal-body" id="scheduleHistoryBody" style="padding:20px;max-height:60vh;overflow-y:auto">
+      <!-- 动态渲染 -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     模态框：分享与导出
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay report-modal" id="shareModal">
+  <div class="modal-panel" style="width:min(480px,95vw)">
+    <div class="modal-header">
+      <span class="modal-title">分享与导出</span>
+      <button class="modal-close" onclick="closeModal('shareModal')"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <div class="modal-body" style="padding:20px">
+      <div class="share-options">
+        <div class="share-option">
+          <div class="share-option-icon email"><span class="material-symbols-rounded">mail</span></div>
+          <div class="share-option-text">
+            <div class="share-option-title">邮件发送</div>
+            <div class="share-option-desc">将报告作为附件发送给团队成员</div>
+          </div>
+          <span class="material-symbols-rounded share-option-arrow">chevron_right</span>
+        </div>
+        <div class="share-option">
+          <div class="share-option-icon link"><span class="material-symbols-rounded">link</span></div>
+          <div class="share-option-text">
+            <div class="share-option-title">生成分享链接</div>
+            <div class="share-option-desc">创建可访问的报告链接，支持权限控制</div>
+          </div>
+          <span class="material-symbols-rounded share-option-arrow">chevron_right</span>
+        </div>
+        <div class="share-option">
+          <div class="share-option-icon export"><span class="material-symbols-rounded">download</span></div>
+          <div class="share-option-text">
+            <div class="share-option-title">导出文件</div>
+            <div class="share-option-desc">支持 PDF、Excel、HTML 格式导出</div>
+          </div>
+          <span class="material-symbols-rounded share-option-arrow">chevron_right</span>
+        </div>
+        <div class="share-option">
+          <div class="share-option-icon subscribe"><span class="material-symbols-rounded">notifications</span></div>
+          <div class="share-option-text">
+            <div class="share-option-title">订阅报告</div>
+            <div class="share-option-desc">设置定期自动推送，不错过任何变化</div>
+          </div>
+          <span class="material-symbols-rounded share-option-arrow">chevron_right</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     模态框：提示词新旧对比
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay report-modal" id="promptDiffModal">
+  <div class="modal-panel" style="width:min(980px,96vw)">
+    <div class="modal-header">
+      <span class="modal-title">提示词改写对比</span>
+      <button class="modal-close" onclick="closeModal('promptDiffModal')"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px 10px">
+      <div class="prompt-diff-layout">
+        <div class="prompt-diff-col">
+          <div class="prompt-diff-head">
+            <span class="material-symbols-rounded">history</span>
+            <span>原始提示词</span>
+          </div>
+          <div class="prompt-diff-box" id="promptDiffOld"></div>
+        </div>
+        <div class="prompt-diff-col">
+          <div class="prompt-diff-head">
+            <span class="material-symbols-rounded">auto_fix_high</span>
+            <span>当前提示词</span>
+          </div>
+          <div class="prompt-diff-box" id="promptDiffNew"></div>
+        </div>
+      </div>
+      <div class="prompt-diff-legend">
+        <span class="same">未变化</span>
+        <span class="added">新增</span>
+        <span class="removed">删除</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeModal('promptDiffModal')">取消</button>
+      <button class="modal-btn-primary" onclick="confirmSaveTemplateFromDiff()">确认保存为模板</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     模态框：新建报告三步向导
+     ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay report-modal" id="newReportModal">
+  <div class="modal-panel wizard-panel" style="width:min(680px,95vw)">
+    <div class="modal-header">
+      <span class="modal-title">新建报告</span>
+      <button class="modal-close" onclick="closeModal('newReportModal')"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <!-- 步骤条 -->
+    <div class="wizard-steps" id="wizardSteps">
+      <div class="wizard-step-item active" data-step="1"><span class="wizard-step-num">1</span>选择方式</div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step-item" data-step="2"><span class="wizard-step-num">2</span>配置参数</div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step-item" data-step="3"><span class="wizard-step-num">3</span>确认生成</div>
+    </div>
+    <div class="wizard-body">
+      <!-- Step 1: 选择方式 -->
+      <div class="wizard-page active" id="wizardStep1">
+        <div class="wizard-page-title">选择报告创建方式</div>
+        <div class="wizard-method-grid">
+          <div class="wizard-method-card" data-method="template" onclick="wizardSelectMethod('template')">
+            <div class="wm-icon template"><span class="material-symbols-rounded">description</span></div>
+            <div class="wm-title">从模板创建</div>
+            <div class="wm-desc">选择内置报告模板，快速生成标准报告</div>
+            <div class="wm-tags"><span class="wm-tag">流量分析</span><span class="wm-tag">故障统计</span><span class="wm-tag">容量规划</span><span class="wm-tag">+2</span></div>
+            <span class="wm-badge">推荐</span>
+          </div>
+          <div class="wizard-method-card" data-method="ai" onclick="wizardSelectMethod('ai')">
+            <div class="wm-icon ai"><span class="material-symbols-rounded">auto_awesome</span></div>
+            <div class="wm-title">AI 对话创建</div>
+            <div class="wm-desc">用自然语言描述需求，AI 自动生成报告</div>
+            <div class="wm-tags"><span class="wm-tag ai">自然语言</span><span class="wm-tag ai">智能分析</span></div>
+          </div>
+          <div class="wizard-method-card" data-method="blank" onclick="wizardSelectMethod('blank')">
+            <div class="wm-icon blank"><span class="material-symbols-rounded">note_add</span></div>
+            <div class="wm-title">空白自定义</div>
+            <div class="wm-desc">从零开始，自由配置报告维度和数据源</div>
+            <div class="wm-tags"><span class="wm-tag">完全自定义</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: 配置参数 -->
+      <div class="wizard-page" id="wizardStep2">
+        <div class="wizard-page-title" id="wizardStep2Title">配置报告参数</div>
+        <!-- 模板路径 -->
+        <div id="wizardTplSection">
+          <div class="wizard-field-label">选择报告模板</div>
+          <div class="wizard-tpl-grid" id="wizardTplGrid">
+            <div class="wizard-tpl-card active" data-tpl="traffic" onclick="wizardSelectTemplate('traffic')">
+              <div class="wtc-icon purple"><span class="material-symbols-rounded">lan</span></div>
+              <div class="wtc-name">流量分析报告</div>
+              <div class="wtc-desc">带宽利用率、协议分布、异常检测</div>
+            </div>
+            <div class="wizard-tpl-card" data-tpl="fault" onclick="wizardSelectTemplate('fault')">
+              <div class="wtc-icon red"><span class="material-symbols-rounded">error</span></div>
+              <div class="wtc-name">故障统计报告</div>
+              <div class="wtc-desc">故障趋势、MTTR、根因分布</div>
+            </div>
+            <div class="wizard-tpl-card" data-tpl="capacity" onclick="wizardSelectTemplate('capacity')">
+              <div class="wtc-icon blue"><span class="material-symbols-rounded">storage</span></div>
+              <div class="wtc-name">容量规划报告</div>
+              <div class="wtc-desc">容量预测、扩容建议、瓶颈识别</div>
+            </div>
+            <div class="wizard-tpl-card" data-tpl="health" onclick="wizardSelectTemplate('health')">
+              <div class="wtc-icon green"><span class="material-symbols-rounded">favorite</span></div>
+              <div class="wtc-name">网络健康报告</div>
+              <div class="wtc-desc">可用性、延迟、健康评分</div>
+            </div>
+            <div class="wizard-tpl-card" data-tpl="device" onclick="wizardSelectTemplate('device')">
+              <div class="wtc-icon orange"><span class="material-symbols-rounded">developer_board</span></div>
+              <div class="wtc-name">设备巡检报告</div>
+              <div class="wtc-desc">设备状态、版本合规、资源使用</div>
+            </div>
+          </div>
+          <div class="wizard-tpl-detail" id="wizardTplDetail">
+            <div class="wizard-tpl-detail-title"><span class="material-symbols-rounded">info</span>模板说明</div>
+            <div class="wizard-tpl-detail-body" id="wizardTplDetailBody">流量分析报告包含带宽利用率趋势、协议分布、异常流量检测等核心维度，适合日常运维监控场景。</div>
+            <div class="wizard-tpl-preview-kpis" id="wizardTplKpis">
+              <span>带宽利用率</span><span>协议分布</span><span>异常检测</span><span>TOP10 IP</span>
+            </div>
+            <div class="wizard-tpl-flow-actions">
+              <button class="wizard-flow-btn" onclick="wizardPreviewTemplate()"><span class="material-symbols-rounded">visibility</span>查看报告预览</button>
+              <button class="wizard-flow-btn primary" onclick="wizardEditTemplateInWorkbench()"><span class="material-symbols-rounded">edit</span>修改模板并保存</button>
+            </div>
+            <div class="wizard-tpl-flow-note">💡 修改模板后可直接在工作台预览效果，保存后回到此向导继续生成。</div>
+          </div>
+        </div>
+        <!-- AI 路径 -->
+        <div id="wizardAiSection" style="display:none">
+          <div class="wizard-field-label">描述你的报告需求</div>
+          <textarea class="wizard-ai-input" id="wizardAiInput" rows="4" placeholder="例如：分析最近30天核心链路的流量趋势，重点关注异常波动和协议分布..."></textarea>
+          <div class="wizard-ai-suggest">
+            <span class="wizard-ai-suggest-label">快速填充：</span>
+            <span class="wizard-ai-chip" onclick="wizardFillAi('分析最近30天核心链路的流量趋势')">流量趋势分析</span>
+            <span class="wizard-ai-chip" onclick="wizardFillAi('统计本月所有故障事件的根因分布')">故障根因统计</span>
+            <span class="wizard-ai-chip" onclick="wizardFillAi('对比A楼和B楼的网络健康评分')">健康评分对比</span>
+          </div>
+          <div class="wizard-ai-parse" id="wizardAiParse" style="display:none">
+            <div class="wizard-ai-parse-title"><span class="material-symbols-rounded">auto_awesome</span>AI 理解结果</div>
+            <div class="wizard-ai-parse-body" id="wizardAiParseBody"></div>
+          </div>
+        </div>
+        <!-- 空白路径 -->
+        <div id="wizardBlankSection" style="display:none">
+          <div class="wizard-field-label">报告类型</div>
+          <div class="wizard-form-row">
+            <select class="wizard-form-select" id="wizardBlankType">
+              <option value="traffic">流量分析报告</option>
+              <option value="fault">故障统计报告</option>
+              <option value="capacity">容量规划报告</option>
+              <option value="health">网络健康报告</option>
+              <option value="device">设备巡检报告</option>
+            </select>
+          </div>
+          <div class="wizard-blank-hint">
+            <span class="material-symbols-rounded">info</span>
+            <span>空白模式将使用默认提示词模板，你可以在工作台中自由修改所有配置。</span>
+          </div>
+        </div>
+        <!-- 通用配置 -->
+        <div class="wizard-common-config">
+          <div class="wizard-field-label">时间范围 <span class="wizard-field-optional">（可选）</span></div>
+          <div class="wizard-time-chips">
+            <span class="wizard-time-chip" onclick="wizardSelectTime(this,'7d')">近 7 天</span>
+            <span class="wizard-time-chip active" onclick="wizardSelectTime(this,'30d')">近 30 天</span>
+            <span class="wizard-time-chip" onclick="wizardSelectTime(this,'90d')">近 90 天</span>
+            <span class="wizard-time-chip" onclick="wizardSelectTime(this,'custom')">自定义</span>
+          </div>
+          <div class="wizard-field-label" style="margin-top:12px">监控对象 <span class="wizard-field-optional">（可选）</span></div>
+          <button class="wizard-obj-btn" onclick="wizardSelectObjects()"><span class="material-symbols-rounded">add</span>选择监控对象</button>
+        </div>
+      </div>
+
+      <!-- Step 3: 确认生成 -->
+      <div class="wizard-page" id="wizardStep3">
+        <div class="wizard-page-title">确认报告配置</div>
+        <div class="wizard-field-label">报告名称</div>
+        <input class="wizard-name-input" id="wizardReportName" placeholder="输入报告名称（留空自动生成）">
+        <div class="wizard-confirm-summary" id="wizardConfirmSummary">
+          <div><b>创建方式：</b><span id="wizardConfirmMethod">从模板创建</span></div>
+          <div><b>报告类型：</b><span id="wizardConfirmType">流量分析报告</span></div>
+          <div><b>时间范围：</b><span id="wizardConfirmTime">近 30 天</span></div>
+          <div><b>监控对象：</b><span id="wizardConfirmObjs">全部对象</span></div>
+        </div>
+      </div>
+
+      <!-- 生成中 -->
+      <div class="wizard-page" id="wizardGenerating">
+        <div class="wizard-generating">
+          <div class="wizard-gen-spinner"><span class="material-symbols-rounded">auto_awesome</span></div>
+          <div class="wizard-gen-title">正在生成报告...</div>
+          <div class="wizard-gen-desc" id="wizardGenDesc">AI 正在分析数据并生成可视化报告</div>
+          <div class="wizard-gen-progress"><div class="wizard-gen-progress-bar" id="wizardGenBar"></div></div>
+        </div>
+      </div>
+    </div>
+    <!-- 底部按钮 -->
+    <div class="modal-footer wizard-footer" id="wizardFooter">
+      <div class="wizard-footer-right">
+        <button class="modal-btn-cancel" id="wizardPrevBtn" onclick="wizardPrev()" style="display:none">上一步</button>
+        <button class="modal-btn-primary" id="wizardNextBtn" onclick="wizardNext()">下一步</button>
+        <button class="modal-btn-cancel" onclick="closeModal('newReportModal')">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     JavaScript 交互逻辑
+     ═══════════════════════════════════════════════════ -->
+<script>
+/* ── 视图切换 ────────────────────────────────────────── */
+var myReports = [
+  {
+    id: 'rpt-custom-bandwidth',
+    title: '自定义带宽监控',
+    type: 'traffic',
+    source: 'custom',
+    generatedAt: '2026-06-23T09:20:00',
+    lastViewedAt: '2026-06-24T10:30:00',
+    viewCount: 42
+  },
+  {
+    id: 'rpt-custom-security',
+    title: '安全合规周报',
+    type: 'fault',
+    source: 'custom',
+    generatedAt: '2026-06-22T14:10:00',
+    lastViewedAt: '2026-06-24T09:15:00',
+    viewCount: 31
+  }
+];
+
+var reportTypeNames = {
+  traffic: '流量分析报告',
+  fault: '故障统计报告',
+  capacity: '容量规划报告',
+  health: '网络健康报告',
+  device: '设备巡检报告'
+};
+
+function formatTimeShort(ts) {
+  var d = new Date(ts);
+  if (isNaN(d.getTime())) return '--';
+  return d.getMonth() + 1 + '-' + d.getDate() + ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+}
+
+function getTopReports(limit) {
+  return myReports.slice().sort(function(a, b) {
+    if (b.viewCount !== a.viewCount) return b.viewCount - a.viewCount;
+    return new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime();
+  }).slice(0, limit || 5);
+}
+
+function updateWorkbenchByType(type) {
+  var sel = document.getElementById('wbReportType');
+  if (sel && reportTypeNames[type]) sel.value = type;
+  var titleEl = document.querySelector('.rw-preview-title');
+  if (titleEl && reportTypeNames[type]) titleEl.textContent = reportTypeNames[type];
+  loadPromptForType(type || 'traffic');
+}
+
+function setActiveNav(selector) {
+  document.querySelectorAll('.report-nav-item').forEach(function(item) { item.classList.remove('active'); });
+  if (!selector) return;
+  var el = document.querySelector(selector);
+  if (el) el.classList.add('active');
+}
+
+function renderMyReportsNavTop5() {
+  var box = document.getElementById('myReportsTop5');
+  if (!box) return;
+  var top = getTopReports(5);
+  if (!top.length) {
+    box.innerHTML = '<div class="report-nav-empty">暂无报告，先通过“报告模版”创建</div>';
+    return;
+  }
+  box.innerHTML = top.map(function(r) {
+    return '<div class="report-nav-item my-report-shortcut" data-view="workbench" data-report-id="' + r.id + '">' +
+      '<span class="material-symbols-rounded">description</span>' +
+      '<span class="report-nav-item-text">' + r.title + '</span>' +
+      '<span class="report-nav-badge">' + r.viewCount + '次</span>' +
+      '</div>';
+  }).join('');
+}
+
+function renderMyReportsList() {
+  var list = document.getElementById('myReportsList');
+  var empty = document.getElementById('myReportsEmpty');
+  if (!list || !empty) return;
+
+  if (!myReports.length) {
+    list.innerHTML = '';
+    empty.classList.remove('report-hidden');
+    return;
+  }
+
+  empty.classList.add('report-hidden');
+  var ordered = myReports.slice().sort(function(a, b) {
+    return new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime();
+  });
+
+  list.innerHTML = ordered.map(function(r) {
+    var sourceText, sourceCls;
+    if (r.source === 'schedule') {
+      var schName = '';
+      if (r.scheduleId) {
+        var sch = schedules.find(function(s) { return s.id === r.scheduleId; });
+        schName = sch ? sch.name : '';
+      }
+      sourceText = schName ? '来自调度: ' + schName : '来自调度';
+      sourceCls = 'schedule';
+    } else if (r.source === 'template') {
+      sourceText = '来自报告模版';
+      sourceCls = 'template';
+    } else {
+      sourceText = '自定义报告';
+      sourceCls = 'custom';
+    }
+    return '<div class="my-report-card" onclick="openMyReport(\'' + r.id + '\')">' +
+      '<div class="my-report-card-head">' +
+        '<div class="my-report-card-title">' + r.title + '</div>' +
+        '<span class="my-report-source ' + sourceCls + '">' + sourceText + '</span>' +
+      '</div>' +
+      '<div class="my-report-card-meta">' +
+        '<span><span class="material-symbols-rounded">calendar_today</span>生成：' + formatTimeShort(r.generatedAt) + '</span>' +
+        '<span><span class="material-symbols-rounded">visibility</span>查看：' + r.viewCount + ' 次</span>' +
+        '<span><span class="material-symbols-rounded">update</span>最近：' + formatTimeShort(r.lastViewedAt) + '</span>' +
+      '</div>' +
+      '<div class="my-report-card-actions">' +
+        '<button class="rtc-action-btn primary" onclick="event.stopPropagation();openMyReport(\'' + r.id + '\')"><span class="material-symbols-rounded">play_arrow</span>查看</button>' +
+        '<button class="rtc-action-btn" onclick="event.stopPropagation();openModal(\'shareModal\')"><span class="material-symbols-rounded">share</span>分享</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderMyReports() {
+  renderMyReportsNavTop5();
+  renderMyReportsList();
+  renderScheduleNav();
+}
+
+var views = {
+  'my-reports':   document.getElementById('viewMyReports'),
+  library:        document.getElementById('viewLibrary'),
+  workbench:      document.getElementById('viewWorkbench'),
+  'ai-workbench': document.getElementById('viewAIWorkbench'),
+  schedules:      document.getElementById('viewSchedules'),
+  viewer:         document.getElementById('viewViewer')
+};
+
+function switchView(viewName) {
+  Object.values(views).forEach(function(v) { if (v) v.classList.add('report-hidden'); });
+  if (views[viewName]) views[viewName].classList.remove('report-hidden');
+
+  if (viewName === 'my-reports') {
+    setActiveNav('.report-nav-item[data-role="my-reports-home"]');
+  }
+  if (viewName === 'schedules') {
+    renderSchedules();
+  }
+}
+
+/* ── 侧栏导航点击 ────────────────────────────────────── */
+document.addEventListener('click', function(e) {
+  var item = e.target.closest('.report-nav-item');
+  if (!item) return;
+
+  if (item.dataset.reportId) {
+    openMyReport(item.dataset.reportId);
+    return;
+  }
+
+  var view = item.dataset.view;
+  if (!view) return;
+  if (view === 'schedules') {
+    switchView('schedules');
+    setActiveNav();
+    item.classList.add('active');
+    return;
+  }
+  if (view === 'workbench' && item.dataset.report) {
+    openReport(item.dataset.report);
+    return;
+  }
+  switchView(view);
+});
+
+/* ── 打开内置报告 ────────────────────────────────────── */
+function openReport(type) {
+  if (type === 'ai') {
+    switchView('ai-workbench');
+    setActiveNav();
+    return;
+  }
+
+  var newId = 'rpt-' + Date.now();
+  var nowIso = new Date().toISOString();
+  var titleBase = reportTypeNames[type] || '自定义报告';
+  var title = titleBase.replace('报告', '') + ' ' + formatTimeShort(nowIso);
+
+  myReports.unshift({
+    id: newId,
+    title: title,
+    type: type,
+    source: 'template',
+    generatedAt: nowIso,
+    lastViewedAt: nowIso,
+    viewCount: 1
+  });
+
+  renderMyReports();
+  openMyReport(newId);
+}
+
+function openMyReport(reportId) {
+  var report = myReports.find(function(r) { return r.id === reportId; });
+  if (!report) return;
+
+  report.viewCount += 1;
+  report.lastViewedAt = new Date().toISOString();
+  currentViewingReport = report;
+
+  renderReportViewer(report);
+  switchView('viewer');
+  renderMyReports();
+  setActiveNav('.report-nav-item[data-report-id="' + reportId + '"]');
+}
+
+/* ── 报告查看器 ──────────────────────────────────────── */
+var currentViewingReport = null;
+
+/* 各报告类型的 KPI 和分析内容模板 */
+var reportContentTemplates = {
+  traffic: {
+    kpis: [
+      { label: '平均带宽利用率', value: '67.3%', trend: 'up', delta: '+2.1% vs 上期' },
+      { label: '峰值流量',       value: '8.7 Gbps', trend: 'up', delta: '+0.5G vs 上期' },
+      { label: '异常流量事件',   value: '12', valueCls: 'red', trend: 'down', delta: '-3 vs 上期' },
+      { label: '链路健康率',     value: '98.6%', valueCls: 'green', trend: 'up', delta: '+0.2% vs 上期' }
+    ],
+    charts: [
+      { icon: 'show_chart',  label: '带宽利用率趋势（近 7 天）' },
+      { icon: 'donut_large', label: '协议分布（HTTP / HTTPS / SSH / DNS / 其他）' },
+      { icon: 'bar_chart',   label: '流量 TOP 10 源 IP 排名' }
+    ],
+    sections: [
+      { title: '带宽利用率趋势分析', icon: 'trending_up',
+        text: '过去 30 天全网平均带宽利用率维持在 67.3%，较上一周期上升 2.1 个百分点。核心链路（Core-SW-01 ↔ Core-SW-02）利用率持续高于 80%，建议重点关注扩容规划。接入层链路平均利用率 45%，处于健康区间。' },
+      { title: '流量 TOP N 排名', icon: 'leaderboard',
+        text: '流量 TOP 10 源 IP 集中在数据中心出口区域，前 3 名 IP 贡献了全网 38% 的流量。其中 10.1.1.100（业务服务器集群）日均流量 1.2TB，建议对高流量服务器部署专线接入。' },
+      { title: '异常流量检测', icon: 'warning',
+        text: '报告期内共检测到 12 起异常流量事件：突增事件 8 起（峰值出现在 6 月 18 日 14:32，瞬时流量达 12.3Gbps），突降事件 3 起，突刺事件 1 起。9 起已自动恢复，3 起需人工介入排查。' },
+      { title: '结论与建议', icon: 'lightbulb',
+        text: '1. 核心链路利用率偏高，建议在 Q3 规划扩容至 40G 上联\n2. 服务器集群流量集中，建议部署流量调度策略\n3. 异常事件环比下降 20%，当前安全态势向好\n4. 建议将流量报告调度频率调整为每周一自动生成' }
+    ]
+  },
+  fault: {
+    kpis: [
+      { label: '故障事件总数', value: '47', valueCls: 'red', trend: 'down', delta: '-8 vs 上期' },
+      { label: '平均 MTTR',   value: '2.4h', trend: 'down', delta: '-0.6h vs 上期' },
+      { label: 'MTBF',        value: '168h', valueCls: 'green', trend: 'up', delta: '+12h vs 上期' },
+      { label: '故障恢复率',   value: '95.7%', valueCls: 'green', trend: 'up', delta: '+1.2% vs 上期' }
+    ],
+    charts: [
+      { icon: 'show_chart',   label: '故障事件趋势（按周统计）' },
+      { icon: 'donut_large',  label: '故障根因 TOP 5 分布' },
+      { icon: 'timeline',     label: '故障事件时间轴' }
+    ],
+    sections: [
+      { title: '故障事件趋势', icon: 'trending_down',
+        text: '本月共发生 47 起故障事件，较上月减少 8 起（-14.5%）。故障集中在周一和周四，分别占 22% 和 19%。02:00-06:00 时段故障率最低，10:00-14:00 为故障高发时段。' },
+      { title: 'MTTR / MTBF 分析', icon: 'timer',
+        text: '平均故障修复时间（MTTR）2.4 小时，较上月缩短 0.6 小时。P1 级故障 MTTR 为 1.2 小时，P2 级为 3.1 小时。平均故障间隔（MTBF）168 小时，提升 7.7%。建议持续优化 P2 级故障响应流程。' },
+      { title: '故障根因 TOP 5', icon: 'bug_report',
+        text: '1. 光模块故障（32%）— 建议批次更换老化模块\n2. 配置错误（24%）— 加强变更审批流程\n3. 软件 Bug（18%）— 跟踪厂商补丁发布\n4. 电源异常（15%）— 完善 UPS 监控\n5. DDoS 攻击（11%）— 升级防护策略' },
+      { title: '结论与建议', icon: 'lightbulb',
+        text: '1. 故障总量持续下降，运维质量稳步提升\n2. 光模块故障占比最高，建议 Q3 集中更换\n3. 配置错误类故障需加强自动化校验\n4. 建议在调度管理中开启故障报告自动生成' }
+    ]
+  },
+  health: {
+    kpis: [
+      { label: '网络可用性',   value: '99.97%', valueCls: 'green', trend: 'up', delta: '+0.02% vs 上期' },
+      { label: '平均延迟',     value: '2.3ms', trend: 'down', delta: '-0.4ms vs 上期' },
+      { label: '丢包率',       value: '0.02%', valueCls: 'green', trend: 'down', delta: '-0.01% vs 上期' },
+      { label: '健康评分',     value: '92/100', valueCls: 'green', trend: 'up', delta: '+3 vs 上期' }
+    ],
+    charts: [
+      { icon: 'show_chart',    label: '可用性趋势（按天统计）' },
+      { icon: 'speed',         label: '延迟 & 丢包率趋势' },
+      { icon: 'health_and_safety', label: '设备健康评分排名' }
+    ],
+    sections: [
+      { title: '网络可用性', icon: 'check_circle',
+        text: '本月网络整体可用性 99.97%，达到 SLA 99.95% 目标。仅 6 月 15 日因 Core-SW-01 主控切换出现 2 分钟短暂中断（可用性降至 99.94%）。建议对核心设备部署 ISSU 无缝升级方案。' },
+      { title: '延迟与丢包', icon: 'speed',
+        text: '全网平均延迟 2.3ms，丢包率 0.02%，均在正常范围。跨区域链路延迟略高（北京↔上海 18ms），建议优化 BGP 路由策略。无线接入区域丢包率 0.08%，需关注 AP 覆盖质量。' },
+      { title: 'SLA 达标率', icon: 'verified',
+        text: '本月 SLA 达标率 98.2%，较上月提升 1.5%。3 台设备未达标：Agg-SW-B02（CPU 峰值 92%）、Access-SW-C01（端口错误率偏高）、Edge-RTR-02（BGP 收敛时间超标）。' },
+      { title: '结论与建议', icon: 'lightbulb',
+        text: '1. 整体健康状态良好，SLA 达标率持续提升\n2. 核心设备需关注主控切换影响，建议 ISSU 方案\n3. 无线区域丢包需排查 AP 部署密度\n4. 3 台不达标设备已列入下月整改计划' }
+    ]
+  },
+  capacity: {
+    kpis: [
+      { label: '平均使用率',   value: '58.4%', trend: 'up', delta: '+4.2% vs 上期' },
+      { label: '瓶颈链路',     value: '7', valueCls: 'red', trend: 'up', delta: '+2 vs 上期' },
+      { label: '预测扩容时间', value: '68 天', trend: 'down', delta: '-12 天 vs 上期' },
+      { label: '资源健康率',   value: '89%', valueCls: 'green', trend: 'down', delta: '-3% vs 上期' }
+    ],
+    charts: [
+      { icon: 'show_chart',  label: '容量使用率趋势及预测（90 天）' },
+      { icon: 'bar_chart',   label: '链路使用率排名 TOP 10' },
+      { icon: 'scatter_plot', label: '资源瓶颈热点分布' }
+    ],
+    sections: [
+      { title: '容量现状', icon: 'storage',
+        text: '全网平均链路使用率 58.4%，较上月增长 4.2%。核心层使用率 72%，汇聚层 61%，接入层 42%。7 条链路使用率超过 80% 阈值，主要集中在数据中心出口和园区骨干段。' },
+      { title: '增长趋势预测', icon: 'trending_up',
+        text: '基于近 6 个月增长趋势拟合，预计 68 天后将有首批链路达到 90% 临界值。其中 Core-SW-01 的 Gi1/0/1 链路预计 45 天后饱和，建议优先安排扩容。整体网络容量将在 120 天内面临系统性瓶颈。' },
+      { title: '扩容建议', icon: 'upgrade',
+        text: '1. 【紧急】Core-SW-01 Gi1/0/1 — 45 天内需升级至 40G\n2. 【高优】Agg-SW-A01 上联 — 60 天内升级至 2×10G LAG\n3. 【中优】数据中心出口 — 90 天内扩容出口带宽\n4. 【建议】接入层 AP 区域 — 评估 802.11ax 替换计划' },
+      { title: '结论与建议', icon: 'lightbulb',
+        text: '1. 容量增长速度加快，需提前规划 Q3 扩容预算\n2. 核心链路风险最高，建议本月启动采购流程\n3. 建议开启容量报告月度调度，持续跟踪变化趋势\n4. 可结合流量分析报告制定精细化扩容方案' }
+    ]
+  },
+  device: {
+    kpis: [
+      { label: '在线设备',   value: '156/162', valueCls: 'green', trend: 'up', delta: '+3 vs 上期' },
+      { label: '合规率',     value: '94.4%', valueCls: 'green', trend: 'up', delta: '+2.1% vs 上期' },
+      { label: '告警设备',   value: '8', valueCls: 'red', trend: 'down', delta: '-2 vs 上期' },
+      { label: '版本一致率', value: '87.2%', trend: 'up', delta: '+5% vs 上期' }
+    ],
+    charts: [
+      { icon: 'inventory_2', label: '设备在线状态分布' },
+      { icon: 'donut_large', label: '软件版本分布' },
+      { icon: 'show_chart',  label: 'CPU / 内存利用率趋势' }
+    ],
+    sections: [
+      { title: '设备清单概览', icon: 'dns',
+        text: '本次巡检覆盖 162 台设备，在线 156 台（96.3%）。离线 6 台：Access-SW-D01~D04（计划维护）、Edge-RTR-03（待排查）、FW-02（固件升级中）。设备类型：核心交换机 8 台、汇聚 24 台、接入 98 台、路由器 12 台、防火墙 6 台、无线控制器 4 台、AP 10 台。' },
+      { title: '版本与合规', icon: 'verified_user',
+        text: '版本一致率 87.2%，目标 90%。存在 3 个软件版本分支：主流版本（7.0.5）占 78%，旧版本（6.8.2）占 15%，测试版本（7.1.0-beta）占 7%。配置合规检查通过率 94.4%，不合规项主要集中在 ACL 规则冗余（12 台）和 SNMP 社区名弱口令（3 台）。' },
+      { title: '资源使用率', icon: 'memory',
+        text: 'CPU 平均利用率 34%，峰值设备 Agg-SW-B02 达 92%（持续 3 分钟）。内存平均利用率 58%，无异常。端口使用率：核心设备平均 72%，接入设备平均 45%。建议对 Agg-SW-B02 进行流量分流优化。' },
+      { title: '结论与建议', icon: 'lightbulb',
+        text: '1. 设备在线率良好，离线设备均为计划内维护\n2. 版本一致性需提升，建议 Q3 统一升级至 7.0.5\n3. 3 台设备存在弱口令风险，需立即整改\n4. Agg-SW-B02 CPU 偏高，建议排查异常进程\n5. 建议将设备巡检设为季度自动调度' }
+    ]
+  }
+};
+
+function renderReportViewer(report) {
+  if (!report) return;
+  var type = report.type || 'traffic';
+  var tpl = reportContentTemplates[type] || reportContentTemplates.traffic;
+  var now = new Date(report.generatedAt);
+
+  /* 标题 */
+  document.getElementById('rvTitle').textContent = report.title;
+  document.getElementById('rvMeta').innerHTML =
+    '<span><span class="material-symbols-rounded">calendar_today</span>' +
+      formatTimeShort(report.generatedAt) + '</span>' +
+    '<span><span class="material-symbols-rounded">visibility</span>查看 ' + report.viewCount + ' 次</span>' +
+    '<span><span class="material-symbols-rounded">update</span>最近查看 ' + formatTimeShort(report.lastViewedAt) + '</span>';
+
+  /* 来源标签 */
+  var badge = document.getElementById('rvSourceBadge');
+  if (report.source === 'schedule') {
+    var schName = '';
+    if (report.scheduleId) { var sch = schedules.find(function(s) { return s.id === report.scheduleId; }); schName = sch ? sch.name : ''; }
+    badge.textContent = schName ? '来自调度: ' + schName : '来自调度';
+    badge.className = 'rv-source-badge schedule';
+  } else if (report.source === 'template') {
+    badge.textContent = '来自模版';
+    badge.className = 'rv-source-badge template';
+  } else {
+    badge.textContent = '自定义';
+    badge.className = 'rv-source-badge custom';
+  }
+
+  /* KPI 卡片 */
+  var kpiHtml = '<div class="rv-kpi-grid">' + tpl.kpis.map(function(k) {
+    return '<div class="rv-kpi-card">' +
+      '<div class="rv-kpi-label">' + k.label + '</div>' +
+      '<div class="rv-kpi-value' + (k.valueCls ? ' ' + k.valueCls : '') + '">' + k.value + '</div>' +
+      '<div class="rv-kpi-trend ' + k.trend + '">' +
+        '<span class="material-symbols-rounded" style="font-size:13px">' + (k.trend === 'up' ? 'trending_up' : 'trending_down') + '</span>' +
+        k.delta +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+
+  /* 图表区域 */
+  var chartHtml = tpl.charts.map(function(c) {
+    return '<div class="rv-chart-block">' +
+      '<span class="material-symbols-rounded">' + c.icon + '</span>' +
+      '<span>' + c.label + '</span>' +
+    '</div>';
+  }).join('');
+
+  /* 分析段落 */
+  var sectionHtml = tpl.sections.map(function(s) {
+    return '<div class="rv-section">' +
+      '<div class="rv-section-title"><span class="material-symbols-rounded">' + s.icon + '</span>' + s.title + '</div>' +
+      '<div class="rv-section-text">' + s.text.replace(/\n/g, '<br>') + '</div>' +
+    '</div>';
+  }).join('');
+
+  /* 完整内容 */
+  document.getElementById('rvContent').innerHTML =
+    '<div class="rv-content-header">' +
+      '<div class="rv-content-title">' + report.title + '</div>' +
+      '<div class="rv-content-subtitle">' + (reportTypeNames[type] || '报告') + ' · ' +
+        formatTimeShort(report.generatedAt) + '</div>' +
+    '</div>' +
+    kpiHtml +
+    '<div class="rv-charts-area">' + chartHtml + '</div>' +
+    '<div class="rv-sections-area">' + sectionHtml + '</div>' +
+    '<div class="rv-footer">' +
+      '<div class="rv-footer-note">本报告由 NGPM 智能报表引擎自动生成 · 数据采集时间 ' + formatTimeShort(report.generatedAt) + '</div>' +
+    '</div>';
+
+  /* 历史版本列表 */
+  renderViewerHistory(report);
+}
+
+function renderViewerHistory(currentReport) {
+  /* 同类型历史报告 */
+  var history = myReports.filter(function(r) {
+    return r.type === currentReport.type && r.id !== currentReport.id;
+  }).sort(function(a, b) {
+    return new Date(b.generatedAt) - new Date(a.generatedAt);
+  });
+
+  /* 加入当前报告 */
+  var all = [currentReport].concat(history);
+
+  document.getElementById('rvHistoryCount').textContent = all.length;
+  var list = document.getElementById('rvHistoryList');
+  list.innerHTML = all.map(function(r) {
+    var isActive = r.id === currentReport.id;
+    var sourceIcon = r.source === 'schedule' ? 'event_repeat' : r.source === 'template' ? 'grid_view' : 'edit_note';
+    return '<div class="rv-history-item' + (isActive ? ' active' : '') + '" onclick="openMyReport(\'' + r.id + '\')">' +
+      '<div class="rv-history-dot' + (isActive ? ' active' : '') + '"></div>' +
+      '<div class="rv-history-info">' +
+        '<div class="rv-history-title">' + r.title + '</div>' +
+        '<div class="rv-history-time"><span class="material-symbols-rounded" style="font-size:12px">' + sourceIcon + '</span>' + formatTimeShort(r.generatedAt) + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* 从查看器进入编辑模式 */
+function editCurrentReport() {
+  if (!currentViewingReport) return;
+  updateWorkbenchByType(currentViewingReport.type || 'traffic');
+  var titleEl = document.querySelector('.rw-preview-title');
+  if (titleEl) titleEl.textContent = currentViewingReport.title;
+  switchView('workbench');
+}
+
+/* 从查看器删除当前报告 */
+function deleteCurrentReport() {
+  if (!currentViewingReport) return;
+  if (!confirm('确定删除报告「' + currentViewingReport.title + '」？此操作不可撤销。')) return;
+  myReports = myReports.filter(function(r) { return r.id !== currentViewingReport.id; });
+  currentViewingReport = null;
+  renderMyReports();
+  switchView('my-reports');
+}
+
+/* ── 模态框 ──────────────────────────────────────────── */
+function openModal(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('open');
+  var panel = el.querySelector('.modal-panel');
+  if (panel) panel.classList.add('open');
+}
+function closeModal(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('open');
+  var panel = el.querySelector('.modal-panel');
+  if (panel) panel.classList.remove('open');
+}
+document.querySelectorAll('.report-modal').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+/* ── 新建报告三步向导 ──────────────────────────────────── */
+var wizardState = { step: 1, method: '', template: 'traffic', timeRange: '30d', objects: '', aiPrompt: '', reportName: '' };
+var wizardFlowActive = false;
+
+function openNewReportModal() {
+  wizardState = { step: 1, method: '', template: 'traffic', timeRange: '30d', objects: '', aiPrompt: '', reportName: '' };
+  wizardFlowActive = false;
+  wizardGoToStep(1);
+  openModal('newReportModal');
+}
+
+function wizardGoToStep(n) {
+  wizardState.step = n;
+  /* 更新步骤条 */
+  document.querySelectorAll('#wizardSteps .wizard-step-item').forEach(function(item) {
+    var s = parseInt(item.dataset.step);
+    item.classList.toggle('active', s <= n);
+  });
+  /* 切换页面 */
+  ['wizardStep1', 'wizardStep2', 'wizardStep3', 'wizardGenerating'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  var pageId = n === 4 ? 'wizardGenerating' : 'wizardStep' + n;
+  var page = document.getElementById(pageId);
+  if (page) page.classList.add('active');
+  /* 按钮状态 */
+  var prevBtn = document.getElementById('wizardPrevBtn');
+  var nextBtn = document.getElementById('wizardNextBtn');
+  if (prevBtn) prevBtn.style.display = n > 1 && n < 4 ? 'inline-flex' : 'none';
+  if (nextBtn) {
+    if (n === 3) { nextBtn.textContent = '生成报告'; }
+    else { nextBtn.innerHTML = '下一步'; }
+    nextBtn.style.display = n < 4 ? 'inline-flex' : 'none';
+  }
+  /* Step 2 切换子区域 */
+  if (n === 2) wizardUpdateStep2Sections();
+  /* Step 3 填充确认 */
+  if (n === 3) wizardFillConfirm();
+}
+
+function wizardSelectMethod(method) {
+  wizardState.method = method;
+  document.querySelectorAll('.wizard-method-card').forEach(function(c) {
+    c.classList.toggle('selected', c.dataset.method === method);
+  });
+  wizardGoToStep(2);
+}
+
+function wizardUpdateStep2Sections() {
+  var tpl = document.getElementById('wizardTplSection');
+  var ai = document.getElementById('wizardAiSection');
+  var blank = document.getElementById('wizardBlankSection');
+  var title = document.getElementById('wizardStep2Title');
+  if (tpl) tpl.style.display = wizardState.method === 'template' ? '' : 'none';
+  if (ai) ai.style.display = wizardState.method === 'ai' ? '' : 'none';
+  if (blank) blank.style.display = wizardState.method === 'blank' ? '' : 'none';
+  if (title) {
+    title.textContent = wizardState.method === 'template' ? '选择报告模板' :
+      wizardState.method === 'ai' ? '描述报告需求' : '配置报告类型';
+  }
+}
+
+function wizardSelectTemplate(tpl) {
+  wizardState.template = tpl;
+  document.querySelectorAll('.wizard-tpl-card').forEach(function(c) {
+    c.classList.toggle('active', c.dataset.tpl === tpl);
+  });
+  /* 更新模板说明 */
+  var details = {
+    traffic: { body: '流量分析报告包含带宽利用率趋势、协议分布、异常流量检测等核心维度，适合日常运维监控场景。', kpis: ['带宽利用率', '协议分布', '异常检测', 'TOP10 IP'] },
+    fault: { body: '故障统计报告涵盖故障事件趋势、MTTR/MTBF 可靠性指标、根因分布分析，帮助提升故障处置效率。', kpis: ['故障总数', 'MTTR', '根因分布', '告警收敛'] },
+    capacity: { body: '容量规划报告提供链路容量现状、增长趋势预测、扩容建议，助力前瞻性资源规划。', kpis: ['使用率', '增长预测', '瓶颈识别', '扩容建议'] },
+    health: { body: '网络健康报告综合评估可用性、延迟、丢包率、设备健康评分，全面掌握网络状态。', kpis: ['可用性', '延迟', '健康评分', '风险预警'] },
+    device: { body: '设备巡检报告覆盖设备在线状态、软件版本合规性、配置检查、资源使用率等维度。', kpis: ['在线率', '版本合规', '配置检查', 'CPU/内存'] }
+  };
+  var d = details[tpl] || details.traffic;
+  var bodyEl = document.getElementById('wizardTplDetailBody');
+  var kpisEl = document.getElementById('wizardTplKpis');
+  if (bodyEl) bodyEl.textContent = d.body;
+  if (kpisEl) kpisEl.innerHTML = d.kpis.map(function(k) { return '<span>' + k + '</span>'; }).join('');
+}
+
+function wizardPreviewTemplate() {
+  closeModal('newReportModal');
+  switchView('workbench');
+  updateWorkbenchByType(wizardState.template || 'traffic');
+  setActiveNav();
+}
+
+function wizardEditTemplateInWorkbench() {
+  wizardFlowActive = true;
+  closeModal('newReportModal');
+  switchView('workbench');
+  updateWorkbenchByType(wizardState.template || 'traffic');
+  setActiveNav();
+  /* 显示返回按钮，隐藏其他 */
+  var backBtn = document.getElementById('wizardBackToFlowBtn');
+  var saveBtn = document.getElementById('wbSaveBtn');
+  var backMyBtn = document.getElementById('wbBackBtn');
+  if (backBtn) backBtn.style.display = 'inline-flex';
+  if (saveBtn) saveBtn.style.display = 'none';
+  if (backMyBtn) backMyBtn.style.display = 'none';
+}
+
+function wizardBackToFlow() {
+  wizardFlowActive = false;
+  /* 恢复按钮 */
+  var backBtn = document.getElementById('wizardBackToFlowBtn');
+  var saveBtn = document.getElementById('wbSaveBtn');
+  var backMyBtn = document.getElementById('wbBackBtn');
+  if (backBtn) backBtn.style.display = 'none';
+  if (saveBtn) saveBtn.style.display = 'inline-flex';
+  if (backMyBtn) backMyBtn.style.display = 'inline-flex';
+  /* 重新打开向导到 step 2 */
+  wizardGoToStep(2);
+  openModal('newReportModal');
+}
+
+function wizardFillAi(text) {
+  var input = document.getElementById('wizardAiInput');
+  if (input) input.value = text;
+  /* 显示 AI 解析 */
+  var parse = document.getElementById('wizardAiParse');
+  var body = document.getElementById('wizardAiParseBody');
+  if (parse) parse.style.display = '';
+  if (body) body.innerHTML = '<b>报告类型：</b>流量分析报告<br><b>时间范围：</b>最近 30 天<br><b>分析维度：</b>趋势分析、异常检测、协议分布<br><b>输出格式：</b>KPI 卡片 + 趋势图 + 排名表';
+}
+
+function wizardSelectTime(el, range) {
+  wizardState.timeRange = range;
+  document.querySelectorAll('.wizard-time-chip').forEach(function(c) { c.classList.remove('active'); });
+  if (el) el.classList.add('active');
+}
+
+function wizardSelectObjects() {
+  /* 模拟选择对象 */
+  wizardState.objects = '核心链路 (12)';
+  var btn = document.querySelector('.wizard-obj-btn');
+  if (btn) btn.innerHTML = '<span class="material-symbols-rounded">check_circle</span>已选择：核心链路 (12)';
+}
+
+function wizardFillConfirm() {
+  var methodNames = { template: '从模板创建', ai: 'AI 对话创建', blank: '空白自定义' };
+  var timeNames = { '7d': '近 7 天', '30d': '近 30 天', '90d': '近 90 天', custom: '自定义' };
+  var type = wizardState.method === 'template' ? wizardState.template :
+    wizardState.method === 'blank' ? (document.getElementById('wizardBlankType') || {}).value || 'traffic' : 'traffic';
+  var mEl = document.getElementById('wizardConfirmMethod');
+  var tEl = document.getElementById('wizardConfirmType');
+  var timeEl = document.getElementById('wizardConfirmTime');
+  var oEl = document.getElementById('wizardConfirmObjs');
+  if (mEl) mEl.textContent = methodNames[wizardState.method] || '从模板创建';
+  if (tEl) tEl.textContent = reportTypeNames[type] || '流量分析报告';
+  if (timeEl) timeEl.textContent = timeNames[wizardState.timeRange] || '近 30 天';
+  if (oEl) oEl.textContent = wizardState.objects || '全部对象';
+  /* 设置默认名称 */
+  var nameInput = document.getElementById('wizardReportName');
+  if (nameInput && !nameInput.value) {
+    var now = new Date();
+    nameInput.value = (reportTypeNames[type] || '报告').replace('报告', '') + ' ' + (now.getMonth() + 1) + '-' + now.getDate() + ' ' + ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+  }
+}
+
+function wizardNext() {
+  if (wizardState.step === 1) {
+    if (!wizardState.method) { wizardState.method = 'template'; }
+    wizardGoToStep(2);
+    return;
+  }
+  if (wizardState.step === 2) {
+    if (wizardState.method === 'ai') {
+      var aiInput = document.getElementById('wizardAiInput');
+      wizardState.aiPrompt = aiInput ? aiInput.value : '';
+      if (!wizardState.aiPrompt.trim()) {
+        aiInput && aiInput.focus();
+        return;
+      }
+    }
+    if (wizardState.method === 'blank') {
+      var blankType = document.getElementById('wizardBlankType');
+      wizardState.template = blankType ? blankType.value : 'traffic';
+    }
+    wizardGoToStep(3);
+    return;
+  }
+  if (wizardState.step === 3) {
+    wizardGenerateReport();
+  }
+}
+
+function wizardPrev() {
+  if (wizardState.step > 1) wizardGoToStep(wizardState.step - 1);
+}
+
+function wizardGenerateReport() {
+  wizardGoToStep(4);
+  var bar = document.getElementById('wizardGenBar');
+  var desc = document.getElementById('wizardGenDesc');
+  var pct = 0;
+  var steps = [
+    { p: 25, t: '正在提取数据...' },
+    { p: 55, t: 'AI 正在分析并生成报告...' },
+    { p: 80, t: '正在渲染可视化图表...' },
+    { p: 100, t: '生成完成！' }
+  ];
+  var i = 0;
+  var timer = setInterval(function() {
+    if (i >= steps.length) {
+      clearInterval(timer);
+      setTimeout(function() {
+        closeModal('newReportModal');
+        /* 创建报告记录 */
+        var type = wizardState.method === 'template' ? wizardState.template :
+          wizardState.method === 'blank' ? wizardState.template : 'traffic';
+        var nameInput = document.getElementById('wizardReportName');
+        var title = (nameInput && nameInput.value.trim()) || (reportTypeNames[type] || '报告').replace('报告', '') + ' ' + formatTimeShort(new Date().toISOString());
+        var newId = 'rpt-' + Date.now();
+        var nowIso = new Date().toISOString();
+        myReports.unshift({
+          id: newId,
+          title: title,
+          type: type,
+          source: wizardState.method === 'template' ? 'template' : 'custom',
+          generatedAt: nowIso,
+          lastViewedAt: nowIso,
+          viewCount: 1
+        });
+        renderMyReports();
+        openMyReport(newId);
+      }, 600);
+      return;
+    }
+    if (bar) bar.style.width = steps[i].p + '%';
+    if (desc) desc.textContent = steps[i].t;
+    i++;
+  }, 800);
+}
+
+/* ── 提示词面板 ───────────────────────────────────────── */
+var promptTemplates = {
+  traffic: '分析 {{timeRange}} 内所有 {{targets}} 的流量数据。\n\n重点关注以下维度：\n1. 带宽利用率趋势及峰值分析\n2. 流量 TOP 10 源/目的 IP 排名\n3. 协议分布（HTTP/HTTPS/SSH/DNS/其他）\n4. 异常流量检测（突增/突降/突刺）\n5. 链路健康度评估\n\n输出格式要求：\n- 包含 KPI 概览卡片（平均利用率、峰值、异常事件数、健康率）\n- 趋势折线图（按天聚合）\n- 协议分布饼图\n- 异常事件时间轴',
+  fault: '统计 {{timeRange}} 内 {{targets}} 的故障事件数据。\n\n重点关注以下维度：\n1. 故障事件总数及趋势\n2. MTTR / MTBF 可靠性指标\n3. 故障根因 TOP N 分布\n4. 告警收敛趋势分析\n5. 故障影响范围评估\n\n输出格式要求：\n- KPI 概览（故障总数、平均 MTTR、根因集中度）\n- 故障趋势折线图\n- 根因分布饼图\n- 故障时间轴',
+  capacity: '分析 {{timeRange}} 内 {{targets}} 的容量使用情况。\n\n重点关注以下维度：\n1. 链路容量使用率现状\n2. 增长趋势预测（未来 30/60/90 天）\n3. 扩容建议及优先级排序\n4. 资源瓶颈热点识别\n5. 成本效益分析\n\n输出格式要求：\n- KPI 概览（平均使用率、峰值、预测瓶颈时间）\n- 容量趋势及预测图\n- 链路使用率排名表\n- 扩容建议清单',
+  health: '评估 {{timeRange}} 内 {{targets}} 的网络健康状态。\n\n重点关注以下维度：\n1. 网络可用性（SLA 达标率）\n2. 丢包率/延迟趋势\n3. 设备健康评分排名\n4. 链路冗余度分析\n5. 潜在风险预警\n\n输出格式要求：\n- KPI 概览（可用性、平均延迟、健康评分）\n- 健康评分仪表盘\n- 延迟/丢包趋势图\n- 风险预警列表',
+  device: '巡检 {{targets}} 的设备状态（{{timeRange}}）。\n\n重点关注以下维度：\n1. 设备清单及在线状态\n2. 软件版本信息及合规性\n3. 配置合规检查结果\n4. 端口使用率统计\n5. CPU / 内存利用率趋势\n\n输出格式要求：\n- KPI 概览（在线率、合规率、告警设备数）\n- 设备状态清单表\n- 版本分布图\n- 资源使用率趋势'
+};
+
+var promptOriginText = '';
+var promptMode = 'editor';
+
+function setPromptMode(mode) {
+  promptMode = mode === 'chat' ? 'chat' : 'editor';
+  var panel = document.getElementById('promptPanel');
+  if (panel) panel.setAttribute('data-mode', promptMode);
+
+  var switchBtn = document.getElementById('promptSwitchBtn');
+  if (switchBtn) {
+    switchBtn.innerHTML = promptMode === 'chat'
+      ? '<span class="material-symbols-rounded">edit_note</span>返回编辑'
+      : '<span class="material-symbols-rounded">forum</span>对话改写';
+  }
+
+  var modeBtn = document.getElementById('promptModeBtn');
+  if (modeBtn) {
+    modeBtn.title = promptMode === 'chat' ? '返回编辑模式' : '切换对话模式';
+    modeBtn.innerHTML = promptMode === 'chat'
+      ? '<span class="material-symbols-rounded">edit_note</span>'
+      : '<span class="material-symbols-rounded">forum</span>';
+  }
+
+  var resetBtn = document.getElementById('promptResetBtn');
+  if (resetBtn) {
+    resetBtn.style.display = promptMode === 'chat' ? 'none' : 'inline-flex';
+  }
+
+  if (promptMode === 'chat') {
+    var input = document.getElementById('promptChatInput');
+    if (input) input.focus();
+  }
+}
+
+function enterPromptChatMode() { setPromptMode('chat'); }
+function enterPromptEditMode() { setPromptMode('editor'); }
+function togglePromptMode() { setPromptMode(promptMode === 'chat' ? 'editor' : 'chat'); }
+
+function loadPromptForType(type) {
+  var editor = document.getElementById('promptEditor');
+  if (editor && promptTemplates[type]) {
+    promptOriginText = promptTemplates[type];
+    editor.value = promptOriginText;
+    var chatLog = document.getElementById('promptChatLog');
+    if (chatLog) {
+      chatLog.innerHTML = '<div class="rw-prompt-chat-msg ai">你可以直接说："把这个提示词改得更偏运维决策"，我会保留结构并自动改写。</div>';
+    }
+    enterPromptEditMode();
+  }
+}
+
+function appendPromptChat(role, text) {
+  var box = document.getElementById('promptChatLog');
+  if (!box) return;
+  var msg = document.createElement('div');
+  msg.className = 'rw-prompt-chat-msg ' + role;
+  msg.textContent = text;
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+}
+
+function aiRewritePrompt(basePrompt, userIntent, reportType) {
+  var additions = [];
+  var intent = (userIntent || '').toLowerCase();
+
+  if (intent.indexOf('管理') >= 0 || intent.indexOf('摘要') >= 0 || intent.indexOf('高层') >= 0) {
+    additions.push('新增要求：输出“管理摘要”章节，先给结论，再给风险与建议。');
+  }
+  if (intent.indexOf('异常') >= 0 || intent.indexOf('告警') >= 0 || intent.indexOf('突增') >= 0) {
+    additions.push('新增要求：加强异常检测说明，包含异常阈值、触发时段、关联告警与处置建议。');
+  }
+  if (intent.indexOf('对比') >= 0 || intent.indexOf('上期') >= 0 || intent.indexOf('环比') >= 0 || intent.indexOf('同比') >= 0) {
+    additions.push('新增要求：增加“本期 vs 上期”对比分析，并解释关键指标变化原因。');
+  }
+  if (intent.indexOf('sla') >= 0 || intent.indexOf('风险') >= 0 || intent.indexOf('预测') >= 0) {
+    additions.push('新增要求：补充 SLA 违约风险预测，按对象给出风险等级和预警建议。');
+  }
+  if (!additions.length) {
+    additions.push('新增要求：根据用户意图优化章节结构，提升可读性，并补充可执行建议。');
+  }
+
+  return basePrompt + '\n\n【对话改写】\n用户意图：' + userIntent + '\n报告类型：' + (reportTypeNames[reportType] || reportType || '通用') + '\n' + additions.map(function(s, idx) { return (idx + 1) + '. ' + s; }).join('\n');
+}
+
+function buildPromptDiffText(oldText, newText) {
+  var oldLines = String(oldText || '').split('\n');
+  var newLines = String(newText || '').split('\n');
+  var max = Math.max(oldLines.length, newLines.length);
+  var out = ['提示词差异（- 为修改前，+ 为修改后）'];
+  for (var i = 0; i < max; i++) {
+    var oldLine = oldLines[i] || '';
+    var newLine = newLines[i] || '';
+    if (oldLine === newLine) continue;
+    if (oldLine) out.push('- ' + oldLine);
+    if (newLine) out.push('+ ' + newLine);
+  }
+  if (out.length === 1) {
+    out.push('当前提示词与原始提示词一致，无差异。');
+  }
+  return out.join('\n');
+}
+
+function applyPromptByChat() {
+  enterPromptChatMode();
+  var input = document.getElementById('promptChatInput');
+  var editor = document.getElementById('promptEditor');
+  var typeSel = document.getElementById('wbReportType');
+  if (!input || !editor) return;
+
+  var msg = input.value.trim();
+  if (!msg) return;
+
+  appendPromptChat('user', msg);
+  var lowered = msg.toLowerCase();
+  if (lowered.indexOf('对比新旧提示词') >= 0 || lowered.indexOf('提示词差异') >= 0 || lowered.indexOf('对比新旧') >= 0) {
+    appendPromptChat('ai', buildPromptDiffText(promptOriginText, editor.value));
+    input.value = '';
+    return;
+  }
+
+  var rewritten = aiRewritePrompt(editor.value, msg, typeSel ? typeSel.value : 'traffic');
+  editor.value = rewritten;
+  input.value = '';
+
+  appendPromptChat('ai', '已根据你的自然语义完成改写，保留原有结构并注入新要求。你可以继续追问“再精简一点”或“增加一节风险建议”。');
+}
+
+function sendPromptQuick(text) {
+  var input = document.getElementById('promptChatInput');
+  if (!input) return;
+  input.value = text;
+  applyPromptByChat();
+}
+
+function escapeHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildDiffHtml(baseText, targetText, role) {
+  var a = String(baseText || '').split('\n');
+  var b = String(targetText || '').split('\n');
+  var max = Math.max(a.length, b.length);
+  var out = [];
+  for (var i = 0; i < max; i++) {
+    var oldLine = a[i] || '';
+    var newLine = b[i] || '';
+    var cls = 'same';
+    var line = role === 'old' ? oldLine : newLine;
+    if (oldLine !== newLine) {
+      if (role === 'old') cls = oldLine && !newLine ? 'removed' : 'same';
+      if (role === 'new') cls = newLine && !oldLine ? 'added' : 'same';
+      if (oldLine && newLine && role === 'new') cls = 'added';
+      if (oldLine && newLine && role === 'old') cls = 'removed';
+    }
+    out.push('<div class="prompt-diff-line ' + cls + '"><span class="ln">' + (i + 1) + '</span><span class="txt">' + escapeHtml(line || ' ') + '</span></div>');
+  }
+  return out.join('');
+}
+
+function openPromptDiffModal() {
+  var editor = document.getElementById('promptEditor');
+  var oldBox = document.getElementById('promptDiffOld');
+  var newBox = document.getElementById('promptDiffNew');
+  if (!editor || !oldBox || !newBox) return;
+
+  var oldText = promptOriginText || '';
+  var newText = editor.value || '';
+  oldBox.innerHTML = buildDiffHtml(oldText, newText, 'old');
+  newBox.innerHTML = buildDiffHtml(oldText, newText, 'new');
+  openModal('promptDiffModal');
+}
+
+function persistTemplateSave() {
+  var tip = document.getElementById('promptSavedTip');
+  if (tip) {
+    tip.style.display = 'flex';
+    setTimeout(function() { tip.style.display = 'none'; }, 2500);
+  }
+
+  var nowIso = new Date().toISOString();
+  myReports.unshift({
+    id: 'rpt-custom-' + Date.now(),
+    title: '自定义报告 ' + (myReports.length + 1),
+    type: document.getElementById('wbReportType').value || 'traffic',
+    source: 'custom',
+    generatedAt: nowIso,
+    lastViewedAt: nowIso,
+    viewCount: 0
+  });
+  renderMyReports();
+  enterPromptEditMode();
+}
+
+function confirmSaveTemplateFromDiff() {
+  closeModal('promptDiffModal');
+  persistTemplateSave();
+}
+
+function resetPrompt() {
+  var type = document.getElementById('wbReportType').value;
+  loadPromptForType(type);
+}
+
+function previewFromPrompt() {
+  /* 模拟预览：触发生成动画 */
+  generateReport();
+}
+
+function saveAsTemplate() {
+  openPromptDiffModal();
+}
+
+/* ── 调度管理 — 数据模型 ──────────────────────────────── */
+var schedules = [
+  {
+    id: 'sch-1',
+    name: '周度流量分析',
+    type: 'traffic',
+    frequency: 'weekly',
+    time: '09:00',
+    day: 'monday',
+    recipients: 'admin@corp.com',
+    format: 'PDF',
+    status: 'running',
+    lastRun: '2026-06-22 09:00',
+    nextRun: '2026-06-29 09:00',
+    runCount: 12,
+    createdAt: '2026-04-01T08:00:00'
+  },
+  {
+    id: 'sch-2',
+    name: '月度健康报告',
+    type: 'health',
+    frequency: 'monthly',
+    time: '10:00',
+    day: '1st',
+    recipients: 'ops-team@corp.com',
+    format: 'PDF',
+    status: 'running',
+    lastRun: '2026-06-01 10:00',
+    nextRun: '2026-07-01 10:00',
+    runCount: 4,
+    createdAt: '2026-03-01T08:00:00'
+  },
+  {
+    id: 'sch-3',
+    name: '季度设备巡检',
+    type: 'device',
+    frequency: 'quarterly',
+    time: '08:00',
+    day: '1st',
+    recipients: 'infra@corp.com',
+    format: 'PDF',
+    status: 'paused',
+    lastRun: '2026-04-01 08:00',
+    nextRun: '2026-07-01 08:00',
+    runCount: 2,
+    createdAt: '2026-01-01T08:00:00'
+  }
+];
+
+var scheduleFreqNames = {
+  daily: '每天',
+  weekly: '每周',
+  monthly: '每月',
+  quarterly: '每季度'
+};
+
+var scheduleDayMap = {
+  daily: '',
+  weekly: '周一',
+  monthly: '每月 1 日',
+  quarterly: '每季度首月 1 日'
+};
+
+/* ── 调度管理 — 侧栏渲染 ──────────────────────────────── */
+function renderScheduleNav() {
+  var box = document.getElementById('scheduleNavList');
+  if (!box) return;
+  if (!schedules.length) {
+    box.innerHTML = '<div class="report-nav-empty">暂无调度任务</div>';
+    return;
+  }
+  box.innerHTML = schedules.map(function(s) {
+    var dotClass = s.status === 'running' ? 'active' : 'paused';
+    return '<div class="report-nav-item" data-view="schedules" onclick="switchView(\'schedules\')">' +
+      '<span class="schedule-dot ' + dotClass + '"></span>' +
+      '<span class="report-nav-item-text">' + s.name + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+/* ── 调度管理 — 表格渲染 ──────────────────────────────── */
+function renderSchedules() {
+  var tbody = document.getElementById('schedulesTableBody');
+  if (!tbody) return;
+  if (!schedules.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--dark-muted,#888)">暂无调度任务，点击右上角"新建调度"开始</td></tr>';
+    renderScheduleStats();
+    renderScheduleNav();
+    return;
+  }
+  tbody.innerHTML = schedules.map(function(s) {
+    var dotCls = s.status === 'running' ? 'running' : 'paused';
+    var rowCls = s.status === 'paused' ? 'rs-paused' : '';
+    var toggleIcon = s.status === 'running' ? 'pause' : 'play_circle';
+    var toggleTitle = s.status === 'running' ? '暂停' : '恢复';
+    var freqText = scheduleFreqNames[s.frequency] || s.frequency;
+    if (s.frequency === 'weekly') freqText = '每周一 ' + s.time;
+    else if (s.frequency === 'monthly') freqText = '每月 1 日 ' + s.time;
+    else if (s.frequency === 'quarterly') freqText = '每季度首月 1 日';
+    else if (s.frequency === 'daily') freqText = '每天 ' + s.time;
+    var typeLabel = reportTypeNames[s.type] || s.type;
+    return '<tr class="' + rowCls + '" data-schedule-id="' + s.id + '">' +
+      '<td><span class="rs-status ' + dotCls + '"></span></td>' +
+      '<td>' +
+        '<div class="rs-task-name">' + s.name + '</div>' +
+        '<div class="rs-task-sub">发送至 ' + s.recipients + '</div>' +
+      '</td>' +
+      '<td><span class="rs-type-badge ' + s.type + '">' + typeLabel + '</span></td>' +
+      '<td>' + freqText + '</td>' +
+      '<td>' + (s.nextRun || '--') + '</td>' +
+      '<td>' + (s.lastRun || '--') + '</td>' +
+      '<td><span class="rs-run-count">' + s.runCount + '</span> 次</td>' +
+      '<td>' +
+        '<div class="rs-actions">' +
+          '<button class="rs-action" title="立即执行" onclick="runScheduleNow(\'' + s.id + '\', this)"><span class="material-symbols-rounded">play_arrow</span></button>' +
+          '<button class="rs-action" title="' + toggleTitle + '" onclick="toggleSchedule(\'' + s.id + '\', this)"><span class="material-symbols-rounded">' + toggleIcon + '</span></button>' +
+          '<button class="rs-action" title="编辑" onclick="editSchedule(\'' + s.id + '\')"><span class="material-symbols-rounded">edit</span></button>' +
+          '<button class="rs-action" title="历史报告" onclick="openScheduleHistory(\'' + s.id + '\')"><span class="material-symbols-rounded">history</span></button>' +
+          '<button class="rs-action danger" title="删除" onclick="deleteSchedule(\'' + s.id + '\')"><span class="material-symbols-rounded">delete</span></button>' +
+        '</div>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+  renderScheduleStats();
+  renderScheduleNav();
+}
+
+/* ── 调度管理 — 统计卡片 ──────────────────────────────── */
+function renderScheduleStats() {
+  var row = document.getElementById('schedulesStatsRow');
+  if (!row) return;
+  var runningCount = schedules.filter(function(s) { return s.status === 'running'; }).length;
+  var pausedCount = schedules.filter(function(s) { return s.status === 'paused'; }).length;
+  var totalRuns = schedules.reduce(function(sum, s) { return sum + s.runCount; }, 0);
+  var nextSchedule = schedules.filter(function(s) { return s.status === 'running'; })
+    .sort(function(a, b) { return (a.nextRun || '').localeCompare(b.nextRun || ''); })[0];
+  var nextText = '--';
+  if (nextSchedule && nextSchedule.nextRun) {
+    var now = new Date();
+    var nextDate = new Date(nextSchedule.nextRun.replace(' ', 'T'));
+    var diffDays = Math.ceil((nextDate - now) / 86400000);
+    if (diffDays <= 0) nextText = '今天';
+    else if (diffDays === 1) nextText = '明天';
+    else if (diffDays <= 7) nextText = diffDays + '天后';
+    else nextText = nextSchedule.nextRun.split(' ')[0];
+  }
+  row.innerHTML =
+    '<div class="rs-stat-card"><div class="rs-stat-icon running-bg"><span class="material-symbols-rounded">play_circle</span></div><div class="rs-stat-info"><div class="rs-stat-value">' + runningCount + '</div><div class="rs-stat-label">运行中</div></div></div>' +
+    '<div class="rs-stat-card"><div class="rs-stat-icon paused-bg"><span class="material-symbols-rounded">pause_circle</span></div><div class="rs-stat-info"><div class="rs-stat-value">' + pausedCount + '</div><div class="rs-stat-label">已暂停</div></div></div>' +
+    '<div class="rs-stat-card"><div class="rs-stat-icon total-bg"><span class="material-symbols-rounded">event_repeat</span></div><div class="rs-stat-info"><div class="rs-stat-value">' + totalRuns + '</div><div class="rs-stat-label">累计执行</div></div></div>' +
+    '<div class="rs-stat-card"><div class="rs-stat-icon next-bg"><span class="material-symbols-rounded">schedule</span></div><div class="rs-stat-info"><div class="rs-stat-value">' + nextText + '</div><div class="rs-stat-label">下次执行</div></div></div>';
+}
+
+/* ── 调度管理 — 立即执行（真正生成报告） ────────────────── */
+function runScheduleNow(scheduleId, btn) {
+  var sch = schedules.find(function(s) { return s.id === scheduleId; });
+  if (!sch) return;
+  btn.innerHTML = '<span class="material-symbols-rounded" style="animation:spin 1s linear infinite">refresh</span>';
+  setTimeout(function() {
+    /* 创建报告到 myReports */
+    var now = new Date();
+    var ts = now.toISOString().replace(/\.\d{3}Z$/, '');
+    var typeLabel = reportTypeNames[sch.type] || sch.type;
+    var newReport = {
+      id: 'rpt-sch-' + Date.now(),
+      title: sch.name + ' (' + (now.getMonth() + 1) + '-' + now.getDate() + ')',
+      type: sch.type,
+      source: 'schedule',
+      scheduleId: sch.id,
+      generatedAt: ts,
+      lastViewedAt: ts,
+      viewCount: 0
+    };
+    myReports.unshift(newReport);
+    sch.runCount++;
+    sch.lastRun = formatDateStr(now);
+    btn.innerHTML = '<span class="material-symbols-rounded">check_circle</span>';
+    setTimeout(function() {
+      btn.innerHTML = '<span class="material-symbols-rounded">play_arrow</span>';
+      renderMyReports();
+      renderScheduleStats();
+    }, 1500);
+  }, 2000);
+}
+
+/* ── 调度管理 — 暂停/恢复 ─────────────────────────────── */
+function toggleSchedule(scheduleId, btn) {
+  var sch = schedules.find(function(s) { return s.id === scheduleId; });
+  if (!sch) return;
+  sch.status = sch.status === 'running' ? 'paused' : 'running';
+  renderSchedules();
+}
+
+/* ── 调度管理 — 删除 ──────────────────────────────────── */
+function deleteSchedule(scheduleId) {
+  if (!confirm('确定删除该调度任务？关联的已生成报告不会被删除。')) return;
+  schedules = schedules.filter(function(s) { return s.id !== scheduleId; });
+  renderSchedules();
+}
+
+/* ── 调度管理 — 新建调度弹窗 ──────────────────────────── */
+function openScheduleModal(editId) {
+  document.getElementById('scheduleEditId').value = editId || '';
+  var modalTitle = document.getElementById('scheduleModal').querySelector('.modal-title');
+  if (editId) {
+    var sch = schedules.find(function(s) { return s.id === editId; });
+    if (sch) {
+      document.getElementById('schName').value = sch.name;
+      document.getElementById('schType').value = sch.type;
+      document.getElementById('schFreq').value = sch.frequency;
+      document.getElementById('schTime').value = sch.time;
+      document.getElementById('schRecipients').value = sch.recipients;
+      if (modalTitle) modalTitle.textContent = '编辑调度';
+    }
+  } else {
+    document.getElementById('schName').value = '';
+    document.getElementById('schType').value = 'traffic';
+    document.getElementById('schFreq').value = 'weekly';
+    document.getElementById('schTime').value = '09:00';
+    document.getElementById('schRecipients').value = '';
+    if (modalTitle) modalTitle.textContent = '配置周期调度';
+  }
+  openModal('scheduleModal');
+}
+
+function editSchedule(scheduleId) {
+  openScheduleModal(scheduleId);
+}
+
+/* ── 快速创建指定类型的调度 ───────────────────────────── */
+function openScheduleWithType(type) {
+  openScheduleModal();
+  var typeSelect = document.getElementById('schType');
+  if (typeSelect && type) typeSelect.value = type;
+  var nameInput = document.getElementById('schName');
+  if (nameInput && reportTypeNames[type]) {
+    nameInput.value = reportTypeNames[type].replace('报告', '') + '调度';
+  }
+}
+
+/* ── 调度管理 — 保存调度 ──────────────────────────────── */
+function saveSchedule() {
+  var editId = document.getElementById('scheduleEditId').value;
+  var name = document.getElementById('schName').value.trim();
+  var type = document.getElementById('schType').value;
+  var freq = document.getElementById('schFreq').value;
+  var time = document.getElementById('schTime').value;
+  var recipients = document.getElementById('schRecipients').value.trim();
+  if (!name) { alert('请输入调度名称'); return; }
+
+  var fmtChips = document.querySelectorAll('#schFormatGroup .obj-filter-chip.active');
+  var format = fmtChips.length ? fmtChips[0].textContent : 'PDF';
+
+  if (editId) {
+    var sch = schedules.find(function(s) { return s.id === editId; });
+    if (sch) {
+      sch.name = name;
+      sch.type = type;
+      sch.frequency = freq;
+      sch.time = time;
+      sch.recipients = recipients;
+      sch.format = format;
+    }
+  } else {
+    var now = new Date();
+    schedules.push({
+      id: 'sch-' + Date.now(),
+      name: name,
+      type: type,
+      frequency: freq,
+      time: time,
+      day: freq === 'weekly' ? 'monday' : '1st',
+      recipients: recipients || 'admin@corp.com',
+      format: format,
+      status: 'running',
+      lastRun: '--',
+      nextRun: calcNextRun(freq, time),
+      runCount: 0,
+      createdAt: now.toISOString()
+    });
+  }
+  closeModal('scheduleModal');
+  renderSchedules();
+}
+
+function toggleSchFormat(el) {
+  el.parentElement.querySelectorAll('.obj-filter-chip').forEach(function(c) { c.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+/* ── 调度管理 — 计算下次执行时间 ──────────────────────── */
+function calcNextRun(freq, time) {
+  var now = new Date();
+  var parts = time.split(':');
+  var h = parseInt(parts[0]), m = parseInt(parts[1]);
+  var next;
+  if (freq === 'daily') {
+    next = new Date(now);
+    next.setHours(h, m, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+  } else if (freq === 'weekly') {
+    next = new Date(now);
+    var dayOfWeek = now.getDay();
+    var diff = (1 - dayOfWeek + 7) % 7 || 7;
+    next.setDate(next.getDate() + diff);
+    next.setHours(h, m, 0, 0);
+  } else if (freq === 'monthly') {
+    next = new Date(now.getFullYear(), now.getMonth() + 1, 1, h, m);
+    if (next <= now) next.setMonth(next.getMonth() + 1);
+  } else if (freq === 'quarterly') {
+    var curQ = Math.floor(now.getMonth() / 3);
+    var nextQMonth = (curQ + 1) * 3;
+    next = new Date(now.getFullYear(), nextQMonth, 1, h, m);
+    if (next <= now) next.setMonth(next.getMonth() + 3);
+  }
+  return next ? formatDateStr(next) : '--';
+}
+
+function formatDateStr(d) {
+  var y = d.getFullYear();
+  var mo = ('0' + (d.getMonth() + 1)).slice(-2);
+  var da = ('0' + d.getDate()).slice(-2);
+  var h = ('0' + d.getHours()).slice(-2);
+  var mi = ('0' + d.getMinutes()).slice(-2);
+  return y + '-' + mo + '-' + da + ' ' + h + ':' + mi;
+}
+
+/* ── 调度管理 — 历史报告弹窗 ──────────────────────────── */
+function openScheduleHistory(scheduleId) {
+  var sch = schedules.find(function(s) { return s.id === scheduleId; });
+  if (!sch) return;
+  var title = document.getElementById('scheduleHistoryTitle');
+  var body = document.getElementById('scheduleHistoryBody');
+  title.textContent = sch.name + ' — 历史报告';
+  var reports = myReports.filter(function(r) { return r.scheduleId === scheduleId; });
+  if (!reports.length) {
+    body.innerHTML = '<div style="text-align:center;padding:30px;color:var(--dark-muted,#888)"><span class="material-symbols-rounded" style="font-size:48px;opacity:.3">history</span><div style="margin-top:12px">该调度暂无生成的报告</div><div style="font-size:13px;margin-top:6px">点击"立即执行"生成第一份报告</div></div>';
+  } else {
+    body.innerHTML = reports.map(function(r) {
+      return '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--dark-border,#e8e8e8);cursor:pointer" onclick="closeModal(\'scheduleHistoryModal\');openMyReport(\'' + r.id + '\')">' +
+        '<span class="material-symbols-rounded" style="color:var(--purple,#6E40C9)">description</span>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-weight:500;font-size:14px">' + r.title + '</div>' +
+          '<div style="font-size:12px;color:var(--dark-muted,#888);margin-top:2px">' + formatTimeShort(r.generatedAt) + ' · 查看 ' + r.viewCount + ' 次</div>' +
+        '</div>' +
+        '<span class="material-symbols-rounded" style="opacity:.3">chevron_right</span>' +
+      '</div>';
+    }).join('');
+  }
+  openModal('scheduleHistoryModal');
+}
+
+/* ── 我的报告卡片 — 区分调度来源 ──────────────────────── */
+/* renderMyReportsList 已在下方定义，此处扩展 reportTypeNames 未含的映射 */
+
+/* ── AI 对话交互 ──────────────────────────────────────── */
+function sendChatMsg() {
+  var input = document.getElementById('aiChatInput');
+  var msg = input.value.trim();
+  if (!msg) return;
+  appendMsg('user', msg);
+  input.value = '';
+  input.style.height = 'auto';
+  setTimeout(function() {
+    appendMsg('ai', '正在分析您的需求，从数据库提取相关数据...<br><br>✅ 已完成数据提取，正在生成可视化报告...');
+    setTimeout(function() {
+      document.getElementById('aiEmptyState').classList.add('report-hidden');
+      document.getElementById('aiReportPreview').classList.remove('report-hidden');
+    }, 1200);
+  }, 800);
+}
+
+function sendQuickMsg(text) {
+  document.getElementById('aiChatInput').value = text;
+  sendChatMsg();
+}
+
+function appendMsg(role, html) {
+  var body = document.getElementById('aiChatBody');
+  var now = new Date();
+  var time = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+  var icon = role === 'ai' ? 'smart_toy' : 'person';
+  var div = document.createElement('div');
+  div.className = 'raw-msg ' + role;
+  div.innerHTML = '<div class="raw-msg-avatar"><span class="material-symbols-rounded" style="font-size:16px">' + icon + '</span></div>' +
+    '<div><div class="raw-msg-bubble">' + html + '</div><div class="raw-msg-time">' + time + '</div></div>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+/* 输入框自动高度 + Enter 发送 */
+var chatInput = document.getElementById('aiChatInput');
+if (chatInput) {
+  chatInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+  chatInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMsg(); }
+  });
+}
+
+/* ── 生成报告按钮动画 ────────────────────────────────── */
+function generateReport() {
+  var btn = document.querySelector('.rw-generate-btn');
+  if (!btn) return;
+  btn.innerHTML = '<span class="material-symbols-rounded" style="animation:spin 1s linear infinite">refresh</span>生成中...';
+  setTimeout(function() {
+    btn.innerHTML = '<span class="material-symbols-rounded">check_circle</span>生成完成';
+    setTimeout(function() {
+      btn.innerHTML = '<span class="material-symbols-rounded">auto_awesome</span>AI 生成报告';
+    }, 2000);
+  }, 1500);
+}
+
+/* ── 筛选按钮 toggle ──────────────────────────────────── */
+document.querySelectorAll('.obj-filter-chip').forEach(function(chip) {
+  chip.addEventListener('click', function() {
+    chip.parentElement.querySelectorAll('.obj-filter-chip').forEach(function(c) { c.classList.remove('active'); });
+    chip.classList.add('active');
+  });
+});
+
+var promptChatInput = document.getElementById('promptChatInput');
+if (promptChatInput) {
+  promptChatInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      applyPromptByChat();
+    }
+  });
+}
+
+/* 初始化默认入口：我的报告 */
+renderMyReports();
+switchView('my-reports');
+setActiveNav('.report-nav-item[data-role="my-reports-home"]');
+setPromptMode('editor');
+</script>
+
+<style>
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
 </body>
 </html>

@@ -121,6 +121,11 @@ button.page-tab { background: none; border: none; font-family: inherit; outline:
 .aperf-drill-btn:hover { border-color: #6E40C9; color: #6E40C9; background: #F5F0FF; }
 .aperf-drill-btn .material-symbols-rounded { font-size: 14px; }
 /* ===== Tab 4: 调用链追踪 ===== */
+.trace-back-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 10px 3px 7px; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); font-size:11px; font-weight:500; color:#8B949E; cursor:pointer; font-family:inherit; transition:all 0.15s; white-space:nowrap; flex-shrink:0; }
+.trace-back-chip:hover { border-color:#8B5CF6; color:#A78BFA; background:rgba(139,92,246,0.15); }
+.trace-back-chip .material-symbols-rounded { font-size:14px; }
+:root:not([data-theme="dark"]) .trace-back-chip { border-color:#D0D7DE; background:transparent; color:#656D76; }
+:root:not([data-theme="dark"]) .trace-back-chip:hover { border-color:#6E40C9; color:#6E40C9; background:rgba(110,64,201,0.06); }
 .trace-layout { display:flex; height:calc(100vh - 142px); gap:0; overflow:hidden; }
 .trace-list-panel { width:300px; border-right:1px solid #E1E4E8; display:flex; flex-direction:column; flex-shrink:0; background:#fff; }
 .trace-list-hdr { padding:10px 14px; border-bottom:1px solid #E1E4E8; font-size:12px; font-weight:600; color:#1F2328; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
@@ -829,12 +834,6 @@ button.page-tab { background: none; border: none; font-family: inherit; outline:
     </div>
 
     <div id="app-tab-trace" class="app-tab-content" style="display:none">
-      <div class="trace-layout">
-        <div class="trace-list-panel" id="traceListPanel"></div>
-        <div class="trace-waterfall-panel" id="traceWaterfallPanel">
-          <div class="trace-wf-empty"><span class="material-symbols-rounded" style="margin-right:8px;font-size:18px">account_tree</span>选择左侧调用链以查看瀑布图</div>
-        </div>
-      </div>
     </div>
     <!-- ===== 内核性能下钻面板（排障漏斗第③步） ===== -->
     <div id="kernelDrill" class="kdrill-overlay" style="display:none">
@@ -1042,7 +1041,7 @@ document.addEventListener('DOMContentLoaded', function(){
   // 深链：?tab=trace 或 ?tab=perf → 自动打开对应 Tab（供其他页面跳转）
   try {
     var t = new URLSearchParams(location.search).get('tab');
-    if (t === 'trace') showAppTab('trace');
+    if (t === 'trace') { showAppTab('trace'); checkShowBackBar(); }
     else if (t === 'perf') showAppTab('perf');
   } catch(e) {}
   document.querySelectorAll('.ai-scenario-btn[data-scenario]').forEach(function(btn){
@@ -1564,9 +1563,19 @@ var TRACE_STATUS_COLOR = { ok:'#1A7F37', slow:'#D09B00', error:'#CF222E' };
 function renderTrace(context) {
   if (context && context.svc) { traceState.filterSvc = context.svc; }
   var el = document.getElementById('app-tab-trace');
+  // 检查是否从协议分析页面跳转过来，决定是否显示返回按钮
+  var showBack = false;
+  try {
+    var ref = new URLSearchParams(location.search).get('ref') || '';
+    showBack = (ref === 'protocol' || ref === 'app-protocol');
+  } catch(e) {}
+  var backChipHtml = showBack
+    ? '<button class="trace-back-chip" onclick="goBackToProtocol()"><span class="material-symbols-rounded">arrow_back</span>返回协议分析</button>'
+    : '';
   el.innerHTML = '<div class="trace-tab-wrap">'
     + '<div class="trace-scatter-section">'
     +   '<div class="trace-scatter-hdr">'
+    +     backChipHtml
     +     '<div class="trace-scatter-title"><span class="material-symbols-rounded">bubble_chart</span>请求延迟分布</div>'
     +     '<div class="trace-scatter-sub">最近 1 小时 · 每点 = 1 次请求 · 点击关键调用链下钻</div>'
     +     '<div class="trace-filterbar" id="traceFilterbar"></div>'
@@ -2694,6 +2703,25 @@ function showAppTab(tabId, context) {
   });
   if (tabId === 'perf') renderAppPerf(context);
   if (tabId === 'trace') renderTrace(context);
+}
+
+// 从 app-protocol.html 跳转过来时显示返回按钮
+function checkShowBackBar() {
+  var backBar = document.getElementById('traceBackBar');
+  if (!backBar) return;
+  try {
+    var params = new URLSearchParams(location.search);
+    // 检查 ref 参数或 from 参数
+    var ref = params.get('ref') || params.get('from') || '';
+    if (ref === 'protocol' || ref === 'app-protocol') {
+      backBar.style.display = 'flex';
+    }
+  } catch(e) {}
+}
+
+// 返回协议分析页面
+function goBackToProtocol() {
+  window.location.href = 'app-protocol.html';
 }
 </script>
 </body>

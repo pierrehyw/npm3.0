@@ -360,7 +360,7 @@ function buildFusionOpt() {
       return {
         id: n.id, name: n.name, x: posX, y: posY, symbol: sym,
         symbolSize: sz, _n: n,
-        itemStyle: { color: nodeFill, borderColor: color, borderWidth: dark ? 2.2 : 2, shadowColor: color, shadowBlur: dimmed ? 0 : (dark ? 5 : 6), opacity: dimmed ? (dark ? 0.45 : 0.2) : 1 },
+        itemStyle: { color: dark ? 'rgba(' + hexToRgb(color) + ', 0.34)' : nodeFill, borderColor: color, borderWidth: dark ? 2.8 : 2, shadowColor: color, shadowBlur: dimmed ? 0 : (dark ? 10 : 6), opacity: dimmed ? (dark ? 0.45 : 0.2) : 1 },
         label: {
           show: true, position: 'bottom',
           formatter: isL4Node || isDbNode ? labelFormatter : n.name,
@@ -380,9 +380,10 @@ function buildFusionOpt() {
     var isL7 = l.type.indexOf('L7') >= 0;
     var isWarn = l.type.indexOf('warn') >= 0;
     var isStack = l.type === 'stack';
-    var color = isWarn ? '#FF7886' : isL7 ? (dark ? '#53D1FF' : '#0969DA') : (isStack ? (dark ? 'rgba(179,138,255,0.86)' : 'rgba(110,64,201,0.3)') : (dark ? '#8BAFFF' : '#6E40C9'));
-    var width = isL7 ? (isWarn ? (dark ? 4.2 : 3.5) : (dark ? 3.2 : 2.5)) : (dark ? 2.1 : 1.5);
-    var opacity = isL7 ? (dark ? 1 : 0.8) : (dark ? 0.96 : 0.6);
+    var isL4 = l.type.indexOf('L4') >= 0;
+    var color = isWarn ? '#FF7886' : isL7 ? (dark ? '#53D1FF' : '#0969DA') : (isStack ? (dark ? 'rgba(179,138,255,0.86)' : 'rgba(110,64,201,0.35)') : (dark ? '#8BAFFF' : (isL4 ? '#4B2DBA' : '#6E40C9')));
+    var width = isL7 ? (isWarn ? (dark ? 4.2 : 3.5) : (dark ? 3.2 : 2.5)) : (dark ? 2.1 : (isL4 ? 1.9 : 1.5));
+    var opacity = isL7 ? (dark ? 1 : 0.82) : (dark ? 0.96 : (isL4 ? 0.84 : 0.6));
     var type = (l.lineStyle && l.lineStyle.type) ? l.lineStyle.type : (isWarn ? 'dashed' : 'solid');
     var curveness = 0;
     if (isL7) { curveness = -0.25; }

@@ -358,3 +358,143 @@ html[data-theme="dark"] body .tr-page [class*="yellow"],
 html[data-theme="dark"] body .tr-page [class*="warn"] {
   border-color: rgba(245,158,11,0.36) !important;
 }
+
+/* SRv6 tunnel view: force class-based light surfaces to dark tones */
+html[data-theme="dark"] body .tr-page .srv6-kpi,
+html[data-theme="dark"] body .tr-page .srv6-kpi.warn,
+html[data-theme="dark"] body .tr-page .srv6-ai-banner,
+html[data-theme="dark"] body .tr-page .srv6-topo-wrap,
+html[data-theme="dark"] body .tr-page .srv6-topo-header,
+html[data-theme="dark"] body .tr-page .srv6-span-note,
+html[data-theme="dark"] body .tr-page .srv6-sid-path,
+html[data-theme="dark"] body .tr-page .srv6-overhead-row,
+html[data-theme="dark"] body .tr-page .srv6-scene-nav,
+html[data-theme="dark"] body .tr-page .srv6-scene-tab,
+html[data-theme="dark"] body .tr-page .srv6-policy-btn,
+html[data-theme="dark"] body .tr-page .srv6-policy-compare-card,
+html[data-theme="dark"] body .tr-page .srv6-policy-compare-hd,
+html[data-theme="dark"] body .tr-page .srv6-waypoint-row,
+html[data-theme="dark"] body .tr-page [data-proto-pane="srv6"] .tr-section,
+html[data-theme="dark"] body .tr-page [data-proto-pane="srv6"] .tr-tbl thead tr {
+  background: rgba(10, 21, 36, 0.92) !important;
+  border-color: rgba(77, 212, 255, 0.22) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+html[data-theme="dark"] body .tr-page .srv6-scene-tab:hover,
+html[data-theme="dark"] body .tr-page .srv6-policy-btn:hover,
+html[data-theme="dark"] body .tr-page .srv6-waypoint-row:hover {
+  background: rgba(77, 212, 255, 0.12) !important;
+  border-color: rgba(77, 212, 255, 0.34) !important;
+}
+
+html[data-theme="dark"] body .tr-page .srv6-scene-tab.active,
+html[data-theme="dark"] body .tr-page .srv6-policy-btn.active {
+  background: linear-gradient(135deg, rgba(77, 212, 255, 0.42), rgba(62, 130, 246, 0.45)) !important;
+  border-color: rgba(77, 212, 255, 0.50) !important;
+  color: #eaf8ff !important;
+}
+
+html[data-theme="dark"] body .tr-page .srv6-overhead-row[style*="border-color:#FFD580"],
+html[data-theme="dark"] body .tr-page .srv6-overhead-row[style*="background:#FFFBEE"] {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(10, 21, 36, 0.90)) !important;
+  border-color: rgba(245, 158, 11, 0.36) !important;
+}
+
+html[data-theme="dark"] body .tr-page .srv6-waypoint-sid,
+html[data-theme="dark"] body .tr-page .srv6-topo-title,
+html[data-theme="dark"] body .tr-page .srv6-kpi .sk-value,
+html[data-theme="dark"] body .tr-page .srv6-overhead-pct,
+html[data-theme="dark"] body .tr-page .srv6-waypoint-util {
+  color: var(--dark-fg-title) !important;
+}
+
+/* SID path pill nodes — class-based backgrounds not caught by inline sweep */
+html[data-theme="dark"] body .tr-page .srv6-sid-addr {
+  background: rgba(8, 18, 32, 0.92) !important;
+  border-color: rgba(179, 146, 240, 0.55) !important;
+  color: #d8c8ff !important;
+}
+
+html[data-theme="dark"] body .tr-page .srv6-sid-addr.headend {
+  background: #5a2db0 !important;
+  border-color: #8957e5 !important;
+  color: #eaf5ff !important;
+}
+
+html[data-theme="dark"] body .tr-page .srv6-sid-addr.egress {
+  background: rgba(61, 29, 138, 0.55) !important;
+  border-color: rgba(155, 106, 232, 0.7) !important;
+  color: #d8c8ff !important;
+}
+
+html[data-theme="dark"] body .tr-page .srv6-kpi .sk-label,
+html[data-theme="dark"] body .tr-page .srv6-kpi .sk-sub,
+html[data-theme="dark"] body .tr-page .srv6-topo-meta,
+html[data-theme="dark"] body .tr-page .srv6-span-note,
+html[data-theme="dark"] body .tr-page .srv6-sid-role,
+html[data-theme="dark"] body .tr-page .srv6-overhead-bytes,
+html[data-theme="dark"] body .tr-page .srv6-waypoint-name {
+  color: var(--dark-fg-subtle) !important;
+}
+
+/* Focus/context bars in tunnel mode */
+html[data-theme="dark"] body .tr-page .tr-focus-bar,
+html[data-theme="dark"] body .tr-page #focusProtoHint {
+  background: rgba(10, 21, 36, 0.96) !important;
+  border-color: rgba(77, 212, 255, 0.22) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+html[data-theme="dark"] body .tr-page .tr-focus-bar-label,
+html[data-theme="dark"] body .tr-page .tr-focus-bar-meta,
+html[data-theme="dark"] body .tr-page #focusProtoHint,
+html[data-theme="dark"] body .tr-page #fphLabel,
+html[data-theme="dark"] body .tr-page #fphPrimaries {
+  color: var(--dark-fg-subtle) !important;
+}
+
+html[data-theme="dark"] body .tr-page .tr-focus-bar-entity,
+html[data-theme="dark"] body .tr-page .tr-link-btn,
+html[data-theme="dark"] body .tr-page .tr-focus-bar-clear {
+  background: rgba(7, 16, 28, 0.92) !important;
+  border-color: rgba(77, 212, 255, 0.24) !important;
+  color: var(--dark-fg-body) !important;
+}
+
+/* Restore metric semantic colors (these were overridden by broad text rules) */
+html[data-theme="dark"] body .tr-page .tr-tbl .td-red,
+html[data-theme="dark"] body .tr-page .tr-session-tbl .td-red {
+  color: #ff9fa8 !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="dark"] body .tr-page .tr-tbl .td-yellow,
+html[data-theme="dark"] body .tr-page .tr-session-tbl .td-yellow {
+  color: #ffd37a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="dark"] body .tr-page .tr-tbl .td-green,
+html[data-theme="dark"] body .tr-page .tr-session-tbl .td-green {
+  color: #7ee8a4 !important;
+  font-weight: 700 !important;
+}
+
+/* Ensure SRv6 throughput columns always keep dark background and readable text */
+html[data-theme="dark"] body .tr-page [data-proto-pane="srv6"] .tr-tbl tbody td.right.mono {
+  background: rgba(8, 18, 32, 0.92) !important;
+  color: #d8ebff !important;
+}
+
+html[data-theme="dark"] body .tr-page [data-proto-pane="srv6"] .tr-tbl tbody td.right.mono.td-red {
+  color: #ff9fa8 !important;
+}
+
+html[data-theme="dark"] body .tr-page [data-proto-pane="srv6"] .tr-tbl tbody td.right.mono.td-yellow {
+  color: #ffd37a !important;
+}
+
+html[data-theme="dark"] body .tr-page [data-proto-pane="srv6"] .tr-tbl tbody td.right.mono.td-green {
+  color: #7ee8a4 !important;
+}
