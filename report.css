@@ -1803,6 +1803,14 @@
 .wizard-ai-parse-title .material-symbols-rounded { font-size: 17px; }
 .wizard-ai-parse-body { font-size: 12.5px; color: #656D76; line-height: 1.6; }
 
+/* AI 对话入口按钮 */
+.wizard-ai-chat-entry {
+  background: linear-gradient(135deg, rgba(110,64,201,0.05), rgba(59,130,246,0.05));
+  border: 1px solid rgba(110,64,201,0.2);
+  border-radius: 10px;
+  padding: 16px;
+}
+
 /* 空白路径 */
 .wizard-form-row { margin-bottom: 12px; }
 .wizard-form-select {

@@ -486,13 +486,18 @@
           <div class="raw-preview-header">
             <span class="raw-preview-title">报告预览</span>
             <div class="raw-preview-actions">
-              <button class="rw-action-btn" onclick="openModal('shareModal')">
+              <!-- 从向导进入时显示：返回向导按钮 -->
+              <button class="rw-action-btn" id="aiBackToWizardBtn" onclick="aiBackToWizard()" style="display:none">
+                <span class="material-symbols-rounded">arrow_back</span>返回向导
+              </button>
+              <!-- 独立进入时显示：分享/导出/保存 -->
+              <button class="rw-action-btn" id="aiShareBtn" onclick="openModal('shareModal')">
                 <span class="material-symbols-rounded">share</span>分享
               </button>
-              <button class="rw-action-btn" onclick="openModal('shareModal')">
+              <button class="rw-action-btn" id="aiDownloadBtn" onclick="openModal('shareModal')">
                 <span class="material-symbols-rounded">download</span>导出
               </button>
-              <button class="rw-action-btn primary">
+              <button class="rw-action-btn primary" id="aiSaveBtn">
                 <span class="material-symbols-rounded">save</span>保存
               </button>
             </div>
@@ -534,6 +539,22 @@
               <div class="rw-chart-placeholder">
                 <span class="material-symbols-rounded">auto_awesome</span>
                 <span>AI 生成的可视化图表</span>
+              </div>
+              <div class="rw-chart-placeholder">
+                <span class="material-symbols-rounded">data_table</span>
+                <span>详细数据分析表格</span>
+              </div>
+            </div>
+            <!-- 确认使用按钮（从向导进入时显示） -->
+            <div class="ai-confirm-area" id="aiConfirmArea" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid #E5E8EB">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <div style="font-weight:700;color:#1F2328">报告已生成</div>
+                  <div style="font-size:12px;color:#8C959F;margin-top:4px">确认后将返回向导，可继续配置调度等选项</div>
+                </div>
+                <button class="rw-action-btn primary" onclick="aiConfirmAndBackToWizard()">
+                  <span class="material-symbols-rounded">check_circle</span>确认使用此报告
+                </button>
               </div>
             </div>
           </div>
@@ -1030,6 +1051,15 @@
             <div class="wizard-ai-parse-title"><span class="material-symbols-rounded">auto_awesome</span>AI 理解结果</div>
             <div class="wizard-ai-parse-body" id="wizardAiParseBody"></div>
           </div>
+          <!-- AI 对话入口按钮 -->
+          <div class="wizard-ai-chat-entry" style="margin-top:16px">
+            <button class="wizard-flow-btn primary" onclick="wizardEnterAiChat()" style="width:100%;justify-content:center">
+              <span class="material-symbols-rounded">forum</span>进入 AI 对话优化
+            </button>
+            <div style="margin-top:8px;font-size:12px;color:#8C959F;text-align:center">
+              💡 进入对话模式可以与 AI 反复沟通需求，实时预览报告效果
+            </div>
+          </div>
         </div>
         <!-- 空白路径 -->
         <div id="wizardBlankSection" style="display:none">
@@ -1143,6 +1173,8 @@
 /* ── 视图切换 ────────────────────────────────────────── */
 var workbenchEntrySource = 'my-reports';  // 'library' | 'my-reports' | 'wizard'
 var workbenchPreviewType = null;           // 当前预览的报告类型（从模版库进入时）
+var aiFromWizard = false;                   // AI 工作台是否从向导进入
+var aiGeneratedReport = null;               // AI 生成的报告数据
 
 var myReports = [
   /* 当前报告 - 用于演示 */
@@ -2032,10 +2064,11 @@ function wizardGoToStep(n) {
   if (nextBtn) {
     if (n === 3) {
       updateWizardNextButtonText();
+      nextBtn.style.display = 'inline-flex';
     } else {
       nextBtn.innerHTML = '下一步';
+      nextBtn.style.display = 'inline-flex';
     }
-    nextBtn.style.display = n < 4 ? 'inline-flex' : 'none';
   }
   /* Step 2 切换子区域 */
   if (n === 2) wizardUpdateStep2Sections();
@@ -2190,6 +2223,77 @@ function wizardUpdateScheduleOptions() {
   updateWizardNextButtonText();
 }
 
+/* ── 从向导进入 AI 对话工作台 ─────────────────────────── */
+function wizardEnterAiChat() {
+  var input = document.getElementById('wizardAiInput');
+  var initialPrompt = input ? input.value.trim() : '';
+
+  // 标记从向导进入
+  aiFromWizard = true;
+
+  // 关闭模态框，进入AI工作台
+  closeModal('newReportModal');
+  switchView('ai-workbench');
+
+  // 更新按钮状态
+  var backBtn = document.getElementById('aiBackToWizardBtn');
+  var shareBtn = document.getElementById('aiShareBtn');
+  var downloadBtn = document.getElementById('aiDownloadBtn');
+  var saveBtn = document.getElementById('aiSaveBtn');
+  var confirmArea = document.getElementById('aiConfirmArea');
+
+  if (backBtn) backBtn.style.display = 'inline-flex';
+  if (shareBtn) shareBtn.style.display = 'none';
+  if (downloadBtn) downloadBtn.style.display = 'none';
+  if (saveBtn) saveBtn.style.display = 'none';
+  if (confirmArea) confirmArea.style.display = 'none';
+
+  // 如果有初始提示词，自动发送
+  if (initialPrompt) {
+    setTimeout(function() {
+      document.getElementById('aiChatInput').value = initialPrompt;
+      sendChatMsg();
+    }, 300);
+  }
+}
+
+/* ── 从 AI 工作台返回向导 ──────────────────────────────── */
+function aiBackToWizard() {
+  aiFromWizard = false;
+  switchView('my-reports');
+  openModal('newReportModal');
+  wizardGoToStep(2);
+}
+
+/* ── 确认 AI 报告并返回向导 ────────────────────────────── */
+function aiConfirmAndBackToWizard() {
+  // 保存AI生成的报告信息
+  aiGeneratedReport = {
+    title: 'AI 自定义报告 - ' + formatTimeShort(new Date().toISOString()),
+    type: 'custom',
+    source: 'ai'
+  };
+
+  // 重置状态
+  aiFromWizard = false;
+
+  // 返回向导到第三步
+  switchView('my-reports');
+  openModal('newReportModal');
+  wizardGoToStep(3);
+
+  // 更新确认页面的信息
+  var methodEl = document.getElementById('wizardConfirmMethod');
+  var typeEl = document.getElementById('wizardConfirmType');
+  var nameInput = document.getElementById('wizardReportName');
+
+  if (methodEl) methodEl.textContent = 'AI 对话创建';
+  if (typeEl) typeEl.textContent = 'AI 自定义报告';
+  if (nameInput) nameInput.value = aiGeneratedReport.title;
+
+  showToast('报告已确认，可继续配置调度选项', 'success');
+}
+
 function wizardFillConfirm() {
   var methodNames = { template: '从模板创建', ai: 'AI 对话创建', blank: '空白自定义' };
   var timeNames = { '7d': '近 7 天', '30d': '近 30 天', '90d': '近 90 天', custom: '自定义' };
@@ -2288,12 +2392,21 @@ function wizardGenerateReport() {
   var bar = document.getElementById('wizardGenBar');
   var desc = document.getElementById('wizardGenDesc');
   var pct = 0;
-  var steps = [
+
+  // AI 路径使用不同的步骤文本
+  var isAiMethod = wizardState.method === 'ai';
+  var steps = isAiMethod ? [
+    { p: 25, t: '正在应用 AI 生成的报告配置...' },
+    { p: 55, t: '正在整理分析结果...' },
+    { p: 80, t: '正在渲染可视化图表...' },
+    { p: 100, t: '生成完成！' }
+  ] : [
     { p: 25, t: '正在提取数据...' },
     { p: 55, t: 'AI 正在分析并生成报告...' },
     { p: 80, t: '正在渲染可视化图表...' },
     { p: 100, t: '生成完成！' }
   ];
+
   var i = 0;
   var timer = setInterval(function() {
     if (i >= steps.length) {
@@ -2302,9 +2415,10 @@ function wizardGenerateReport() {
         closeModal('newReportModal');
         /* 创建报告记录 */
         var type = wizardState.method === 'template' ? wizardState.template :
-          wizardState.method === 'blank' ? wizardState.template : 'traffic';
+          wizardState.method === 'blank' ? wizardState.template : 'custom';
         var nameInput = document.getElementById('wizardReportName');
-        var title = (nameInput && nameInput.value.trim()) || (reportTypeNames[type] || '报告').replace('报告', '') + ' ' + formatTimeShort(new Date().toISOString());
+        var title = (nameInput && nameInput.value.trim()) ||
+          (wizardState.method === 'ai' ? 'AI 自定义报告' : (reportTypeNames[type] || '报告').replace('报告', '')) + ' ' + formatTimeShort(new Date().toISOString());
         var newId = 'rpt-' + Date.now();
         var nowIso = new Date().toISOString();
 
@@ -2312,7 +2426,7 @@ function wizardGenerateReport() {
           id: newId,
           title: title,
           type: type,
-          source: wizardState.method === 'template' ? 'template' : 'custom',
+          source: wizardState.method === 'template' ? 'template' : (wizardState.method === 'ai' ? 'ai' : 'custom'),
           generatedAt: nowIso,
           lastViewedAt: nowIso,
           viewCount: 1
@@ -3261,6 +3375,17 @@ function sendChatMsg() {
     setTimeout(function() {
       document.getElementById('aiEmptyState').classList.add('report-hidden');
       document.getElementById('aiReportPreview').classList.remove('report-hidden');
+
+      // 如果是从向导进入，显示确认使用按钮
+      if (aiFromWizard) {
+        var confirmArea = document.getElementById('aiConfirmArea');
+        if (confirmArea) confirmArea.style.display = 'block';
+      }
+
+      // 显示完成消息
+      setTimeout(function() {
+        appendMsg('ai', '✅ 报告已生成！您可以：<br>· 继续对话，让我调整报告内容<br>· 点击「确认使用此报告」返回向导继续配置');
+      }, 500);
     }, 1200);
   }, 800);
 }
