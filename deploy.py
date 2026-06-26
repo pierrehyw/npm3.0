@@ -114,13 +114,16 @@ server {
     listen 80;
     server_name _;
     root /usr/share/nginx/html;
-    index dashboard.html index.html;
+    index login.html dashboard.html index.html;
     charset utf-8;
+    location = / {
+        return 302 /login.html;
+    }
     location / {
-        try_files $uri $uri/ /dashboard.html;
+        try_files $uri $uri/ /login.html;
         add_header Cache-Control "no-cache, must-revalidate";
     }
-    error_page 404 /dashboard.html;
+    error_page 404 /login.html;
 }
 """
     # 写 nginx 配置文件

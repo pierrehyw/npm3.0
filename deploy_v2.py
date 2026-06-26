@@ -28,10 +28,14 @@ NGINX_CONF = """server {
     server_name  localhost;
     charset utf-8;
 
+    location = / {
+        return 302 /login.html;
+    }
+
     location / {
         root   /usr/share/nginx/html;
-        index  dashboard.html index.html;
-        try_files $uri $uri/ /dashboard.html;
+        index  login.html dashboard.html index.html;
+        try_files $uri $uri/ /login.html;
         add_header Cache-Control "no-cache";
     }
 
