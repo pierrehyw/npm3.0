@@ -141,7 +141,7 @@
             <div class="rtc-title">流量分析报告</div>
             <div class="rtc-desc">展示带宽利用率趋势、流量 TOP N、协议分布、异常流量检测等关键指标。</div>
             <div class="rtc-actions">
-              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('traffic')">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();generateReportFromLibrary('traffic')">
                 <span class="material-symbols-rounded">play_arrow</span>生成
               </button>
               <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('traffic')">
@@ -162,7 +162,7 @@
             <div class="rtc-title">故障统计报告</div>
             <div class="rtc-desc">故障事件统计、MTTR/MTBF 分析、故障根因 TOP N、告警收敛趋势。</div>
             <div class="rtc-actions">
-              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('fault')">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();generateReportFromLibrary('fault')">
                 <span class="material-symbols-rounded">play_arrow</span>生成
               </button>
               <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('fault')">
@@ -182,7 +182,7 @@
             <div class="rtc-title">容量规划报告</div>
             <div class="rtc-desc">链路容量使用率、增长趋势预测、扩容建议、资源瓶颈分析。</div>
             <div class="rtc-actions">
-              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('capacity')">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();generateReportFromLibrary('capacity')">
                 <span class="material-symbols-rounded">play_arrow</span>生成
               </button>
               <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('capacity')">
@@ -202,7 +202,7 @@
             <div class="rtc-title">网络健康报告</div>
             <div class="rtc-desc">网络可用性、丢包率/延迟趋势、设备健康评分、SLA 达标率统计。</div>
             <div class="rtc-actions">
-              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('health')">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();generateReportFromLibrary('health')">
                 <span class="material-symbols-rounded">play_arrow</span>生成
               </button>
               <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('health')">
@@ -222,7 +222,7 @@
             <div class="rtc-title">设备巡检报告</div>
             <div class="rtc-desc">设备清单、版本信息、配置合规检查、端口使用率、CPU/内存趋势。</div>
             <div class="rtc-actions">
-              <button class="rtc-action-btn primary" onclick="event.stopPropagation();openReport('device')">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();generateReportFromLibrary('device')">
                 <span class="material-symbols-rounded">play_arrow</span>生成
               </button>
               <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('device')">
@@ -421,10 +421,13 @@
           <button class="rw-action-btn" id="wizardBackToFlowBtn" onclick="wizardBackToFlow()" style="display:none">
             <span class="material-symbols-rounded">arrow_back</span>返回新建流程
           </button>
-          <button class="rw-action-btn" id="wbBackBtn" onclick="switchView('my-reports')">
-            <span class="material-symbols-rounded">arrow_back</span>返回我的报告
+          <button class="rw-action-btn" id="wbBackBtn" onclick="wbBackFromWorkbench()">
+            <span class="material-symbols-rounded">arrow_back</span>返回
           </button>
-          <button class="rw-action-btn primary" id="wbSaveBtn">
+          <button class="rw-action-btn primary" id="wbGenerateBtn" onclick="generateReportFromWorkbench()">
+            <span class="material-symbols-rounded">play_arrow</span>生成报告
+          </button>
+          <button class="rw-action-btn primary" id="wbSaveBtn" style="display:none">
             <span class="material-symbols-rounded">save</span>保存报告
           </button>
         </div>
@@ -542,34 +545,43 @@
         <div class="rs-header">
           <div>
             <div class="rs-title">调度管理</div>
-            <div class="rs-sub">管理所有周期性报告任务，查看执行历史与运行状态</div>
+            <div class="rs-sub">以报告为中心管理多频率调度，一次配置日报/周报/月报</div>
           </div>
-          <button class="rw-action-btn primary" onclick="openScheduleModal()">
-            <span class="material-symbols-rounded">add</span>新建调度
-          </button>
-        </div>
-
-        <!-- 调度任务表格 -->
-        <div class="rs-table-wrap">
-          <table class="rs-table">
-            <thead>
-              <tr>
-                <th>状态</th>
-                <th>调度名称</th>
-                <th>报告类型</th>
-                <th>执行频率</th>
-                <th>下次执行</th>
-                <th>上次执行</th>
-                <th>已执行</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="schedulesTableBody"></tbody>
-          </table>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="rs-view-tabs">
+              <button class="rs-view-tab active" onclick="switchScheduleView('matrix')" data-view="matrix">按报告分组</button>
+              <button class="rs-view-tab" onclick="switchScheduleView('frequency')" data-view="frequency">按频率分组</button>
+            </div>
+            <button class="rw-action-btn primary" onclick="openScheduleModal()">
+              <span class="material-symbols-rounded">add</span>配置调度
+            </button>
+          </div>
         </div>
 
         <!-- 调度统计概览 -->
         <div class="rs-stats-row" id="schedulesStatsRow"></div>
+
+        <!-- 视图1: 频率矩阵表格（按报告分组） -->
+        <div class="rs-table-wrap" id="scheduleMatrixView">
+          <table class="rs-matrix-table">
+            <thead>
+              <tr>
+                <th style="width:28%">报告模板</th>
+                <th style="width:15%;text-align:center">日报</th>
+                <th style="width:15%;text-align:center">周报</th>
+                <th style="width:15%;text-align:center">月报</th>
+                <th style="width:15%;text-align:center">季报</th>
+                <th style="width:12%">操作</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleMatrixBody"></tbody>
+          </table>
+        </div>
+
+        <!-- 视图2: 频率分组视图 -->
+        <div class="rs-table-wrap report-hidden" id="scheduleFreqGroupView">
+          <div class="rs-freq-groups" id="scheduleFreqGroups"></div>
+        </div>
       </div>
 
       <!-- ══ View E: 报告查看器 ═══════════════════════ -->
@@ -590,9 +602,16 @@
             <button class="rw-action-btn" onclick="editCurrentReport()">
               <span class="material-symbols-rounded">edit</span>编辑
             </button>
-            <button class="rw-action-btn" onclick="openScheduleWithType(currentViewingReport ? currentViewingReport.type : '')">
-              <span class="material-symbols-rounded">schedule</span>调度
-            </button>
+            <!-- 调度下拉菜单 -->
+            <div class="rv-schedule-dropdown">
+              <button class="rw-action-btn" onclick="toggleScheduleDropdown(this)" onblur="setTimeout(function(){document.querySelector('.rv-schedule-dropdown-menu').classList.remove('open')},200)">
+                <span class="material-symbols-rounded">schedule</span>调度
+                <span class="material-symbols-rounded" style="font-size:16px">arrow_drop_down</span>
+              </button>
+              <div class="rv-schedule-dropdown-menu" id="rvScheduleDropdownMenu">
+                <!-- 动态填充 -->
+              </div>
+            </div>
             <button class="rw-action-btn" onclick="openModal('shareModal')">
               <span class="material-symbols-rounded">download</span>导出
             </button>
@@ -617,7 +636,28 @@
               <span>历史版本</span>
               <span class="rv-history-count" id="rvHistoryCount">0</span>
             </div>
-            <div class="rv-history-list" id="rvHistoryList"></div>
+            <!-- 日历导航 -->
+            <div class="rv-calendar-nav">
+              <button class="rv-calendar-nav-btn" onclick="calendarPrevMonth()">
+                <span class="material-symbols-rounded">chevron_left</span>
+              </button>
+              <span class="rv-calendar-month" id="rvCalendarMonth">2026年6月</span>
+              <button class="rv-calendar-nav-btn" onclick="calendarNextMonth()">
+                <span class="material-symbols-rounded">chevron_right</span>
+              </button>
+            </div>
+            <!-- 日历图例 -->
+            <div class="rv-calendar-legend">
+              <span class="rv-legend-item"><span class="rv-legend-dot daily"></span>日报</span>
+              <span class="rv-legend-item"><span class="rv-legend-dot weekly"></span>周报</span>
+              <span class="rv-legend-item"><span class="rv-legend-dot monthly"></span>月报</span>
+            </div>
+            <!-- 日历网格 -->
+            <div class="rv-calendar-grid" id="rvCalendarGrid"></div>
+            <!-- 选中日期的报告列表 -->
+            <div class="rv-calendar-day-reports" id="rvCalendarDayReports">
+              <div class="rv-calendar-day-title">选择日期查看报告</div>
+            </div>
           </div>
         </div>
       </div>
@@ -710,51 +750,51 @@
      模态框：周期调度配置
      ═══════════════════════════════════════════════════ -->
 <div class="modal-overlay report-modal" id="scheduleModal">
-  <div class="modal-panel" style="width:min(560px,95vw)">
+  <div class="modal-panel" style="width:min(620px,95vw)">
     <div class="modal-header">
-      <span class="modal-title">配置周期调度</span>
+      <span class="modal-title">配置报告调度</span>
       <button class="modal-close" onclick="closeModal('scheduleModal')"><span class="material-symbols-rounded">close</span></button>
     </div>
     <div class="modal-body" style="padding:20px">
       <div class="schedule-config">
         <input type="hidden" id="scheduleEditId" value="">
         <div class="schedule-field">
-          <label>调度名称</label>
-          <input type="text" id="schName" placeholder="例如：周度流量分析报告">
+          <label>报告类型</label>
+          <select id="schType">
+            <option value="traffic">流量分析报告</option>
+            <option value="fault">故障统计报告</option>
+            <option value="capacity">容量规划报告</option>
+            <option value="health">网络健康报告</option>
+            <option value="device">设备巡检报告</option>
+          </select>
         </div>
-        <div class="schedule-row">
-          <div class="schedule-field">
-            <label>报告类型</label>
-            <select id="schType">
-              <option value="traffic">流量分析报告</option>
-              <option value="fault">故障统计报告</option>
-              <option value="capacity">容量规划报告</option>
-              <option value="health">网络健康报告</option>
-              <option value="device">设备巡检报告</option>
-            </select>
-          </div>
-          <div class="schedule-field">
-            <label>执行频率</label>
-            <select id="schFreq">
-              <option value="daily">每天</option>
-              <option value="weekly">每周</option>
-              <option value="monthly">每月</option>
-              <option value="quarterly">每季度</option>
-            </select>
-          </div>
-        </div>
-        <div class="schedule-row">
-          <div class="schedule-field">
-            <label>执行时间</label>
-            <input type="time" id="schTime" value="09:00">
-          </div>
-          <div class="schedule-field">
-            <label>时区</label>
-            <select>
-              <option selected>Asia/Shanghai (UTC+8)</option>
-            </select>
+
+        <div class="schedule-field">
+          <label>选择执行频率（可多选）</label>
+          <div class="schedule-freq-matrix" id="schFreqMatrix">
+            <div class="schedule-freq-card" data-freq="daily" onclick="toggleFreqCard(this)">
+              <div class="freq-name">日报</div>
+              <div class="freq-desc">每天执行</div>
+            </div>
+            <div class="schedule-freq-card" data-freq="weekly" onclick="toggleFreqCard(this)">
+              <div class="freq-name">周报</div>
+              <div class="freq-desc">每周一执行</div>
+            </div>
+            <div class="schedule-freq-card" data-freq="monthly" onclick="toggleFreqCard(this)">
+              <div class="freq-name">月报</div>
+              <div class="freq-desc">每月1日执行</div>
+            </div>
+            <div class="schedule-freq-card" data-freq="quarterly" onclick="toggleFreqCard(this)">
+              <div class="freq-name">季报</div>
+              <div class="freq-desc">每季度首月1日</div>
+            </div>
           </div>
         </div>
+
+        <div class="schedule-time-config" id="schTimeConfig">
+          <!-- 动态渲染各频率时间配置 -->
+        </div>
+
         <div class="schedule-field">
           <label>接收人邮箱</label>
           <input type="text" id="schRecipients" placeholder="输入邮箱后回车添加，多个用逗号分隔">
@@ -772,14 +812,14 @@
         <div class="schedule-ai-preview">
           <div class="schedule-ai-title"><span class="material-symbols-rounded">auto_awesome</span>AI 调度建议</div>
           <div class="schedule-ai-text">
-            基于您的报告使用习惯分析：建议将流量分析报告设置为<strong>每周一 09:00</strong>自动生成，这是您最常查看报告的时间。同时建议增加<strong>异常事件触发</strong>机制，当检测到流量突增 &gt;200% 时自动发送告警报告。
+            基于您的报告使用习惯分析：建议将流量分析报告设置为<strong>日报 + 周报</strong>组合，每天早上快速预览，每周一进行详细分析。
           </div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="modal-btn-cancel" onclick="closeModal('scheduleModal')">取消</button>
-      <button class="modal-btn-primary" onclick="saveSchedule()">保存调度</button>
+      <button class="modal-btn-primary" onclick="saveSchedule()">保存配置</button>
     </div>
   </div>
 </div>
@@ -1033,6 +1073,46 @@
           <div><b>时间范围：</b><span id="wizardConfirmTime">近 30 天</span></div>
           <div><b>监控对象：</b><span id="wizardConfirmObjs">全部对象</span></div>
         </div>
+
+        <!-- 调度频率选择 -->
+        <div class="wizard-field-label" style="margin-top:20px;margin-bottom:10px">调度设置 <span class="wizard-field-optional">（可选，定期生成任务）</span></div>
+        <div class="wizard-schedule-options">
+          <label class="wizard-schedule-option">
+            <input type="radio" name="wizardScheduleFreq" value="none" checked onchange="wizardUpdateScheduleOptions()">
+            <span class="ws-radio"></span>
+            <span class="ws-label">不设置调度（仅生成一次）</span>
+          </label>
+          <label class="wizard-schedule-option">
+            <input type="radio" name="wizardScheduleFreq" value="daily" onchange="wizardUpdateScheduleOptions()">
+            <span class="ws-radio"></span>
+            <span class="ws-label">日报（每天生成）</span>
+          </label>
+          <label class="wizard-schedule-option">
+            <input type="radio" name="wizardScheduleFreq" value="weekly" onchange="wizardUpdateScheduleOptions()">
+            <span class="ws-radio"></span>
+            <span class="ws-label">周报（每周一生成）</span>
+          </label>
+          <label class="wizard-schedule-option">
+            <input type="radio" name="wizardScheduleFreq" value="monthly" onchange="wizardUpdateScheduleOptions()">
+            <span class="ws-radio"></span>
+            <span class="ws-label">月报（每月1日生成）</span>
+          </label>
+        </div>
+
+        <!-- 生成方式选择（仅设置调度时显示） -->
+        <div class="wizard-generate-options" id="wizardGenerateOptions" style="display:none;margin-top:16px">
+          <div class="wizard-field-label" style="margin-bottom:10px">生成方式</div>
+          <label class="wizard-schedule-option">
+            <input type="radio" name="wizardGenerateNow" value="yes" checked onchange="updateWizardNextButtonText()">
+            <span class="ws-radio"></span>
+            <span class="ws-label">立即生成 + 设置调度</span>
+          </label>
+          <label class="wizard-schedule-option">
+            <input type="radio" name="wizardGenerateNow" value="no" onchange="updateWizardNextButtonText()">
+            <span class="ws-radio"></span>
+            <span class="ws-label">仅设置调度（下次自动生成）</span>
+          </label>
+        </div>
       </div>
 
       <!-- 生成中 -->
@@ -1061,7 +1141,126 @@
      ═══════════════════════════════════════════════════ -->
 <script>
 /* ── 视图切换 ────────────────────────────────────────── */
+var workbenchEntrySource = 'my-reports';  // 'library' | 'my-reports' | 'wizard'
+var workbenchPreviewType = null;           // 当前预览的报告类型（从模版库进入时）
+
 var myReports = [
+  /* 当前报告 - 用于演示 */
+  {
+    id: 'rpt-current-demo',
+    title: '流量分析报告 - 6月25日',
+    type: 'traffic',
+    source: 'schedule',
+    frequency: 'daily',
+    generatedAt: '2026-06-25T10:00:00',
+    lastViewedAt: '2026-06-25T10:30:00',
+    viewCount: 15
+  },
+  /* 日报 - 连续几天 */
+  {
+    id: 'rpt-daily-0624',
+    title: '流量分析日报 - 6月24日',
+    type: 'traffic',
+    source: 'schedule',
+    frequency: 'daily',
+    generatedAt: '2026-06-24T08:00:00',
+    lastViewedAt: '2026-06-24T09:00:00',
+    viewCount: 8
+  },
+  {
+    id: 'rpt-daily-0623',
+    title: '流量分析日报 - 6月23日',
+    type: 'traffic',
+    source: 'schedule',
+    frequency: 'daily',
+    generatedAt: '2026-06-23T08:00:00',
+    lastViewedAt: '2026-06-23T09:00:00',
+    viewCount: 12
+  },
+  {
+    id: 'rpt-daily-0620',
+    title: '流量分析日报 - 6月20日',
+    type: 'traffic',
+    source: 'schedule',
+    frequency: 'daily',
+    generatedAt: '2026-06-20T08:00:00',
+    lastViewedAt: '2026-06-20T09:00:00',
+    viewCount: 6
+  },
+  /* 周报 */
+  {
+    id: 'rpt-weekly-w3',
+    title: '网络健康周报 - 第25周',
+    type: 'health',
+    source: 'schedule',
+    frequency: 'weekly',
+    generatedAt: '2026-06-23T10:00:00',
+    lastViewedAt: '2026-06-23T11:00:00',
+    viewCount: 25
+  },
+  {
+    id: 'rpt-weekly-w2',
+    title: '网络健康周报 - 第24周',
+    type: 'health',
+    source: 'schedule',
+    frequency: 'weekly',
+    generatedAt: '2026-06-16T10:00:00',
+    lastViewedAt: '2026-06-16T11:00:00',
+    viewCount: 18
+  },
+  /* 月报 */
+  {
+    id: 'rpt-monthly-may',
+    title: '故障统计月报 - 5月',
+    type: 'fault',
+    source: 'schedule',
+    frequency: 'monthly',
+    generatedAt: '2026-06-01T09:00:00',
+    lastViewedAt: '2026-06-01T10:00:00',
+    viewCount: 35
+  },
+  {
+    id: 'rpt-monthly-apr',
+    title: '容量规划月报 - 4月',
+    type: 'capacity',
+    source: 'schedule',
+    frequency: 'monthly',
+    generatedAt: '2026-05-01T09:00:00',
+    lastViewedAt: '2026-05-01T10:00:00',
+    viewCount: 28
+  },
+  /* 同一天有多种类型报告的情况 - 用于演示多标记 */
+  {
+    id: 'rpt-multi-day-daily',
+    title: '流量日报 - 6月15日',
+    type: 'traffic',
+    source: 'schedule',
+    frequency: 'daily',
+    generatedAt: '2026-06-15T08:00:00',
+    lastViewedAt: '2026-06-15T09:00:00',
+    viewCount: 5
+  },
+  {
+    id: 'rpt-multi-day-weekly',
+    title: '健康周报 - 6月第2周',
+    type: 'health',
+    source: 'schedule',
+    frequency: 'weekly',
+    generatedAt: '2026-06-15T10:00:00',
+    lastViewedAt: '2026-06-15T11:00:00',
+    viewCount: 10
+  },
+  {
+    id: 'rpt-multi-day-monthly',
+    title: '故障月报 - 6月',
+    type: 'fault',
+    source: 'schedule',
+    frequency: 'monthly',
+    generatedAt: '2026-06-15T14:00:00',
+    lastViewedAt: '2026-06-15T15:00:00',
+    viewCount: 20
+  },
+  /* 原有数据 */
   {
     id: 'rpt-custom-bandwidth',
     title: '自定义带宽监控',
@@ -1147,11 +1346,28 @@ function renderMyReportsList() {
   }
 
   empty.classList.add('report-hidden');
-  var ordered = myReports.slice().sort(function(a, b) {
+
+  /* 按报告类型分组，只显示每个类型的最新报告 */
+  var reportGroups = {};
+  myReports.forEach(function(r) {
+    /* 使用 type + source 作为分组键，区分调度报告和自定义报告 */
+    var groupKey = r.type + '-' + (r.source === 'schedule' ? 'schedule' : r.source);
+    if (!reportGroups[groupKey]) {
+      reportGroups[groupKey] = [];
+    }
+    reportGroups[groupKey].push(r);
+  });
+
+  /* 取每组最新的报告，并按生成时间排序 */
+  var latestReports = Object.values(reportGroups).map(function(group) {
+    return group.sort(function(a, b) {
+      return new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime();
+    })[0];
+  }).sort(function(a, b) {
     return new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime();
   });
 
-  list.innerHTML = ordered.map(function(r) {
+  list.innerHTML = latestReports.map(function(r) {
     var sourceText, sourceCls;
     if (r.source === 'schedule') {
       var schName = '';
@@ -1168,6 +1384,11 @@ function renderMyReportsList() {
       sourceText = '自定义报告';
       sourceCls = 'custom';
     }
+
+    /* 计算该类型报告的历史版本数量 */
+    var groupKey = r.type + '-' + (r.source === 'schedule' ? 'schedule' : r.source);
+    var historyCount = reportGroups[groupKey] ? reportGroups[groupKey].length : 1;
+
     return '<div class="my-report-card" onclick="openMyReport(\'' + r.id + '\')">' +
       '<div class="my-report-card-head">' +
         '<div class="my-report-card-title">' + r.title + '</div>' +
@@ -1176,7 +1397,7 @@ function renderMyReportsList() {
       '<div class="my-report-card-meta">' +
         '<span><span class="material-symbols-rounded">calendar_today</span>生成：' + formatTimeShort(r.generatedAt) + '</span>' +
         '<span><span class="material-symbols-rounded">visibility</span>查看：' + r.viewCount + ' 次</span>' +
-        '<span><span class="material-symbols-rounded">update</span>最近：' + formatTimeShort(r.lastViewedAt) + '</span>' +
+        '<span><span class="material-symbols-rounded">history</span>历史版本：' + historyCount + ' 份</span>' +
       '</div>' +
       '<div class="my-report-card-actions">' +
         '<button class="rtc-action-btn primary" onclick="event.stopPropagation();openMyReport(\'' + r.id + '\')"><span class="material-symbols-rounded">play_arrow</span>查看</button>' +
@@ -1209,7 +1430,9 @@ function switchView(viewName) {
     setActiveNav('.report-nav-item[data-role="my-reports-home"]');
   }
   if (viewName === 'schedules') {
-    renderSchedules();
+    // 使用新的调度视图渲染
+    renderScheduleMatrix();
+    renderScheduleStats();
   }
 }
 
@@ -1238,7 +1461,7 @@ document.addEventListener('click', function(e) {
   switchView(view);
 });
 
-/* ── 打开内置报告 ────────────────────────────────────── */
+/* ── 打开内置报告（从模版库点击）────────────────────── */
 function openReport(type) {
   if (type === 'ai') {
     switchView('ai-workbench');
@@ -1246,6 +1469,39 @@ function openReport(type) {
     return;
   }
 
+  // 从模版库点击时：先进入工作台预览，不直接生成报告
+  workbenchEntrySource = 'library';
+  workbenchPreviewType = type;
+  updateWorkbenchByType(type);
+  switchView('workbench');
+  setActiveNav();
+
+  // 更新返回按钮文本
+  var backBtn = document.getElementById('wbBackBtn');
+  if (backBtn) backBtn.innerHTML = '<span class="material-symbols-rounded">arrow_back</span>返回模版库';
+}
+
+/* ── 从工作台返回 ────────────────────────────────────── */
+function wbBackFromWorkbench() {
+  var backBtn = document.getElementById('wbBackBtn');
+  if (workbenchEntrySource === 'library') {
+    // 从模版库来的，返回模版库
+    switchView('library');
+    // 恢复按钮文本
+    if (backBtn) backBtn.innerHTML = '<span class="material-symbols-rounded">arrow_back</span>返回';
+  } else if (workbenchEntrySource === 'wizard') {
+    // 从向导来的，回到新建报告向导
+    wizardBackToFlow();
+  } else {
+    // 默认返回我的报告
+    switchView('my-reports');
+    if (backBtn) backBtn.innerHTML = '<span class="material-symbols-rounded">arrow_back</span>返回';
+  }
+  workbenchPreviewType = null;
+}
+
+/* ── 从模版库直接生成报告 ────────────────────────────── */
+function generateReportFromLibrary(type) {
   var newId = 'rpt-' + Date.now();
   var nowIso = new Date().toISOString();
   var titleBase = reportTypeNames[type] || '自定义报告';
@@ -1265,6 +1521,12 @@ function openReport(type) {
   openMyReport(newId);
 }
 
+/* ── 从工作台生成报告 ────────────────────────────────── */
+function generateReportFromWorkbench() {
+  var type = workbenchPreviewType || (document.getElementById('wbReportType') || {}).value || 'traffic';
+  generateReportFromLibrary(type);
+}
+
 function openMyReport(reportId) {
   var report = myReports.find(function(r) { return r.id === reportId; });
   if (!report) return;
@@ -1272,6 +1534,10 @@ function openMyReport(reportId) {
   report.viewCount += 1;
   report.lastViewedAt = new Date().toISOString();
   currentViewingReport = report;
+
+  // 设置进入来源为我的报告
+  workbenchEntrySource = 'my-reports';
+  workbenchPreviewType = null;
 
   renderReportViewer(report);
   switchView('viewer');
@@ -1418,9 +1684,11 @@ function renderReportViewer(report) {
   /* 来源标签 */
   var badge = document.getElementById('rvSourceBadge');
   if (report.source === 'schedule') {
-    var schName = '';
-    if (report.scheduleId) { var sch = schedules.find(function(s) { return s.id === report.scheduleId; }); schName = sch ? sch.name : ''; }
-    badge.textContent = schName ? '来自调度: ' + schName : '来自调度';
+    var tplName = '';
+    if (report.templateId) { var tpl = scheduleTemplates.find(function(t) { return t.id === report.templateId; }); tplName = tpl ? tpl.name : ''; }
+    var freqLabel = report.frequency ? scheduleFreqNames[report.frequency] : '';
+    var labelSuffix = freqLabel ? ' (' + freqLabel + ')' : '';
+    badge.textContent = tplName ? '来自调度: ' + tplName + labelSuffix : '来自调度';
     badge.className = 'rv-source-badge schedule';
   } else if (report.source === 'template') {
     badge.textContent = '来自模版';
@@ -1458,7 +1726,10 @@ function renderReportViewer(report) {
     '</div>';
   }).join('');
 
-  /* 完整内容 */
+  /* 渲染调度下拉菜单内容 */
+  renderScheduleDropdownMenu(type);
+
+  /* 完整报告内容 */
   document.getElementById('rvContent').innerHTML =
     '<div class="rv-content-header">' +
       '<div class="rv-content-title">' + report.title + '</div>' +
@@ -1476,30 +1747,216 @@ function renderReportViewer(report) {
   renderViewerHistory(report);
 }
 
+/* ── 日历视图相关变量 ────────────────────────────────── */
+var calendarCurrentDate = new Date();
+var calendarSelectedDate = null;
+var calendarReportData = [];
+
 function renderViewerHistory(currentReport) {
-  /* 同类型历史报告 */
+  /* 同类型历史报告 - 显示该类型所有历史版本，不区分来源 */
   var history = myReports.filter(function(r) {
     return r.type === currentReport.type && r.id !== currentReport.id;
   }).sort(function(a, b) {
-    return new Date(b.generatedAt) - new Date(a.generatedAt);
+    return new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime();
   });
 
   /* 加入当前报告 */
   var all = [currentReport].concat(history);
+  calendarReportData = all;
 
   document.getElementById('rvHistoryCount').textContent = all.length;
-  var list = document.getElementById('rvHistoryList');
-  list.innerHTML = all.map(function(r) {
-    var isActive = r.id === currentReport.id;
+
+  /* 渲染日历 */
+  renderCalendar();
+
+  /* 默认选中当前报告的日期 */
+  var currentDate = new Date(currentReport.generatedAt);
+  calendarSelectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+  renderDayReports(calendarSelectedDate);
+}
+
+/* 渲染日历 */
+function renderCalendar() {
+  var year = calendarCurrentDate.getFullYear();
+  var month = calendarCurrentDate.getMonth();
+
+  /* 更新月份显示 */
+  document.getElementById('rvCalendarMonth').textContent = year + '年' + (month + 1) + '月';
+
+  /* 获取当月第一天和最后一天 */
+  var firstDay = new Date(year, month, 1);
+  var lastDay = new Date(year, month + 1, 0);
+  var startDayOfWeek = firstDay.getDay(); /* 0 = 周日, 1 = 周一, ... */
+
+  /* 调整为周一为第一天 */
+  var startOffset = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+
+  /* 计算需要显示的日期 */
+  var days = [];
+  var today = new Date();
+  today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  /* 上月的日期 */
+  var prevMonthLastDay = new Date(year, month, 0).getDate();
+  for (var i = startOffset - 1; i >= 0; i--) {
+    days.push({
+      day: prevMonthLastDay - i,
+      isCurrentMonth: false,
+      date: new Date(year, month - 1, prevMonthLastDay - i)
+    });
+  }
+
+  /* 当月的日期 */
+  for (var i = 1; i <= lastDay.getDate(); i++) {
+    days.push({
+      day: i,
+      isCurrentMonth: true,
+      date: new Date(year, month, i)
+    });
+  }
+
+  /* 下月的日期 */
+  var remainingDays = 42 - days.length; /* 6行 * 7列 */
+  for (var i = 1; i <= remainingDays; i++) {
+    days.push({
+      day: i,
+      isCurrentMonth: false,
+      date: new Date(year, month + 1, i)
+    });
+  }
+
+  /* 构建日历HTML */
+  var html = '<div class="rv-calendar-weekdays">' +
+    '<div class="rv-calendar-weekday">一</div>' +
+    '<div class="rv-calendar-weekday">二</div>' +
+    '<div class="rv-calendar-weekday">三</div>' +
+    '<div class="rv-calendar-weekday">四</div>' +
+    '<div class="rv-calendar-weekday">五</div>' +
+    '<div class="rv-calendar-weekday">六</div>' +
+    '<div class="rv-calendar-weekday">日</div>' +
+    '</div><div class="rv-calendar-days">';
+
+  days.forEach(function(d) {
+    var dateKey = d.date.toDateString();
+    var isToday = d.date.getTime() === today.getTime();
+    var isSelected = calendarSelectedDate && d.date.getTime() === calendarSelectedDate.getTime();
+
+    /* 获取该日期的报告类型 */
+    var reportTypes = getReportTypesForDate(d.date);
+
+    var classes = ['rv-calendar-day'];
+    if (!d.isCurrentMonth) classes.push('other-month');
+    if (isToday) classes.push('today');
+    if (isSelected) classes.push('selected');
+
+    html += '<div class="' + classes.join(' ') + '" onclick="selectCalendarDate(new Date(\'' + d.date.toISOString() + '\'))">' +
+      '<span>' + d.day + '</span>';
+
+    if (reportTypes.length > 0) {
+      html += '<div class="rv-day-markers">';
+      reportTypes.forEach(function(type) {
+        html += '<span class="rv-day-marker ' + type + '"></span>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+  });
+
+  html += '</div>';
+  document.getElementById('rvCalendarGrid').innerHTML = html;
+}
+
+/* 获取某日期的报告类型 */
+function getReportTypesForDate(date) {
+  var dateStr = date.toDateString();
+  var types = new Set();
+
+  calendarReportData.forEach(function(r) {
+    var rDate = new Date(r.generatedAt);
+    if (rDate.toDateString() === dateStr) {
+      /* 根据标题或类型判断报告周期类型 */
+      if (r.title.includes('日报') || r.frequency === 'daily') {
+        types.add('daily');
+      } else if (r.title.includes('周报') || r.frequency === 'weekly') {
+        types.add('weekly');
+      } else if (r.title.includes('月报') || r.frequency === 'monthly') {
+        types.add('monthly');
+      } else {
+        /* 默认按日报处理 */
+        types.add('daily');
+      }
+    }
+  });
+
+  return Array.from(types);
+}
+
+/* 选择日历日期 */
+function selectCalendarDate(date) {
+  calendarSelectedDate = date;
+  renderCalendar();
+  renderDayReports(date);
+}
+
+/* 渲染选中日期的报告列表 */
+function renderDayReports(date) {
+  var dateStr = date.toDateString();
+  var reports = calendarReportData.filter(function(r) {
+    return new Date(r.generatedAt).toDateString() === dateStr;
+  });
+
+  var titleEl = document.querySelector('.rv-calendar-day-title');
+  if (titleEl) {
+    titleEl.textContent = (date.getMonth() + 1) + '月' + date.getDate() + '日 · 报告 (' + reports.length + ')';
+  }
+
+  var container = document.getElementById('rvCalendarDayReports');
+  if (reports.length === 0) {
+    container.innerHTML = '<div class="rv-calendar-day-title">' + (date.getMonth() + 1) + '月' + date.getDate() + '日</div>' +
+      '<div class="rv-calendar-no-reports">该日期暂无报告</div>';
+    return;
+  }
+
+  var html = '<div class="rv-calendar-day-title">' + (date.getMonth() + 1) + '月' + date.getDate() + '日 · 报告 (' + reports.length + ')</div>';
+
+  reports.forEach(function(r) {
+    var isActive = currentViewingReport && r.id === currentViewingReport.id;
+
+    /* 判断报告周期类型 */
+    var freqType = 'daily';
+    if (r.title.includes('周报') || r.frequency === 'weekly') {
+      freqType = 'weekly';
+    } else if (r.title.includes('月报') || r.frequency === 'monthly') {
+      freqType = 'monthly';
+    }
+
     var sourceIcon = r.source === 'schedule' ? 'event_repeat' : r.source === 'template' ? 'grid_view' : 'edit_note';
-    return '<div class="rv-history-item' + (isActive ? ' active' : '') + '" onclick="openMyReport(\'' + r.id + '\')">' +
-      '<div class="rv-history-dot' + (isActive ? ' active' : '') + '"></div>' +
-      '<div class="rv-history-info">' +
-        '<div class="rv-history-title">' + r.title + '</div>' +
-        '<div class="rv-history-time"><span class="material-symbols-rounded" style="font-size:12px">' + sourceIcon + '</span>' + formatTimeShort(r.generatedAt) + '</div>' +
+    var time = new Date(r.generatedAt);
+    var timeStr = ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2);
+
+    html += '<div class="rv-calendar-report-item' + (isActive ? ' active' : '') + '" onclick="openMyReport(\'' + r.id + '\')">' +
+      '<span class="rv-calendar-report-type ' + freqType + '"></span>' +
+      '<div class="rv-calendar-report-info">' +
+        '<div class="rv-calendar-report-name">' + r.title + '</div>' +
+        '<div class="rv-calendar-report-time"><span class="material-symbols-rounded" style="font-size:10px">' + sourceIcon + '</span>' + timeStr + '</div>' +
       '</div>' +
     '</div>';
-  }).join('');
+  });
+
+  container.innerHTML = html;
+}
+
+/* 上月 */
+function calendarPrevMonth() {
+  calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() - 1);
+  renderCalendar();
+}
+
+/* 下月 */
+function calendarNextMonth() {
+  calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + 1);
+  renderCalendar();
 }
 
 /* 从查看器进入编辑模式 */
@@ -1573,14 +2030,37 @@ function wizardGoToStep(n) {
   var nextBtn = document.getElementById('wizardNextBtn');
   if (prevBtn) prevBtn.style.display = n > 1 && n < 4 ? 'inline-flex' : 'none';
   if (nextBtn) {
-    if (n === 3) { nextBtn.textContent = '生成报告'; }
-    else { nextBtn.innerHTML = '下一步'; }
+    if (n === 3) {
+      updateWizardNextButtonText();
+    } else {
+      nextBtn.innerHTML = '下一步';
+    }
     nextBtn.style.display = n < 4 ? 'inline-flex' : 'none';
   }
   /* Step 2 切换子区域 */
   if (n === 2) wizardUpdateStep2Sections();
   /* Step 3 填充确认 */
   if (n === 3) wizardFillConfirm();
+}
+
+/* ── 更新向导下一步按钮文本 ──────────────────────────── */
+function updateWizardNextButtonText() {
+  var nextBtn = document.getElementById('wizardNextBtn');
+  var freqEl = document.querySelector('input[name="wizardScheduleFreq"]:checked');
+  var genNowEl = document.querySelector('input[name="wizardGenerateNow"]:checked');
+
+  if (!nextBtn || !freqEl) return;
+
+  var freq = freqEl.value;
+  var genNow = genNowEl ? genNowEl.value === 'yes' : true;
+
+  if (freq === 'none') {
+    nextBtn.textContent = '生成报告';
+  } else if (genNow) {
+    nextBtn.textContent = '生成并设置调度';
+  } else {
+    nextBtn.textContent = '创建调度任务';
+  }
 }
 
 function wizardSelectMethod(method) {
@@ -1627,18 +2107,27 @@ function wizardSelectTemplate(tpl) {
 
 function wizardPreviewTemplate() {
   closeModal('newReportModal');
+  // 设置从向导进入的状态
+  workbenchEntrySource = 'wizard';
+  workbenchPreviewType = wizardState.template || 'traffic';
+  updateWorkbenchByType(workbenchPreviewType);
   switchView('workbench');
-  updateWorkbenchByType(wizardState.template || 'traffic');
   setActiveNav();
+  // 更新返回按钮文本
+  var backBtn = document.getElementById('wbBackBtn');
+  if (backBtn) backBtn.innerHTML = '<span class="material-symbols-rounded">arrow_back</span>返回新建向导';
 }
 
 function wizardEditTemplateInWorkbench() {
   wizardFlowActive = true;
   closeModal('newReportModal');
+  // 设置从向导进入的状态
+  workbenchEntrySource = 'wizard';
+  workbenchPreviewType = wizardState.template || 'traffic';
+  updateWorkbenchByType(workbenchPreviewType);
   switchView('workbench');
-  updateWorkbenchByType(wizardState.template || 'traffic');
   setActiveNav();
-  /* 显示返回按钮，隐藏其他 */
+  /* 显示返回新建流程按钮，隐藏其他返回按钮 */
   var backBtn = document.getElementById('wizardBackToFlowBtn');
   var saveBtn = document.getElementById('wbSaveBtn');
   var backMyBtn = document.getElementById('wbBackBtn');
@@ -1682,6 +2171,23 @@ function wizardSelectObjects() {
   wizardState.objects = '核心链路 (12)';
   var btn = document.querySelector('.wizard-obj-btn');
   if (btn) btn.innerHTML = '<span class="material-symbols-rounded">check_circle</span>已选择：核心链路 (12)';
+}
+
+/* ── 调度选项变化 ────────────────────────────────────── */
+function wizardUpdateScheduleOptions() {
+  var freqEl = document.querySelector('input[name="wizardScheduleFreq"]:checked');
+  var genOptionsEl = document.getElementById('wizardGenerateOptions');
+  if (!freqEl || !genOptionsEl) return;
+
+  var freq = freqEl.value;
+  if (freq === 'none') {
+    genOptionsEl.style.display = 'none';
+  } else {
+    genOptionsEl.style.display = 'block';
+  }
+
+  /* 更新按钮文本 */
+  updateWizardNextButtonText();
 }
 
 function wizardFillConfirm() {
@@ -1737,6 +2243,47 @@ function wizardPrev() {
 }
 
 function wizardGenerateReport() {
+  var freqEl = document.querySelector('input[name="wizardScheduleFreq"]:checked');
+  var genNowEl = document.querySelector('input[name="wizardGenerateNow"]:checked');
+  var freq = freqEl ? freqEl.value : 'none';
+  var genNow = genNowEl ? genNowEl.value === 'yes' : true;
+
+  /* 如果仅设置调度，不显示生成进度 */
+  if (freq !== 'none' && !genNow) {
+    closeModal('newReportModal');
+    /* 只创建调度任务 */
+    var type = wizardState.method === 'template' ? wizardState.template :
+      wizardState.method === 'blank' ? wizardState.template : 'traffic';
+    var nameInput = document.getElementById('wizardReportName');
+    var title = (nameInput && nameInput.value.trim()) || (reportTypeNames[type] || '报告').replace('报告', '');
+
+    /* 添加到调度列表 */
+    var tplId = 'tpl-' + type + '-' + Date.now();
+    var timeMap = { daily: '08:30', weekly: '09:00', monthly: '10:00', quarterly: '08:00' };
+
+    scheduleTemplates.push({
+      id: tplId,
+      type: type,
+      name: title,
+      recipients: 'myself@corp.com',
+      format: 'PDF',
+      frequencies: {
+        daily: { enabled: freq === 'daily', time: timeMap.daily, status: freq === 'daily' ? 'running' : 'paused', lastRun: '--', runCount: 0 },
+        weekly: { enabled: freq === 'weekly', time: timeMap.weekly, status: freq === 'weekly' ? 'running' : 'paused', lastRun: '--', runCount: 0 },
+        monthly: { enabled: freq === 'monthly', time: timeMap.monthly, status: freq === 'monthly' ? 'running' : 'paused', lastRun: '--', runCount: 0 },
+        quarterly: { enabled: freq === 'quarterly', time: timeMap.quarterly, status: freq === 'quarterly' ? 'running' : 'paused', lastRun: '--', runCount: 0 }
+      }
+    });
+
+    /* 跳转到调度管理页面 */
+    switchView('schedules');
+    renderScheduleMatrix();
+    renderScheduleStats();
+    showToast('调度任务创建成功', 'success');
+    return;
+  }
+
+  /* 正常生成报告流程 */
   wizardGoToStep(4);
   var bar = document.getElementById('wizardGenBar');
   var desc = document.getElementById('wizardGenDesc');
@@ -1760,7 +2307,8 @@ function wizardGenerateReport() {
         var title = (nameInput && nameInput.value.trim()) || (reportTypeNames[type] || '报告').replace('报告', '') + ' ' + formatTimeShort(new Date().toISOString());
         var newId = 'rpt-' + Date.now();
         var nowIso = new Date().toISOString();
-        myReports.unshift({
+
+        var newReport = {
           id: newId,
           title: title,
           type: type,
@@ -1768,9 +2316,39 @@ function wizardGenerateReport() {
           generatedAt: nowIso,
           lastViewedAt: nowIso,
           viewCount: 1
-        });
+        };
+
+        /* 如果设置了调度，同时创建调度任务 */
+        if (freq !== 'none') {
+          var tplId = 'tpl-' + type + '-' + Date.now();
+          var timeMap = { daily: '08:30', weekly: '09:00', monthly: '10:00', quarterly: '08:00' };
+          var lastRunTime = nowIso.slice(0, 10) + ' ' + timeMap[freq];
+
+          scheduleTemplates.push({
+            id: tplId,
+            type: type,
+            name: title,
+            recipients: 'myself@corp.com',
+            format: 'PDF',
+            frequencies: {
+              daily: { enabled: freq === 'daily', time: timeMap.daily, status: freq === 'daily' ? 'running' : 'paused', lastRun: freq === 'daily' ? lastRunTime : '--', runCount: freq === 'daily' ? 1 : 0 },
+              weekly: { enabled: freq === 'weekly', time: timeMap.weekly, status: freq === 'weekly' ? 'running' : 'paused', lastRun: freq === 'weekly' ? lastRunTime : '--', runCount: freq === 'weekly' ? 1 : 0 },
+              monthly: { enabled: freq === 'monthly', time: timeMap.monthly, status: freq === 'monthly' ? 'running' : 'paused', lastRun: freq === 'monthly' ? lastRunTime : '--', runCount: freq === 'monthly' ? 1 : 0 },
+              quarterly: { enabled: freq === 'quarterly', time: timeMap.quarterly, status: freq === 'quarterly' ? 'running' : 'paused', lastRun: freq === 'quarterly' ? lastRunTime : '--', runCount: freq === 'quarterly' ? 1 : 0 }
+            }
+          });
+          newReport.scheduleId = tplId;
+          newReport.frequency = freq;
+          newReport.source = 'schedule';
+        }
+
+        myReports.unshift(newReport);
         renderMyReports();
         openMyReport(newId);
+
+        if (freq !== 'none') {
+          showToast('报告生成成功，已添加调度任务', 'success');
+        }
       }, 600);
       return;
     }
@@ -1778,6 +2356,41 @@ function wizardGenerateReport() {
     if (desc) desc.textContent = steps[i].t;
     i++;
   }, 800);
+}
+
+/* ── 计算下次运行时间 ────────────────────────────────── */
+function getNextRunTime(frequency) {
+  var now = new Date();
+  var next = new Date(now);
+
+  if (frequency === 'daily') {
+    next.setDate(next.getDate() + 1);
+    next.setHours(8, 0, 0, 0);
+  } else if (frequency === 'weekly') {
+    var daysToMonday = (1 + 7 - next.getDay()) % 7;
+    daysToMonday = daysToMonday === 0 ? 7 : daysToMonday;
+    next.setDate(next.getDate() + daysToMonday);
+    next.setHours(8, 0, 0, 0);
+  } else if (frequency === 'monthly') {
+    next.setMonth(next.getMonth() + 1);
+    next.setDate(1);
+    next.setHours(8, 0, 0, 0);
+  }
+
+  return next.toISOString();
+}
+
+/* ── 显示提示消息 ────────────────────────────────────── */
+function showToast(message, type) {
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:80px;right:20px;padding:12px 20px;background:#2DA44E;color:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:13px;font-weight:600;z-index:10000;animation:slideIn .3s ease;';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(function() {
+    toast.style.animation = 'slideOut .3s ease';
+    setTimeout(function() { document.body.removeChild(toast); }, 300);
+  }, 3000);
 }
 
 /* ── 提示词面板 ───────────────────────────────────────── */
@@ -2006,152 +2619,226 @@ function saveAsTemplate() {
   openPromptDiffModal();
 }
 
-/* ── 调度管理 — 数据模型 ──────────────────────────────── */
-var schedules = [
+/* ── 调度管理 — 新数据模型（报告为中心） ────────────────── */
+var scheduleTemplates = [
   {
-    id: 'sch-1',
-    name: '周度流量分析',
+    id: 'tpl-traffic',
     type: 'traffic',
-    frequency: 'weekly',
-    time: '09:00',
-    day: 'monday',
+    name: '流量分析报告',
     recipients: 'admin@corp.com',
     format: 'PDF',
-    status: 'running',
-    lastRun: '2026-06-22 09:00',
-    nextRun: '2026-06-29 09:00',
-    runCount: 12,
-    createdAt: '2026-04-01T08:00:00'
+    frequencies: {
+      daily: { enabled: true, time: '08:30', status: 'running', lastRun: '2026-06-24 08:30', runCount: 15 },
+      weekly: { enabled: true, time: '09:00', status: 'running', lastRun: '2026-06-23 09:00', runCount: 8 },
+      monthly: { enabled: false, time: '10:00', status: 'paused', lastRun: '--', runCount: 0 },
+      quarterly: { enabled: false, time: '08:00', status: 'paused', lastRun: '--', runCount: 0 }
+    }
   },
   {
-    id: 'sch-2',
-    name: '月度健康报告',
+    id: 'tpl-health',
     type: 'health',
-    frequency: 'monthly',
-    time: '10:00',
-    day: '1st',
+    name: '网络健康报告',
     recipients: 'ops-team@corp.com',
     format: 'PDF',
-    status: 'running',
-    lastRun: '2026-06-01 10:00',
-    nextRun: '2026-07-01 10:00',
-    runCount: 4,
-    createdAt: '2026-03-01T08:00:00'
+    frequencies: {
+      daily: { enabled: false, time: '09:00', status: 'paused', lastRun: '--', runCount: 0 },
+      weekly: { enabled: true, time: '09:00', status: 'running', lastRun: '2026-06-23 09:00', runCount: 6 },
+      monthly: { enabled: true, time: '10:00', status: 'running', lastRun: '2026-06-01 10:00', runCount: 3 },
+      quarterly: { enabled: false, time: '08:00', status: 'paused', lastRun: '--', runCount: 0 }
+    }
   },
   {
-    id: 'sch-3',
-    name: '季度设备巡检',
+    id: 'tpl-device',
     type: 'device',
-    frequency: 'quarterly',
-    time: '08:00',
-    day: '1st',
+    name: '设备巡检报告',
     recipients: 'infra@corp.com',
     format: 'PDF',
-    status: 'paused',
-    lastRun: '2026-04-01 08:00',
-    nextRun: '2026-07-01 08:00',
-    runCount: 2,
-    createdAt: '2026-01-01T08:00:00'
+    frequencies: {
+      daily: { enabled: false, time: '08:00', status: 'paused', lastRun: '--', runCount: 0 },
+      weekly: { enabled: false, time: '09:00', status: 'paused', lastRun: '--', runCount: 0 },
+      monthly: { enabled: false, time: '10:00', status: 'paused', lastRun: '--', runCount: 0 },
+      quarterly: { enabled: true, time: '08:00', status: 'running', lastRun: '2026-04-01 08:00', runCount: 2 }
+    }
   }
 ];
 
 var scheduleFreqNames = {
+  daily: '日报',
+  weekly: '周报',
+  monthly: '月报',
+  quarterly: '季报'
+};
+
+var scheduleFreqLabels = {
   daily: '每天',
-  weekly: '每周',
-  monthly: '每月',
-  quarterly: '每季度'
+  weekly: '每周一',
+  monthly: '每月1日',
+  quarterly: '每季度首月1日'
 };
 
-var scheduleDayMap = {
-  daily: '',
-  weekly: '周一',
-  monthly: '每月 1 日',
-  quarterly: '每季度首月 1 日'
-};
+var currentScheduleView = 'matrix'; // 'matrix' | 'frequency'
+var selectedFreqsForModal = [];
 
-/* ── 调度管理 — 侧栏渲染 ──────────────────────────────── */
-function renderScheduleNav() {
-  var box = document.getElementById('scheduleNavList');
-  if (!box) return;
-  if (!schedules.length) {
-    box.innerHTML = '<div class="report-nav-empty">暂无调度任务</div>';
-    return;
+/* ── 调度管理 — 视图切换 ──────────────────────────────── */
+function switchScheduleView(view) {
+  currentScheduleView = view;
+  document.querySelectorAll('.rs-view-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelector('.rs-view-tab[data-view="' + view + '"]').classList.add('active');
+
+  if (view === 'matrix') {
+    document.getElementById('scheduleMatrixView').classList.remove('report-hidden');
+    document.getElementById('scheduleFreqGroupView').classList.add('report-hidden');
+    renderScheduleMatrix();
+  } else {
+    document.getElementById('scheduleMatrixView').classList.add('report-hidden');
+    document.getElementById('scheduleFreqGroupView').classList.remove('report-hidden');
+    renderScheduleFreqGroups();
   }
-  box.innerHTML = schedules.map(function(s) {
-    var dotClass = s.status === 'running' ? 'active' : 'paused';
-    return '<div class="report-nav-item" data-view="schedules" onclick="switchView(\'schedules\')">' +
-      '<span class="schedule-dot ' + dotClass + '"></span>' +
-      '<span class="report-nav-item-text">' + s.name + '</span>' +
-    '</div>';
-  }).join('');
+  renderScheduleStats();
 }
 
-/* ── 调度管理 — 表格渲染 ──────────────────────────────── */
-function renderSchedules() {
-  var tbody = document.getElementById('schedulesTableBody');
+/* ── 调度管理 — 频率矩阵表格渲染 ────────────────────────── */
+function renderScheduleMatrix() {
+  var tbody = document.getElementById('scheduleMatrixBody');
   if (!tbody) return;
-  if (!schedules.length) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--dark-muted,#888)">暂无调度任务，点击右上角"新建调度"开始</td></tr>';
-    renderScheduleStats();
-    renderScheduleNav();
+
+  if (!scheduleTemplates.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="rs-empty-state" style="padding:50px 20px;text-align:center"><div class="rs-empty-icon" style="width:64px;height:64px;margin:0 auto 16px;background:#f6f8fa;border-radius:50%;display:flex;align-items:center;justify-content:center"><span class="material-symbols-rounded" style="font-size:32px;color:#888">event</span></div><div style="font-size:15px;font-weight:700">暂无报告调度配置</div><div style="font-size:13px;color:#888;margin-top:6px">点击右上角"配置调度"，为您的报告设置自动生成计划</div></td></tr>';
     return;
   }
-  tbody.innerHTML = schedules.map(function(s) {
-    var dotCls = s.status === 'running' ? 'running' : 'paused';
-    var rowCls = s.status === 'paused' ? 'rs-paused' : '';
-    var toggleIcon = s.status === 'running' ? 'pause' : 'play_circle';
-    var toggleTitle = s.status === 'running' ? '暂停' : '恢复';
-    var freqText = scheduleFreqNames[s.frequency] || s.frequency;
-    if (s.frequency === 'weekly') freqText = '每周一 ' + s.time;
-    else if (s.frequency === 'monthly') freqText = '每月 1 日 ' + s.time;
-    else if (s.frequency === 'quarterly') freqText = '每季度首月 1 日';
-    else if (s.frequency === 'daily') freqText = '每天 ' + s.time;
-    var typeLabel = reportTypeNames[s.type] || s.type;
-    return '<tr class="' + rowCls + '" data-schedule-id="' + s.id + '">' +
-      '<td><span class="rs-status ' + dotCls + '"></span></td>' +
+
+  tbody.innerHTML = scheduleTemplates.map(function(tpl) {
+    var typeIcon = getTypeIcon(tpl.type);
+    return '<tr data-template-id="' + tpl.id + '">' +
       '<td>' +
-        '<div class="rs-task-name">' + s.name + '</div>' +
-        '<div class="rs-task-sub">发送至 ' + s.recipients + '</div>' +
+        '<div class="rs-report-name">' +
+          '<div class="rs-report-icon ' + tpl.type + '">' + typeIcon + '</div>' +
+          '<div>' +
+            '<div class="rs-report-title">' + tpl.name + '</div>' +
+            '<div class="rs-report-recipients">发送至 ' + tpl.recipients + '</div>' +
+          '</div>' +
+        '</div>' +
       '</td>' +
-      '<td><span class="rs-type-badge ' + s.type + '">' + typeLabel + '</span></td>' +
-      '<td>' + freqText + '</td>' +
-      '<td>' + (s.nextRun || '--') + '</td>' +
-      '<td>' + (s.lastRun || '--') + '</td>' +
-      '<td><span class="rs-run-count">' + s.runCount + '</span> 次</td>' +
+      renderFreqCell(tpl, 'daily') +
+      renderFreqCell(tpl, 'weekly') +
+      renderFreqCell(tpl, 'monthly') +
+      renderFreqCell(tpl, 'quarterly') +
       '<td>' +
         '<div class="rs-actions">' +
-          '<button class="rs-action" title="立即执行" onclick="runScheduleNow(\'' + s.id + '\', this)"><span class="material-symbols-rounded">play_arrow</span></button>' +
-          '<button class="rs-action" title="' + toggleTitle + '" onclick="toggleSchedule(\'' + s.id + '\', this)"><span class="material-symbols-rounded">' + toggleIcon + '</span></button>' +
-          '<button class="rs-action" title="编辑" onclick="editSchedule(\'' + s.id + '\')"><span class="material-symbols-rounded">edit</span></button>' +
-          '<button class="rs-action" title="历史报告" onclick="openScheduleHistory(\'' + s.id + '\')"><span class="material-symbols-rounded">history</span></button>' +
-          '<button class="rs-action danger" title="删除" onclick="deleteSchedule(\'' + s.id + '\')"><span class="material-symbols-rounded">delete</span></button>' +
+          '<button class="rs-action" title="编辑配置" onclick="editScheduleTemplate(\'' + tpl.id + '\')"><span class="material-symbols-rounded">edit</span></button>' +
+          '<button class="rs-action" title="立即执行所有启用频率" onclick="runTemplateNow(\'' + tpl.id + '\', this)"><span class="material-symbols-rounded">play_arrow</span></button>' +
         '</div>' +
       '</td>' +
     '</tr>';
   }).join('');
-  renderScheduleStats();
-  renderScheduleNav();
 }
 
-/* ── 调度管理 — 统计卡片 ──────────────────────────────── */
+function renderFreqCell(tpl, freq) {
+  var freqConfig = tpl.frequencies[freq];
+  var enabledClass = freqConfig.enabled ? 'enabled' : '';
+  var timeClass = freqConfig.enabled ? 'has-time' : '';
+  return '<td style="text-align:center;padding:14px 8px">' +
+    '<div class="rs-freq-cell">' +
+      '<div class="rs-freq-toggle ' + enabledClass + '" onclick="toggleTemplateFreq(\'' + tpl.id + '\', \'' + freq + '\', this)"></div>' +
+      '<div class="rs-freq-time ' + timeClass + '">' + (freqConfig.enabled ? freqConfig.time : '未启用') + '</div>' +
+    '</div>' +
+  '</td>';
+}
+
+function getTypeIcon(type) {
+  var icons = {
+    traffic: '<span class="material-symbols-rounded">show_chart</span>',
+    fault: '<span class="material-symbols-rounded">warning</span>',
+    capacity: '<span class="material-symbols-rounded">storage</span>',
+    health: '<span class="material-symbols-rounded">favorite</span>',
+    device: '<span class="material-symbols-rounded">router</span>'
+  };
+  return icons[type] || icons.traffic;
+}
+
+/* ── 调度管理 — 按频率分组视图渲染 ──────────────────────── */
+function renderScheduleFreqGroups() {
+  var container = document.getElementById('scheduleFreqGroups');
+  if (!container) return;
+
+  var freqs = ['daily', 'weekly', 'monthly', 'quarterly'];
+  container.innerHTML = freqs.map(function(freq) {
+    var enabledTemplates = scheduleTemplates.filter(function(t) { return t.frequencies[freq].enabled; });
+    return '<div class="rs-freq-group-card">' +
+      '<div class="rs-freq-group-header">' +
+        '<div class="rs-freq-group-title">' + scheduleFreqLabels[freq] + ' · ' + scheduleFreqNames[freq] + '</div>' +
+        '<div class="rs-freq-group-count">' + enabledTemplates.length + ' 份报告</div>' +
+      '</div>' +
+      '<div class="rs-freq-group-body">' +
+        (enabledTemplates.length ? enabledTemplates.map(function(tpl) {
+          return '<div class="rs-freq-report-item">' +
+            '<div class="rs-freq-report-info">' +
+              '<div class="rs-freq-report-icon ' + tpl.type + '">' + getTypeIcon(tpl.type) + '</div>' +
+              '<div>' +
+                '<div class="rs-freq-report-name">' + tpl.name + '</div>' +
+                '<div class="rs-freq-report-time">' + tpl.frequencies[freq].time + ' · 已执行 ' + tpl.frequencies[freq].runCount + ' 次</div>' +
+              '</div>' +
+            '</div>' +
+            '<button class="rs-action" title="立即执行" onclick="runTemplateFreqNow(\'' + tpl.id + '\', \'' + freq + '\', this)"><span class="material-symbols-rounded">play_arrow</span></button>' +
+          '</div>';
+        }).join('') : '<div style="text-align:center;padding:30px;color:#888;font-size:13px">暂无启用此频率的报告</div>') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ── 调度管理 — 切换单个频率开关 ──────────────────────── */
+function toggleTemplateFreq(templateId, freq, btn) {
+  var tpl = scheduleTemplates.find(function(t) { return t.id === templateId; });
+  if (!tpl) return;
+  var freqConfig = tpl.frequencies[freq];
+  freqConfig.enabled = !freqConfig.enabled;
+  freqConfig.status = freqConfig.enabled ? 'running' : 'paused';
+  btn.classList.toggle('enabled');
+  var timeEl = btn.parentElement.querySelector('.rs-freq-time');
+  if (timeEl) timeEl.classList.toggle('has-time', freqConfig.enabled);
+  renderScheduleStats();
+  if (currentScheduleView === 'frequency') renderScheduleFreqGroups();
+  // 如果正在查看该报告，更新报告详情页的调度面板
+  if (currentViewingReport && currentViewingReport.type === tpl.type) {
+    renderScheduleDropdownMenu(tpl.type);
+  }
+}
+
+/* ── 调度管理 — 统计卡片（新） ────────────────────────────── */
 function renderScheduleStats() {
   var row = document.getElementById('schedulesStatsRow');
   if (!row) return;
-  var runningCount = schedules.filter(function(s) { return s.status === 'running'; }).length;
-  var pausedCount = schedules.filter(function(s) { return s.status === 'paused'; }).length;
-  var totalRuns = schedules.reduce(function(sum, s) { return sum + s.runCount; }, 0);
-  var nextSchedule = schedules.filter(function(s) { return s.status === 'running'; })
-    .sort(function(a, b) { return (a.nextRun || '').localeCompare(b.nextRun || ''); })[0];
+
+  var allFreqs = [];
+  scheduleTemplates.forEach(function(tpl) {
+    Object.keys(tpl.frequencies).forEach(function(freq) {
+      if (tpl.frequencies[freq].enabled) {
+        allFreqs.push({ template: tpl, freq: freq, config: tpl.frequencies[freq] });
+      }
+    });
+  });
+
+  var runningCount = allFreqs.filter(function(f) { return f.config.status === 'running'; }).length;
+  var pausedCount = allFreqs.filter(function(f) { return f.config.status === 'paused'; }).length;
+  var totalRuns = allFreqs.reduce(function(sum, f) { return sum + (f.config.runCount || 0); }, 0);
+
+  // 计算最近的下次执行
   var nextText = '--';
-  if (nextSchedule && nextSchedule.nextRun) {
-    var now = new Date();
-    var nextDate = new Date(nextSchedule.nextRun.replace(' ', 'T'));
-    var diffDays = Math.ceil((nextDate - now) / 86400000);
-    if (diffDays <= 0) nextText = '今天';
-    else if (diffDays === 1) nextText = '明天';
-    else if (diffDays <= 7) nextText = diffDays + '天后';
-    else nextText = nextSchedule.nextRun.split(' ')[0];
-  }
+  var minDiff = Infinity;
+  allFreqs.forEach(function(f) {
+    if (f.config.status === 'running') {
+      var diff = calcTimeDiff(f.freq, f.config.time);
+      if (diff < minDiff) {
+        minDiff = diff;
+        if (diff <= 0) nextText = '今天';
+        else if (diff === 1) nextText = '明天';
+        else if (diff <= 7) nextText = diff + '天后';
+        else nextText = scheduleFreqNames[f.freq];
+      }
+    }
+  });
+
   row.innerHTML =
     '<div class="rs-stat-card"><div class="rs-stat-icon running-bg"><span class="material-symbols-rounded">play_circle</span></div><div class="rs-stat-info"><div class="rs-stat-value">' + runningCount + '</div><div class="rs-stat-label">运行中</div></div></div>' +
     '<div class="rs-stat-card"><div class="rs-stat-icon paused-bg"><span class="material-symbols-rounded">pause_circle</span></div><div class="rs-stat-info"><div class="rs-stat-value">' + pausedCount + '</div><div class="rs-stat-label">已暂停</div></div></div>' +
@@ -2159,29 +2846,85 @@ function renderScheduleStats() {
     '<div class="rs-stat-card"><div class="rs-stat-icon next-bg"><span class="material-symbols-rounded">schedule</span></div><div class="rs-stat-info"><div class="rs-stat-value">' + nextText + '</div><div class="rs-stat-label">下次执行</div></div></div>';
 }
 
-/* ── 调度管理 — 立即执行（真正生成报告） ────────────────── */
-function runScheduleNow(scheduleId, btn) {
-  var sch = schedules.find(function(s) { return s.id === scheduleId; });
-  if (!sch) return;
+function calcTimeDiff(freq, time) {
+  var now = new Date();
+  var parts = time.split(':');
+  var h = parseInt(parts[0]), m = parseInt(parts[1]);
+  if (freq === 'daily') return (h - now.getHours()) / 24 + 0.1;
+  if (freq === 'weekly') return (1 - now.getDay() + 7) % 7 || 7;
+  if (freq === 'monthly') return new Date(now.getFullYear(), now.getMonth() + 1, 1).getDate() - now.getDate();
+  if (freq === 'quarterly') {
+    var nextQ = Math.floor(now.getMonth() / 3) + 1;
+    return 90; // 简化估算
+  }
+  return 999;
+}
+
+/* ── 调度管理 — 立即执行整个模板（所有启用频率） ────────── */
+function runTemplateNow(templateId, btn) {
+  var tpl = scheduleTemplates.find(function(t) { return t.id === templateId; });
+  if (!tpl) return;
   btn.innerHTML = '<span class="material-symbols-rounded" style="animation:spin 1s linear infinite">refresh</span>';
+
   setTimeout(function() {
-    /* 创建报告到 myReports */
     var now = new Date();
     var ts = now.toISOString().replace(/\.\d{3}Z$/, '');
-    var typeLabel = reportTypeNames[sch.type] || sch.type;
+
+    // 对每个启用的频率生成一份报告
+    Object.keys(tpl.frequencies).forEach(function(freq) {
+      if (tpl.frequencies[freq].enabled) {
+        var newReport = {
+          id: 'rpt-sch-' + Date.now() + '-' + freq,
+          title: tpl.name + ' — ' + scheduleFreqNames[freq] + ' (' + (now.getMonth() + 1) + '-' + now.getDate() + ')',
+          type: tpl.type,
+          source: 'schedule',
+          templateId: templateId,
+          frequency: freq,
+          generatedAt: ts,
+          lastViewedAt: ts,
+          viewCount: 0
+        };
+        myReports.unshift(newReport);
+        tpl.frequencies[freq].runCount++;
+        tpl.frequencies[freq].lastRun = formatDateStr(now);
+      }
+    });
+
+    btn.innerHTML = '<span class="material-symbols-rounded">check_circle</span>';
+    setTimeout(function() {
+      btn.innerHTML = '<span class="material-symbols-rounded">play_arrow</span>';
+      renderMyReports();
+      renderScheduleStats();
+      if (currentScheduleView === 'frequency') renderScheduleFreqGroups();
+    }, 1500);
+  }, 2000);
+}
+
+/* ── 调度管理 — 立即执行单个频率 ──────────────────────── */
+function runTemplateFreqNow(templateId, freq, btn) {
+  var tpl = scheduleTemplates.find(function(t) { return t.id === templateId; });
+  if (!tpl) return;
+  btn.innerHTML = '<span class="material-symbols-rounded" style="animation:spin 1s linear infinite">refresh</span>';
+
+  setTimeout(function() {
+    var now = new Date();
+    var ts = now.toISOString().replace(/\.\d{3}Z$/, '');
+
     var newReport = {
       id: 'rpt-sch-' + Date.now(),
-      title: sch.name + ' (' + (now.getMonth() + 1) + '-' + now.getDate() + ')',
-      type: sch.type,
+      title: tpl.name + ' — ' + scheduleFreqNames[freq] + ' (' + (now.getMonth() + 1) + '-' + now.getDate() + ')',
+      type: tpl.type,
       source: 'schedule',
-      scheduleId: sch.id,
+      templateId: templateId,
+      frequency: freq,
       generatedAt: ts,
       lastViewedAt: ts,
       viewCount: 0
     };
     myReports.unshift(newReport);
-    sch.runCount++;
-    sch.lastRun = formatDateStr(now);
+    tpl.frequencies[freq].runCount++;
+    tpl.frequencies[freq].lastRun = formatDateStr(now);
+
     btn.innerHTML = '<span class="material-symbols-rounded">check_circle</span>';
     setTimeout(function() {
       btn.innerHTML = '<span class="material-symbols-rounded">play_arrow</span>';
@@ -2191,48 +2934,80 @@ function runScheduleNow(scheduleId, btn) {
   }, 2000);
 }
 
-/* ── 调度管理 — 暂停/恢复 ─────────────────────────────── */
-function toggleSchedule(scheduleId, btn) {
-  var sch = schedules.find(function(s) { return s.id === scheduleId; });
-  if (!sch) return;
-  sch.status = sch.status === 'running' ? 'paused' : 'running';
-  renderSchedules();
+/* ── 调度管理 — 弹窗：频率卡片切换 ────────────────────── */
+function toggleFreqCard(el) {
+  el.classList.toggle('selected');
+  renderTimeConfigInputs();
 }
 
-/* ── 调度管理 — 删除 ──────────────────────────────────── */
-function deleteSchedule(scheduleId) {
-  if (!confirm('确定删除该调度任务？关联的已生成报告不会被删除。')) return;
-  schedules = schedules.filter(function(s) { return s.id !== scheduleId; });
-  renderSchedules();
+function renderTimeConfigInputs() {
+  var selectedCards = document.querySelectorAll('#schFreqMatrix .schedule-freq-card.selected');
+  var timeConfig = document.getElementById('schTimeConfig');
+  if (!timeConfig) return;
+
+  selectedFreqsForModal = [];
+  selectedCards.forEach(function(card) {
+    selectedFreqsForModal.push(card.dataset.freq);
+  });
+
+  if (selectedFreqsForModal.length === 0) {
+    timeConfig.innerHTML = '';
+    return;
+  }
+
+  timeConfig.innerHTML = selectedFreqsForModal.map(function(freq) {
+    return '<div class="schedule-time-item">' +
+      '<label>' + scheduleFreqLabels[freq] + ' 执行时间</label>' +
+      '<input type="time" id="schTime-' + freq + '" value="09:00">' +
+    '</div>';
+  }).join('');
 }
 
-/* ── 调度管理 — 新建调度弹窗 ──────────────────────────── */
-function openScheduleModal(editId) {
-  document.getElementById('scheduleEditId').value = editId || '';
+/* ── 调度管理 — 打开配置弹窗 ──────────────────────────── */
+function openScheduleModal(editTemplateId) {
+  document.getElementById('scheduleEditId').value = editTemplateId || '';
   var modalTitle = document.getElementById('scheduleModal').querySelector('.modal-title');
-  if (editId) {
-    var sch = schedules.find(function(s) { return s.id === editId; });
-    if (sch) {
-      document.getElementById('schName').value = sch.name;
-      document.getElementById('schType').value = sch.type;
-      document.getElementById('schFreq').value = sch.frequency;
-      document.getElementById('schTime').value = sch.time;
-      document.getElementById('schRecipients').value = sch.recipients;
-      if (modalTitle) modalTitle.textContent = '编辑调度';
+
+  // 重置选择
+  document.querySelectorAll('#schFreqMatrix .schedule-freq-card').forEach(function(c) { c.classList.remove('selected'); });
+  selectedFreqsForModal = [];
+
+  if (editTemplateId) {
+    var tpl = scheduleTemplates.find(function(t) { return t.id === editTemplateId; });
+    if (tpl) {
+      document.getElementById('schType').value = tpl.type;
+      document.getElementById('schRecipients').value = tpl.recipients;
+
+      // 选中已启用的频率
+      Object.keys(tpl.frequencies).forEach(function(freq) {
+        if (tpl.frequencies[freq].enabled) {
+          var card = document.querySelector('#schFreqMatrix .schedule-freq-card[data-freq="' + freq + '"]');
+          if (card) card.classList.add('selected');
+        }
+      });
+      renderTimeConfigInputs();
+
+      // 回填各频率的时间
+      Object.keys(tpl.frequencies).forEach(function(freq) {
+        var timeInput = document.getElementById('schTime-' + freq);
+        if (timeInput && tpl.frequencies[freq].enabled) {
+          timeInput.value = tpl.frequencies[freq].time;
+        }
+      });
+
+      if (modalTitle) modalTitle.textContent = '编辑报告调度';
     }
   } else {
-    document.getElementById('schName').value = '';
     document.getElementById('schType').value = 'traffic';
-    document.getElementById('schFreq').value = 'weekly';
-    document.getElementById('schTime').value = '09:00';
     document.getElementById('schRecipients').value = '';
-    if (modalTitle) modalTitle.textContent = '配置周期调度';
+    if (modalTitle) modalTitle.textContent = '配置报告调度';
+    renderTimeConfigInputs();
   }
   openModal('scheduleModal');
 }
 
-function editSchedule(scheduleId) {
-  openScheduleModal(scheduleId);
+function editScheduleTemplate(templateId) {
+  openScheduleModal(templateId);
 }
 
 /* ── 快速创建指定类型的调度 ───────────────────────────── */
@@ -2240,88 +3015,103 @@ function openScheduleWithType(type) {
   openScheduleModal();
   var typeSelect = document.getElementById('schType');
   if (typeSelect && type) typeSelect.value = type;
-  var nameInput = document.getElementById('schName');
-  if (nameInput && reportTypeNames[type]) {
-    nameInput.value = reportTypeNames[type].replace('报告', '') + '调度';
-  }
 }
 
-/* ── 调度管理 — 保存调度 ──────────────────────────────── */
+/* ── 调度管理 — 保存（新模型） ───────────────────────────── */
 function saveSchedule() {
-  var editId = document.getElementById('scheduleEditId').value;
-  var name = document.getElementById('schName').value.trim();
+  var editTemplateId = document.getElementById('scheduleEditId').value;
   var type = document.getElementById('schType').value;
-  var freq = document.getElementById('schFreq').value;
-  var time = document.getElementById('schTime').value;
   var recipients = document.getElementById('schRecipients').value.trim();
-  if (!name) { alert('请输入调度名称'); return; }
+
+  var selectedFreqs = [];
+  document.querySelectorAll('#schFreqMatrix .schedule-freq-card.selected').forEach(function(card) {
+    selectedFreqs.push({ freq: card.dataset.freq, time: document.getElementById('schTime-' + card.dataset.freq)?.value || '09:00' });
+  });
+
+  if (selectedFreqs.length === 0) {
+    alert('请至少选择一个执行频率');
+    return;
+  }
 
   var fmtChips = document.querySelectorAll('#schFormatGroup .obj-filter-chip.active');
   var format = fmtChips.length ? fmtChips[0].textContent : 'PDF';
 
-  if (editId) {
-    var sch = schedules.find(function(s) { return s.id === editId; });
-    if (sch) {
-      sch.name = name;
-      sch.type = type;
-      sch.frequency = freq;
-      sch.time = time;
-      sch.recipients = recipients;
-      sch.format = format;
+  if (editTemplateId) {
+    // 编辑现有模板
+    var tpl = scheduleTemplates.find(function(t) { return t.id === editTemplateId; });
+    if (tpl) {
+      tpl.type = type;
+      tpl.name = reportTypeNames[type] || type + '报告';
+      tpl.recipients = recipients || 'admin@corp.com';
+      tpl.format = format;
+
+      // 更新各频率状态
+      var allFreqs = ['daily', 'weekly', 'monthly', 'quarterly'];
+      allFreqs.forEach(function(freq) {
+        var selected = selectedFreqs.find(function(s) { return s.freq === freq; });
+        if (selected) {
+          tpl.frequencies[freq].enabled = true;
+          tpl.frequencies[freq].status = 'running';
+          tpl.frequencies[freq].time = selected.time;
+        } else {
+          // 如果原来启用了但现在没选中，保持不变（只是不再添加新的）
+        }
+      });
     }
   } else {
-    var now = new Date();
-    schedules.push({
-      id: 'sch-' + Date.now(),
-      name: name,
-      type: type,
-      frequency: freq,
-      time: time,
-      day: freq === 'weekly' ? 'monday' : '1st',
-      recipients: recipients || 'admin@corp.com',
-      format: format,
-      status: 'running',
-      lastRun: '--',
-      nextRun: calcNextRun(freq, time),
-      runCount: 0,
-      createdAt: now.toISOString()
-    });
+    // 新建模板
+    var existingTpl = scheduleTemplates.find(function(t) { return t.type === type; });
+    if (existingTpl) {
+      // 该类型已有模板，更新它
+      existingTpl.recipients = recipients || 'admin@corp.com';
+      existingTpl.format = format;
+      selectedFreqs.forEach(function(s) {
+        existingTpl.frequencies[s.freq].enabled = true;
+        existingTpl.frequencies[s.freq].status = 'running';
+        existingTpl.frequencies[s.freq].time = s.time;
+      });
+    } else {
+      // 完全新建
+      var now = new Date();
+      var newTemplate = {
+        id: 'tpl-' + Date.now(),
+        type: type,
+        name: reportTypeNames[type] || type + '报告',
+        recipients: recipients || 'admin@corp.com',
+        format: format,
+        frequencies: {
+          daily: { enabled: false, time: '09:00', status: 'paused', lastRun: '--', runCount: 0 },
+          weekly: { enabled: false, time: '09:00', status: 'paused', lastRun: '--', runCount: 0 },
+          monthly: { enabled: false, time: '09:00', status: 'paused', lastRun: '--', runCount: 0 },
+          quarterly: { enabled: false, time: '09:00', status: 'paused', lastRun: '--', runCount: 0 }
+        }
+      };
+      selectedFreqs.forEach(function(s) {
+        newTemplate.frequencies[s.freq].enabled = true;
+        newTemplate.frequencies[s.freq].status = 'running';
+        newTemplate.frequencies[s.freq].time = s.time;
+      });
+      scheduleTemplates.push(newTemplate);
+    }
   }
+
   closeModal('scheduleModal');
-  renderSchedules();
+  // 重新渲染当前视图
+  if (currentScheduleView === 'matrix') {
+    renderScheduleMatrix();
+  } else {
+    renderScheduleFreqGroups();
+  }
+  renderScheduleStats();
+  // 如果正在查看该报告，更新调度下拉菜单
+  if (currentViewingReport && currentViewingReport.type === type) {
+    renderScheduleDropdownMenu(type);
+  }
 }
 
 function toggleSchFormat(el) {
   el.parentElement.querySelectorAll('.obj-filter-chip').forEach(function(c) { c.classList.remove('active'); });
   el.classList.add('active');
-}
-
-/* ── 调度管理 — 计算下次执行时间 ──────────────────────── */
-function calcNextRun(freq, time) {
-  var now = new Date();
-  var parts = time.split(':');
-  var h = parseInt(parts[0]), m = parseInt(parts[1]);
-  var next;
-  if (freq === 'daily') {
-    next = new Date(now);
-    next.setHours(h, m, 0, 0);
-    if (next <= now) next.setDate(next.getDate() + 1);
-  } else if (freq === 'weekly') {
-    next = new Date(now);
-    var dayOfWeek = now.getDay();
-    var diff = (1 - dayOfWeek + 7) % 7 || 7;
-    next.setDate(next.getDate() + diff);
-    next.setHours(h, m, 0, 0);
-  } else if (freq === 'monthly') {
-    next = new Date(now.getFullYear(), now.getMonth() + 1, 1, h, m);
-    if (next <= now) next.setMonth(next.getMonth() + 1);
-  } else if (freq === 'quarterly') {
-    var curQ = Math.floor(now.getMonth() / 3);
-    var nextQMonth = (curQ + 1) * 3;
-    next = new Date(now.getFullYear(), nextQMonth, 1, h, m);
-    if (next <= now) next.setMonth(next.getMonth() + 3);
-  }
-  return next ? formatDateStr(next) : '--';
 }
 
 function formatDateStr(d) {
@@ -2333,29 +3123,126 @@ function formatDateStr(d) {
   return y + '-' + mo + '-' + da + ' ' + h + ':' + mi;
 }
 
-/* ── 调度管理 — 历史报告弹窗 ──────────────────────────── */
-function openScheduleHistory(scheduleId) {
-  var sch = schedules.find(function(s) { return s.id === scheduleId; });
-  if (!sch) return;
+/* ── 调度管理 — 查看报告模板的历史报告 ───────────────────── */
+function openTemplateHistory(templateId) {
+  var tpl = scheduleTemplates.find(function(t) { return t.id === templateId; });
+  if (!tpl) return;
   var title = document.getElementById('scheduleHistoryTitle');
   var body = document.getElementById('scheduleHistoryBody');
-  title.textContent = sch.name + ' — 历史报告';
-  var reports = myReports.filter(function(r) { return r.scheduleId === scheduleId; });
+  title.textContent = tpl.name + ' — 历史报告';
+  var reports = myReports.filter(function(r) { return r.templateId === templateId; });
   if (!reports.length) {
-    body.innerHTML = '<div style="text-align:center;padding:30px;color:var(--dark-muted,#888)"><span class="material-symbols-rounded" style="font-size:48px;opacity:.3">history</span><div style="margin-top:12px">该调度暂无生成的报告</div><div style="font-size:13px;margin-top:6px">点击"立即执行"生成第一份报告</div></div>';
+    body.innerHTML = '<div style="text-align:center;padding:30px;color:var(--dark-muted,#888)"><span class="material-symbols-rounded" style="font-size:48px;opacity:.3">history</span><div style="margin-top:12px">该报告暂无调度生成的记录</div></div>';
   } else {
     body.innerHTML = reports.map(function(r) {
+      var freqBadge = r.frequency ? '<span style="background:#e5e8eb;padding:2px 8px;border-radius:4px;font-size:11px">' + scheduleFreqNames[r.frequency] + '</span>' : '';
       return '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--dark-border,#e8e8e8);cursor:pointer" onclick="closeModal(\'scheduleHistoryModal\');openMyReport(\'' + r.id + '\')">' +
         '<span class="material-symbols-rounded" style="color:var(--purple,#6E40C9)">description</span>' +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-weight:500;font-size:14px">' + r.title + '</div>' +
-          '<div style="font-size:12px;color:var(--dark-muted,#888);margin-top:2px">' + formatTimeShort(r.generatedAt) + ' · 查看 ' + r.viewCount + ' 次</div>' +
+          '<div style="font-size:12px;color:var(--dark-muted,#888);margin-top:2px;display:flex;align-items:center;gap:8px">' +
+            freqBadge + formatTimeShort(r.generatedAt) + ' · 查看 ' + r.viewCount + ' 次' +
+          '</div>' +
         '</div>' +
         '<span class="material-symbols-rounded" style="opacity:.3">chevron_right</span>' +
       '</div>';
     }).join('');
   }
   openModal('scheduleHistoryModal');
+}
+
+/* ── 报告查看器 — 立即执行调度 ────────────────────────── */
+function runViewerFreqNow(templateId, freq, btn) {
+  var tpl = scheduleTemplates.find(function(t) { return t.id === templateId; });
+  if (!tpl) return;
+  btn.innerHTML = '<span class="material-symbols-rounded" style="animation:spin 1s linear infinite">refresh</span>';
+
+  setTimeout(function() {
+    var now = new Date();
+    var ts = now.toISOString().replace(/\.\d{3}Z$/, '');
+
+    var newReport = {
+      id: 'rpt-sch-' + Date.now(),
+      title: tpl.name + ' — ' + scheduleFreqNames[freq] + ' (' + (now.getMonth() + 1) + '-' + now.getDate() + ')',
+      type: tpl.type,
+      source: 'schedule',
+      templateId: templateId,
+      frequency: freq,
+      generatedAt: ts,
+      lastViewedAt: ts,
+      viewCount: 0
+    };
+    myReports.unshift(newReport);
+    tpl.frequencies[freq].runCount++;
+    tpl.frequencies[freq].lastRun = formatDateStr(now);
+
+    btn.innerHTML = '<span class="material-symbols-rounded">check_circle</span>';
+    setTimeout(function() {
+      btn.innerHTML = '<span class="material-symbols-rounded">play_arrow</span>';
+      renderMyReports();
+      // 更新下拉菜单
+      if (currentViewingReport) {
+        renderScheduleDropdownMenu(currentViewingReport.type);
+      }
+    }, 1500);
+  }, 2000);
+}
+
+/* ── 调度下拉菜单 — 切换显示 ───────────────────────────── */
+function toggleScheduleDropdown(btn) {
+  var menu = document.getElementById('rvScheduleDropdownMenu');
+  if (menu) {
+    menu.classList.toggle('open');
+  }
+}
+
+/* ── 调度下拉菜单 — 渲染内容 ───────────────────────────── */
+function renderScheduleDropdownMenu(reportType) {
+  var menu = document.getElementById('rvScheduleDropdownMenu');
+  if (!menu) return;
+
+  var tpl = scheduleTemplates.find(function(t) { return t.type === reportType; });
+  var enabledFreqs = tpl ? Object.keys(tpl.frequencies).filter(function(freq) {
+    return tpl.frequencies[freq].enabled;
+  }) : [];
+
+  if (!tpl || enabledFreqs.length === 0) {
+    menu.innerHTML =
+      '<div class="rv-dropdown-empty">' +
+        '<span class="material-symbols-rounded">schedule_send</span>' +
+        '<div style="font-size:13px;color:#57606A;margin-top:6px">该报告暂无调度配置</div>' +
+      '</div>' +
+      '<div class="rv-dropdown-divider"></div>' +
+      '<div class="rv-dropdown-item" onclick="openScheduleWithType(\'' + reportType + '\');document.querySelector(\'.rv-schedule-dropdown-menu\').classList.remove(\'open\');">' +
+        '<span class="material-symbols-rounded">add_circle</span>' +
+        '<span>配置调度</span>' +
+      '</div>';
+    return;
+  }
+
+  var freqItemsHtml = enabledFreqs.map(function(freq) {
+    var config = tpl.frequencies[freq];
+    return '<div class="rv-dropdown-schedule-item">' +
+      '<div class="rv-dropdown-schedule-info">' +
+        '<span class="rv-dropdown-schedule-badge">' + scheduleFreqNames[freq] + '</span>' +
+        '<div class="rv-dropdown-schedule-detail">' +
+          '<div class="rv-dropdown-schedule-time">' + scheduleFreqLabels[freq] + ' ' + config.time + '</div>' +
+          '<div class="rv-dropdown-schedule-meta">已执行 ' + config.runCount + ' 次 · 上次 ' + config.lastRun + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<button class="rv-dropdown-play-btn" onclick="runViewerFreqNow(\'' + tpl.id + '\', \'' + freq + '\', this);event.stopPropagation();">' +
+        '<span class="material-symbols-rounded">play_arrow</span>' +
+      '</button>' +
+    '</div>';
+  }).join('');
+
+  menu.innerHTML =
+    freqItemsHtml +
+    '<div class="rv-dropdown-divider"></div>' +
+    '<div class="rv-dropdown-item" onclick="openScheduleWithType(\'' + reportType + '\');document.querySelector(\'.rv-schedule-dropdown-menu\').classList.remove(\'open\');">' +
+      '<span class="material-symbols-rounded">settings</span>' +
+      '<span>管理调度配置</span>' +
+    '</div>';
 }
 
 /* ── 我的报告卡片 — 区分调度来源 ──────────────────────── */
@@ -2448,6 +3335,8 @@ setPromptMode('editor');
 
 <style>
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 </style>
 </body>
 </html>
