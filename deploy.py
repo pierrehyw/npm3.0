@@ -111,13 +111,13 @@ def main():
     # 创建自定义 nginx 配置，支持 UTF-8 编码
     nginx_conf = r"""
 server {
-    listen 80;
+    listen 80 default_server;
     server_name _;
     root /usr/share/nginx/html;
     index login.html dashboard.html index.html;
     charset utf-8;
     location = / {
-        return 302 /login.html;
+        return 302 http://$http_host/login.html;
     }
     location / {
         try_files $uri $uri/ /login.html;

@@ -24,12 +24,12 @@ STATIC_FILES = [
 ]
 
 NGINX_CONF = """server {
-    listen       80;
-    server_name  localhost;
+    listen       80 default_server;
+    server_name  _;
     charset utf-8;
 
     location = / {
-        return 302 /login.html;
+        return 302 http://$http_host/login.html;
     }
 
     location / {

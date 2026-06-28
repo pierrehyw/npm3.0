@@ -2192,3 +2192,704 @@
 :root[data-theme="dark"] #scheduleHistoryBody > div:hover {
   background: var(--dark-panel-3, #2d2d3d) !important;
 }
+
+/* ── Multi-Link Dashboard Dark Theme ───────────────────── */
+:root[data-theme="dark"] .multi-link-section {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .section-header-bar {
+  background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%) !important;
+}
+:root[data-theme="dark"] .link-cards-grid {
+  background: var(--dark-bg, #1a1a28) !important;
+}
+:root[data-theme="dark"] .multi-link-card {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .multi-link-card:hover {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4) !important;
+}
+:root[data-theme="dark"] .multi-link-name {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .multi-link-bandwidth {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .link-tag {
+  color: var(--dark-text, #c8c8c8) !important;
+  background: var(--dark-panel-3, #2d2d3d) !important;
+}
+:root[data-theme="dark"] .link-tag.score {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .multi-link-micro-chart {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+}
+:root[data-theme="dark"] .multi-link-status-bar {
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .tcp-rate {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .table-header-bar {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .comparison-table {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .comparison-table thead {
+  background: linear-gradient(180deg, #2d2d3d 0%, #252535 100%) !important;
+}
+:root[data-theme="dark"] .comparison-table th {
+  color: var(--dark-muted, #888) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .comparison-table td {
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .comparison-table tbody tr:hover {
+  background: #332d4d !important;
+}
+:root[data-theme="dark"] .link-cell-name b {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .table-badge.critical {
+  background: #3B1E1E !important;
+  color: #FF8080 !important;
+}
+:root[data-theme="dark"] .table-badge.warning {
+  background: #3B2E1A !important;
+  color: #FFD080 !important;
+}
+:root[data-theme="dark"] .table-badge.normal {
+  background: #1A3A28 !important;
+  color: #7EE2A8 !important;
+}
+:root[data-theme="dark"] .tcp-cell-value {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .peak-time-cell {
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .util-labels {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .failure-cell {
+  color: #FF6B6B !important;
+}
+:root[data-theme="dark"] .comparison-table-container {
+  background: var(--dark-panel, #252535) !important;
+}
+
+/* ── 报表模板卡片暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .report-type-card {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .report-type-card:hover {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4) !important;
+}
+:root[data-theme="dark"] .rtc-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .rtc-desc {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .rtc-action-btn {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .rtc-action-btn:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .rtc-action-btn.primary {
+  background: #6E40C9 !important;
+  border-color: #6E40C9 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .rtc-action-btn.primary:hover {
+  background: #5B33A8 !important;
+  border-color: #8E68E8 !important;
+}
+:root[data-theme="dark"] .rtc-icon.purple { background: #3B2266 !important; color: #C4AAFF !important; }
+:root[data-theme="dark"] .rtc-icon.blue { background: #1A2E3B !important; color: #80D0FF !important; }
+:root[data-theme="dark"] .rtc-icon.green { background: #1A3A28 !important; color: #7EE2A8 !important; }
+:root[data-theme="dark"] .rtc-icon.orange { background: #3B2E1A !important; color: #FFD080 !important; }
+:root[data-theme="dark"] .rtc-icon.red { background: #3B1E1E !important; color: #FFA0A0 !important; }
+:root[data-theme="dark"] .rtc-icon.teal { background: #1A3A3A !important; color: #80E0D0 !important; }
+:root[data-theme="dark"] .rtc-tag.hot { background: #3B1E1E !important; color: #FFA0A0 !important; }
+:root[data-theme="dark"] .rtc-tag.new { background: #1A2E3B !important; color: #80D0FF !important; }
+:root[data-theme="dark"] .rtc-tag.ai { background: #3B2266 !important; color: #C4AAFF !important; }
+
+/* ── 报表页面通用暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .report-wall-title,
+:root[data-theme="dark"] .rw-title,
+:root[data-theme="dark"] .rs-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .report-wall-sub,
+:root[data-theme="dark"] .rs-sub {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .report-wall-btn {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .report-wall-btn:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .my-report-card {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .my-report-card:hover {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3) !important;
+}
+:root[data-theme="dark"] .my-report-card-meta span {
+  color: var(--dark-muted, #888) !important;
+}
+
+/* ── 报表工作台暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .rw-body {
+  background: var(--dark-bg, #1a1a28) !important;
+}
+:root[data-theme="dark"] .rw-preview-card {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .rw-prompt-panel {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .rw-prompt-header {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .rw-prompt-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .rw-prompt-desc {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .rw-prompt-editor {
+  background: var(--dark-bg, #1a1a28) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .rw-prompt-editor:focus {
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .rw-prompt-chat-view {
+  background: var(--dark-bg, #1a1a28) !important;
+}
+:root[data-theme="dark"] .rw-prompt-chat-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .rw-prompt-chat-quick .rtc-action-btn {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .rw-prompt-chat-quick .rtc-action-btn:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .rw-prompt-chat-input {
+  background: var(--dark-bg, #1a1a28) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .rw-prompt-chat-input:focus {
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .rw-action-btn {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .rw-action-btn:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .rw-action-btn.primary {
+  background: #6E40C9 !important;
+  border-color: #6E40C9 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .rw-action-btn.primary:hover {
+  background: #5B33A8 !important;
+  border-color: #8E68E8 !important;
+}
+:root[data-theme="dark"] .rw-action-btn.danger:hover {
+  background: #3B1E1E !important;
+  border-color: #CF222E !important;
+  color: #FF6B6B !important;
+}
+
+/* ── 报表弹窗暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .modal-panel {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .modal-header {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .modal-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .modal-body {
+  background: var(--dark-panel, #252535) !important;
+}
+:root[data-theme="dark"] .modal-footer {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .modal-btn-cancel {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .modal-btn-cancel:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .modal-btn-primary {
+  background: #6E40C9 !important;
+  border-color: #6E40C9 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .modal-btn-primary:hover {
+  background: #5B33A8 !important;
+  border-color: #8E68E8 !important;
+}
+:root[data-theme="dark"] .obj-search-input {
+  background: var(--dark-bg, #1a1a28) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .obj-search-input:focus {
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .obj-filter-chip {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .obj-filter-chip:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .obj-filter-chip.active {
+  background: #6E40C9 !important;
+  border-color: #6E40C9 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .obj-item {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .obj-item:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .obj-name {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .obj-sub {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .obj-item.selected {
+  border-color: #8B5CF6 !important;
+  background: #3B2266 !important;
+}
+
+/* ── 调度配置弹窗暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .schedule-field label {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .sch-type,
+:root[data-theme="dark"] .sch-recipients {
+  background: var(--dark-bg, #1a1a28) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .schedule-freq-card {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .schedule-freq-card:hover {
+  border-color: #8B5CF6 !important;
+  background: #3B335E !important;
+}
+:root[data-theme="dark"] .schedule-freq-card.selected {
+  border-color: #8B5CF6 !important;
+  background: #3B2266 !important;
+}
+:root[data-theme="dark"] .freq-name {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .freq-desc {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .schedule-ai-preview {
+  background: #3B2266 !important;
+  border-color: #6E40C9 !important;
+}
+:root[data-theme="dark"] .schedule-ai-title {
+  color: #C4AAFF !important;
+}
+:root[data-theme="dark"] .schedule-ai-text {
+  color: var(--dark-text, #c8c8c8) !important;
+}
+
+/* ── 向导页面暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .wizard-page-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .wizard-tpl-card {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .wizard-tpl-card:hover {
+  border-color: #8B5CF6 !important;
+  background: #3B335E !important;
+}
+:root[data-theme="dark"] .wizard-tpl-card.active {
+  border-color: #8B5CF6 !important;
+  background: #3B2266 !important;
+}
+:root[data-theme="dark"] .wtc-name {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .wtc-desc {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .wizard-field-label {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .wizard-time-chip {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .wizard-time-chip:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .wizard-time-chip.active {
+  background: #6E40C9 !important;
+  border-color: #6E40C9 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .wizard-name-input {
+  background: var(--dark-bg, #1a1a28) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .wizard-name-input:focus {
+  border-color: #8B5CF6 !important;
+}
+
+/* ── 报表查看器暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .rv-toolbar {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .rv-back-btn {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .rv-back-btn:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .rv-content {
+  background: var(--dark-bg, #1a1a28) !important;
+}
+:root[data-theme="dark"] .rv-history-panel {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .rv-history-header {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .rv-calendar-nav-btn {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .rv-calendar-nav-btn:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .rv-calendar-month {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .rv-calendar-grid {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+}
+:root[data-theme="dark"] .rv-calendar-cell {
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .rv-calendar-cell:hover {
+  background: #3B335E !important;
+}
+:root[data-theme="dark"] .rv-calendar-cell.today {
+  border-color: #8B5CF6 !important;
+  background: #3B2266 !important;
+}
+:root[data-theme="dark"] .rv-calendar-day-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .rv-calendar-day-reports {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .rv-calendar-day-reports > div {
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .rv-calendar-day-reports > div:hover {
+  background: #3B335E !important;
+}
+
+/* ── 二级侧边栏导航暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .report-nav-group {
+  background: var(--dark-panel, #252535) !important;
+}
+:root[data-theme="dark"] .report-nav-label {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .report-nav-item {
+  background: transparent !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .report-nav-item:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .report-nav-item.active {
+  background: #3B2266 !important;
+  border-color: #6E40C9 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .report-nav-badge {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .report-nav-item.active .report-nav-badge {
+  background: #6E40C9 !important;
+  color: #fff !important;
+}
+:root[data-theme="dark"] .report-nav-subhint {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .report-nav-add-schedule {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .report-nav-add-schedule:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+}
+
+/* ── 链路性能报告（报表工作台内预览）暗色 ───────────── */
+:root[data-theme="dark"] .lpr-header-bar {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .lpr-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .lpr-period {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .lpr-time-btn {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .lpr-time-btn:hover {
+  background: #3B335E !important;
+  border-color: #8B5CF6 !important;
+}
+:root[data-theme="dark"] .lpr-time-btn.active {
+  background: #6E40C9 !important;
+  border-color: #6E40C9 !important;
+  color: #fff !important;
+}
+
+/* ── KPI卡片暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .lpr-kpi-card {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .lpr-kpi-label {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .lpr-kpi-value {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .lpr-kpi-sub {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .lpr-health-ring-card {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .lpr-health-ring-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+
+/* ── 诊断摘要暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .lpr-diagnosis-container {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .lpr-diagnosis-title {
+  color: #FF6B6B !important;
+}
+:root[data-theme="dark"] .lpr-diagnosis-card {
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .lpr-diagnosis-card.capacity { background: #2D221A !important; }
+:root[data-theme="dark"] .lpr-diagnosis-card.capacity::before { background: #B45309 !important; }
+:root[data-theme="dark"] .lpr-diagnosis-card.latency { background: #1A2335 !important; }
+:root[data-theme="dark"] .lpr-diagnosis-card.latency::before { background: #3B82F6 !important; }
+:root[data-theme="dark"] .lpr-diagnosis-card.connection { background: #2D1A1A !important; }
+:root[data-theme="dark"] .lpr-diagnosis-card.connection::before { background: #EF4444 !important; }
+:root[data-theme="dark"] .lpr-diagnosis-card:hover,
+:root[data-theme="dark"] .lpr-diagnosis-card.active {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3) !important;
+}
+:root[data-theme="dark"] .lpr-diagnosis-card.capacity:hover,
+:root[data-theme="dark"] .lpr-diagnosis-card.capacity.active { border-color: #B45309 !important; }
+:root[data-theme="dark"] .lpr-diagnosis-card.latency:hover,
+:root[data-theme="dark"] .lpr-diagnosis-card.latency.active { border-color: #3B82F6 !important; }
+:root[data-theme="dark"] .lpr-diagnosis-card.connection:hover,
+:root[data-theme="dark"] .lpr-diagnosis-card.connection.active { border-color: #EF4444 !important; }
+:root[data-theme="dark"] .lpr-diagnosis-link {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .lpr-diagnosis-text {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .lpr-diagnosis-infer {
+  background: rgba(0,0,0,.2) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .lpr-diagnosis-trend {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .lpr-info-hint {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  color: var(--dark-muted, #888) !important;
+}
+
+/* ── 趋势分析与排行榜暗色 ────────────────────────── */
+:root[data-theme="dark"] .lpr-trend-section,
+:root[data-theme="dark"] .lpr-top-chart-card,
+:root[data-theme="dark"] .lpr-table-card {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .lpr-section-title,
+:root[data-theme="dark"] .lpr-chart-card-title {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .lpr-current-link-name {
+  color: #8B5CF6 !important;
+}
+
+/* ── 明细表暗色 ───────────────────────────────── */
+:root[data-theme="dark"] .lpr-data-table th {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+  color: var(--dark-muted, #888) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .lpr-data-table th:hover {
+  background: #3B335E !important;
+}
+:root[data-theme="dark"] .lpr-data-table td {
+  border-color: var(--dark-border, #3d3d4d) !important;
+  color: var(--dark-text, #c8c8c8) !important;
+}
+:root[data-theme="dark"] .lpr-data-table tbody tr {
+  background: var(--dark-panel, #252535) !important;
+}
+:root[data-theme="dark"] .lpr-data-table tbody tr:hover {
+  background: #3B335E !important;
+}
+:root[data-theme="dark"] .lpr-data-table tbody tr.selected {
+  background: #3B2266 !important;
+}
+:root[data-theme="dark"] .lpr-data-table tbody tr.highlight {
+  background: #3B1E1E !important;
+}
+:root[data-theme="dark"] .lpr-link-name-cell {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .lpr-util-bar {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+}
+:root[data-theme="dark"] .lpr-util-bar-fill.low { background: #1A7F37 !important; }
+:root[data-theme="dark"] .lpr-util-bar-fill.medium { background: #B45309 !important; }
+:root[data-theme="dark"] .lpr-util-bar-fill.high { background: #CF222E !important; }
+:root[data-theme="dark"] .lpr-status-badge.normal { background: #1A3A28 !important; color: #7EE2A8 !important; }
+:root[data-theme="dark"] .lpr-status-badge.warning { background: #3B2E1A !important; color: #FFD080 !important; }
+:root[data-theme="dark"] .lpr-status-badge.critical { background: #3B1E1E !important; color: #FFA0A0 !important; }
+
+/* ── 单链路深度分析暗色 ────────────────────────── */
+:root[data-theme="dark"] .lpr-detail-section-card {
+  background: var(--dark-panel, #252535) !important;
+  border-color: var(--dark-border, #3d3d4d) !important;
+}
+:root[data-theme="dark"] .lpr-detail-grid {
+  background: var(--dark-panel, #252535) !important;
+}
+:root[data-theme="dark"] .lpr-detail-card {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+}
+:root[data-theme="dark"] .lpr-detail-label {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .lpr-detail-value {
+  color: var(--dark-title, #e0e0e0) !important;
+}
+:root[data-theme="dark"] .lpr-detail-sub {
+  color: var(--dark-muted, #888) !important;
+}
+:root[data-theme="dark"] .lpr-packet-bars {
+  background: var(--dark-panel-3, #2d2d3d) !important;
+}
+:root[data-theme="dark"] .lpr-packet-bar.small { background: #1A7F37 !important; }
+:root[data-theme="dark"] .lpr-packet-bar.medium { background: #3B82F6 !important; }
+:root[data-theme="dark"] .lpr-packet-bar.large { background: #CF222E !important; }

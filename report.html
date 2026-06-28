@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="report.css">
 <link rel="stylesheet" href="dark-theme.css">
 <script src="theme-toggle.js"></script>
+<script src="echarts.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -59,7 +60,7 @@
       <nav class="top-primary-nav">
         <div class="nav-list">
           <a href="dashboard.html" class="nav-item"><span class="material-symbols-rounded">dashboard</span><span>总览</span></a>
-          <a href="network.html" class="nav-item"><span class="material-symbols-rounded">account_tree</span><span>数据分析</span></a>
+          <a href="traffic.html" class="nav-item"><span class="material-symbols-rounded">stacked_line_chart</span><span>数据分析</span></a>
           <a href="topology.html" class="nav-item"><span class="material-symbols-rounded">location_on</span><span>数字地图</span></a>
           <a href="report.html" class="nav-item active"><span class="material-symbols-rounded">area_chart</span><span>报表报告</span></a>
           <a href="ai-agent.html" class="nav-item"><span class="material-symbols-rounded">smart_toy</span><span>AI Agent</span></a>
@@ -87,9 +88,6 @@
           <div class="report-wall-actions">
             <button class="report-wall-btn" onclick="switchView('library')">
               <span class="material-symbols-rounded">grid_view</span>报告模版
-            </button>
-            <button class="report-wall-btn" onclick="openNewReportModal()">
-              <span class="material-symbols-rounded">add</span>新建报告
             </button>
           </div>
         </div>
@@ -145,6 +143,27 @@
                 <span class="material-symbols-rounded">play_arrow</span>生成
               </button>
               <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('traffic')">
+                <span class="material-symbols-rounded">schedule</span>调度
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openModal('shareModal')">
+                <span class="material-symbols-rounded">share</span>分享
+              </button>
+            </div>
+          </div>
+
+          <!-- 流程分析报告 -->
+          <div class="report-type-card" onclick="openReport('process')">
+            <div class="rtc-icon-row">
+              <div class="rtc-icon blue"><span class="material-symbols-rounded">hub</span></div>
+              <span class="rtc-tag hot">热门</span>
+            </div>
+            <div class="rtc-title">流程分析报告</div>
+            <div class="rtc-desc">深度分析互联网链路质量、路由性能、业务路径可用性、运营商 SLA 达标情况。</div>
+            <div class="rtc-actions">
+              <button class="rtc-action-btn primary" onclick="event.stopPropagation();generateReportFromLibrary('process')">
+                <span class="material-symbols-rounded">play_arrow</span>生成
+              </button>
+              <button class="rtc-action-btn" onclick="event.stopPropagation();openScheduleWithType('process')">
                 <span class="material-symbols-rounded">schedule</span>调度
               </button>
               <button class="rtc-action-btn" onclick="event.stopPropagation();openModal('shareModal')">
@@ -259,6 +278,7 @@
             <span class="rw-config-label">报告类型</span>
             <select class="rw-config-select" id="wbReportType">
               <option value="traffic" selected>流量分析报告</option>
+              <option value="process">流程分析报告</option>
               <option value="fault">故障统计报告</option>
               <option value="capacity">容量规划报告</option>
               <option value="health">网络健康报告</option>
@@ -284,8 +304,8 @@
 
         <!-- 报告预览主体 -->
         <div class="rw-body">
-          <div class="rw-preview">
-            <div class="rw-preview-card">
+          <div class="rw-preview" id="workbenchPreview">
+            <div class="rw-preview-card" id="previewCard">
               <div class="rw-preview-title">流量分析报告</div>
               <div class="rw-preview-meta">
                 <span><span class="material-symbols-rounded">calendar_today</span>2026-05-25 ~ 2026-06-24</span>
@@ -293,38 +313,139 @@
                 <span><span class="material-symbols-rounded">update</span>生成于 10:30</span>
               </div>
 
-              <!-- KPI 指标卡片 -->
-              <div class="rw-kpi-grid">
-                <div class="rw-kpi-card">
-                  <div class="rw-kpi-label">平均带宽利用率</div>
-                  <div class="rw-kpi-value">67.3%</div>
-                  <div class="rw-kpi-trend up"><span class="material-symbols-rounded" style="font-size:13px">trending_up</span>+2.1% vs 上期</div>
+              <!-- ========== 链路性能报告：时间粒度控制 ========== -->
+              <div class="lpr-header-bar">
+                <div>
+                  <div class="lpr-title">数据中心链路性能<span id="lprReportTypeLabel">日报</span></div>
+                  <div class="lpr-period" id="lprPeriodText">报告周期：2026-06-28 00:00 ~ 23:59</div>
                 </div>
-                <div class="rw-kpi-card">
-                  <div class="rw-kpi-label">峰值流量</div>
-                  <div class="rw-kpi-value">8.7 Gbps</div>
-                  <div class="rw-kpi-trend up"><span class="material-symbols-rounded" style="font-size:13px">trending_up</span>+0.5G vs 上期</div>
-                </div>
-                <div class="rw-kpi-card">
-                  <div class="rw-kpi-label">异常流量事件</div>
-                  <div class="rw-kpi-value red">12</div>
-                  <div class="rw-kpi-trend down"><span class="material-symbols-rounded" style="font-size:13px">trending_down</span>-3 vs 上期</div>
-                </div>
-                <div class="rw-kpi-card">
-                  <div class="rw-kpi-label">链路健康率</div>
-                  <div class="rw-kpi-value green">98.6%</div>
-                  <div class="rw-kpi-trend up"><span class="material-symbols-rounded" style="font-size:13px">trending_up</span>+0.2% vs 上期</div>
+                <div class="lpr-time-buttons">
+                  <button class="lpr-time-btn active" onclick="lprSwitchGranularity('daily')">日报</button>
+                  <button class="lpr-time-btn" onclick="lprSwitchGranularity('weekly')">周报</button>
+                  <button class="lpr-time-btn" onclick="lprSwitchGranularity('monthly')">月报</button>
                 </div>
               </div>
 
-              <!-- 图表占位 -->
-              <div class="rw-chart-placeholder">
-                <span class="material-symbols-rounded">show_chart</span>
-                <span>带宽利用率趋势图（7天）</span>
+              <!-- ========== 链路性能报告：KPI概览 ========== -->
+              <div class="lpr-kpi-container">
+                <div class="lpr-kpi-card">
+                  <div class="lpr-kpi-label">整体健康度</div>
+                  <div class="lpr-kpi-value" id="lprHealthScore">88</div>
+                  <div class="lpr-kpi-sub">较昨日 <span id="lprHealthTrend" class="lpr-trend-up">↑ 2%</span></div>
+                </div>
+                <div class="lpr-kpi-card">
+                  <div class="lpr-kpi-label">平均时延 / 最大时延</div>
+                  <div class="lpr-kpi-value" id="lprLatency">12 <span style="font-size:16px;font-weight:500">ms</span></div>
+                  <div class="lpr-kpi-sub">最高 <span id="lprMaxLatency">85 ms</span></div>
+                </div>
+                <div class="lpr-kpi-card">
+                  <div class="lpr-kpi-label">峰值利用率</div>
+                  <div class="lpr-kpi-value" id="lprUtilization">82 <span style="font-size:16px;font-weight:500">%</span></div>
+                  <div class="lpr-kpi-sub" id="lprUtilizationLink">最拥堵：互联网出口-1</div>
+                </div>
+                <div class="lpr-kpi-card">
+                  <div class="lpr-kpi-label">异常链路数</div>
+                  <div class="lpr-kpi-value" id="lprAnomalyCount" style="color:#E5493F">3</div>
+                  <div class="lpr-kpi-sub">需要关注处理</div>
+                </div>
+                <div class="lpr-health-ring-card">
+                  <div class="lpr-health-ring-title">链路健康度分布</div>
+                  <div id="lprHealthRingChart"></div>
+                </div>
               </div>
-              <div class="rw-chart-placeholder">
-                <span class="material-symbols-rounded">donut_large</span>
-                <span>协议分布饼图</span>
+
+              <!-- ========== 链路性能报告：智能诊断摘要 ========== -->
+              <div id="lprDiagnosisContainer" class="lpr-diagnosis-container has-issues">
+                <div class="lpr-diagnosis-title">🔍 异常链路智能诊断摘要</div>
+                <div class="lpr-diagnosis-cards" id="lprDiagnosisCards"></div>
+                <div class="lpr-info-hint">💡 点击诊断卡片可快速定位该链路的详细趋势与深度分析</div>
+              </div>
+
+              <!-- ========== 链路性能报告：全局趋势分析图 ========== -->
+              <div class="lpr-trend-section">
+                <div class="lpr-section-header">
+                  <div class="lpr-section-title">📈 <span id="lprTrendChartTitle">互联网出口-1</span> 趋势分析</div>
+                  <div class="lpr-current-link-name" id="lprTrendChartLink">当前链路：互联网出口-1</div>
+                </div>
+                <div id="lprTrendChart"></div>
+              </div>
+
+              <!-- ========== 链路性能报告：Top N 排行与明细表 ========== -->
+              <div class="lpr-top-section">
+                <div class="lpr-top-chart-card">
+                  <div class="lpr-chart-card-title">📊 Top 5 利用率最高链路</div>
+                  <div id="lprTopUtilChart" class="lpr-top-chart"></div>
+                </div>
+                <div class="lpr-top-chart-card">
+                  <div class="lpr-chart-card-title">⚠️ Top 5 丢包率最高链路</div>
+                  <div id="lprTopLossChart" class="lpr-top-chart"></div>
+                </div>
+              </div>
+
+              <div class="lpr-table-card">
+                <div class="lpr-chart-card-title">📋 链路性能明细</div>
+                <table class="lpr-data-table">
+                  <thead>
+                    <tr>
+                      <th onclick="lprSortTable('name')">链路名称 <span class="lpr-sort-icon">↕</span></th>
+                      <th onclick="lprSortTable('throughput')">总吞吐量(Mbps) <span class="lpr-sort-icon">↕</span></th>
+                      <th onclick="lprSortTable('utilIn')">流入利用率 <span class="lpr-sort-icon">↕</span></th>
+                      <th onclick="lprSortTable('utilOut')">流出利用率 <span class="lpr-sort-icon">↕</span></th>
+                      <th onclick="lprSortTable('loss')">丢包率(%) <span class="lpr-sort-icon">↕</span></th>
+                      <th onclick="lprSortTable('latency')">时延(ms) <span class="lpr-sort-icon">↕</span></th>
+                      <th onclick="lprSortTable('connRate')">建连成功率(%) <span class="lpr-sort-icon">↕</span></th>
+                      <th onclick="lprSortTable('health')">健康度评分 <span class="lpr-sort-icon">↕</span></th>
+                      <th onclick="lprSortTable('status')">状态 <span class="lpr-sort-icon">↕</span></th>
+                    </tr>
+                  </thead>
+                  <tbody id="lprLinkTableBody"></tbody>
+                </table>
+              </div>
+
+              <!-- ========== 链路性能报告：单链路深度分析 ========== -->
+              <div class="lpr-detail-section-card">
+                <div class="lpr-section-header">
+                  <div class="lpr-section-title">🎯 单链路深度健康分析</div>
+                  <div class="lpr-current-link-name" id="lprDetailLinkName">当前链路：互联网出口-1</div>
+                </div>
+                <div class="lpr-detail-grid">
+                  <div id="lprRadarChart" class="lpr-radar-chart"></div>
+                  <div class="lpr-detail-cards-grid">
+                    <div class="lpr-detail-card">
+                      <div class="lpr-detail-label">客户端时延 / 服务端时延</div>
+                      <div class="lpr-detail-value">
+                        <span id="lprDetailClientLatency">3.6</span> / <span id="lprDetailServerLatency">8.4</span> ms
+                      </div>
+                      <div class="lpr-detail-sub">客户端占比 30%，服务端占比 70%</div>
+                    </div>
+                    <div class="lpr-detail-card">
+                      <div class="lpr-detail-label">建连成功率 / 失败率</div>
+                      <div class="lpr-detail-value">
+                        <span id="lprDetailConnRate" style="color:#34A853">99.2%</span> / <span id="lprDetailFailRate" style="color:#E5493F">0.8%</span>
+                      </div>
+                      <div class="lpr-detail-sub">客户端失败 10 次，服务端失败 45 次</div>
+                    </div>
+                    <div class="lpr-detail-card">
+                      <div class="lpr-detail-label">流入 / 流出数据包数</div>
+                      <div class="lpr-detail-row">
+                        <span style="color:#1A73E8;font-weight:600" id="lprDetailInPackets">847K</span>
+                        <span style="color:#34A853;font-weight:600" id="lprDetailOutPackets">323K</span>
+                      </div>
+                      <div class="lpr-detail-sub">流入占比 72%，流出占比 28%</div>
+                    </div>
+                    <div class="lpr-detail-card">
+                      <div class="lpr-detail-label">数据包大小分布</div>
+                      <div class="lpr-packet-bars">
+                        <div class="lpr-packet-bar small" style="height:60%" id="lprPacketSmall">64%</div>
+                        <div class="lpr-packet-bar medium" style="height:85%" id="lprPacketMedium">85%</div>
+                        <div class="lpr-packet-bar large" style="height:40%" id="lprPacketLarge">40%</div>
+                      </div>
+                      <div class="lpr-detail-sub" style="display:flex;justify-content:space-between">
+                        <span>小包(＜64B)</span><span>中包(64-512B)</span><span>大包(＞512B)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1067,6 +1188,7 @@
           <div class="wizard-form-row">
             <select class="wizard-form-select" id="wizardBlankType">
               <option value="traffic">流量分析报告</option>
+              <option value="process">流程分析报告</option>
               <option value="fault">故障统计报告</option>
               <option value="capacity">容量规划报告</option>
               <option value="health">网络健康报告</option>
@@ -1315,6 +1437,7 @@ var myReports = [
 
 var reportTypeNames = {
   traffic: '流量分析报告',
+  process: '流程分析报告',
   fault: '故障统计报告',
   capacity: '容量规划报告',
   health: '网络健康报告',
@@ -1339,6 +1462,35 @@ function updateWorkbenchByType(type) {
   if (sel && reportTypeNames[type]) sel.value = type;
   var titleEl = document.querySelector('.rw-preview-title');
   if (titleEl && reportTypeNames[type]) titleEl.textContent = reportTypeNames[type];
+
+  // 更新工作台预览的 KPI 卡片和图表占位
+  var tpl = reportContentTemplates[type];
+  if (tpl) {
+    var kpiGrid = document.querySelector('.rw-kpi-grid');
+    if (kpiGrid) {
+      kpiGrid.innerHTML = tpl.kpis.map(function(k) {
+        return '<div class="rw-kpi-card">' +
+          '<div class="rw-kpi-label">' + k.label + '</div>' +
+          '<div class="rw-kpi-value' + (k.valueCls ? ' ' + k.valueCls : '') + '">' + k.value + '</div>' +
+          '<div class="rw-kpi-trend ' + k.trend + '">' +
+            '<span class="material-symbols-rounded" style="font-size:13px">' + (k.trend === 'up' ? 'trending_up' : 'trending_down') + '</span>' +
+            k.delta +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+    // 更新图表占位区域
+    var chartArea = document.querySelector('.rw-chart-placeholder').parentElement;
+    if (chartArea && tpl.charts) {
+      chartArea.innerHTML = tpl.charts.map(function(c) {
+        return '<div class="rw-chart-placeholder">' +
+          '<span class="material-symbols-rounded">' + c.icon + '</span>' +
+          '<span>' + c.label + '</span>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
   loadPromptForType(type || 'traffic');
 }
 
@@ -1439,6 +1591,28 @@ function renderMyReportsList() {
   }).join('');
 }
 
+function renderScheduleNav() {
+  // 调度导航快捷入口渲染函数
+  var navList = document.getElementById('scheduleNavList');
+  if (!navList) return;
+
+  // 模拟数据 - 显示最近的调度任务
+  var schedules = [
+    { name: '流量日报', type: 'daily', next: '今日 18:00' },
+    { name: '网络健康周报', type: 'weekly', next: '下周一 09:00' },
+    { name: '故障统计月报', type: 'monthly', next: '下月1日 10:00' }
+  ];
+
+  navList.innerHTML = schedules.map(function(s) {
+    var icon = s.type === 'daily' ? 'today' : s.type === 'weekly' ? 'date_range' : 'calendar_month';
+    return '<div class="report-nav-item">' +
+      '<span class="material-symbols-rounded">' + icon + '</span>' +
+      '<span class="report-nav-item-text">' + s.name + '</span>' +
+      '<span class="report-nav-badge">' + s.next + '</span>' +
+    '</div>';
+  }).join('');
+}
+
 function renderMyReports() {
   renderMyReportsNavTop5();
   renderMyReportsList();
@@ -1466,6 +1640,418 @@ function switchView(viewName) {
     renderScheduleMatrix();
     renderScheduleStats();
   }
+  if (viewName === 'workbench') {
+    // 工作台视图：初始化图表
+    setTimeout(function() { initWorkbenchCharts(); }, 100);
+  }
+}
+
+/* ========== 链路性能报告数据与图表 (LPR) ========== */
+var lprCurrentGranularity = 'daily';
+var lprCurrentLinkIndex = 0;
+var lprCurrentSortField = null;
+var lprCurrentSortDirection = 'asc';
+var lprCharts = [];
+
+var lprLinksData = [
+  { id: 'link_1', name: '互联网出口-1', type: 'internet', bandwidth: 1000, healthScore: 82, avgLatency: 25, avgLoss: 0.35, tcpScore: 85, appScore: 78, serverScore: 82, connectSuccessRate: 98.8, activeSessions: 3523, clientLatencyRatio: 0.35, serverLatencyRatio: 0.65, inTrafficRatio: 0.75, outTrafficRatio: 0.25, connectFailClient: 25, connectFailServer: 68, serverReset: 35, noResponse: 42, packetSmall: 55, packetMedium: 30, packetLarge: 15 },
+  { id: 'link_2', name: '互联网出口-2', type: 'internet', bandwidth: 1000, healthScore: 78, avgLatency: 32, avgLoss: 0.48, tcpScore: 80, appScore: 75, serverScore: 79, connectSuccessRate: 98.2, activeSessions: 2847, clientLatencyRatio: 0.40, serverLatencyRatio: 0.60, inTrafficRatio: 0.70, outTrafficRatio: 0.30, connectFailClient: 32, connectFailServer: 85, serverReset: 48, noResponse: 55, packetSmall: 50, packetMedium: 35, packetLarge: 15 },
+  { id: 'link_3', name: '上海专线', type: 'mpls', bandwidth: 500, healthScore: 96, avgLatency: 8, avgLoss: 0.02, tcpScore: 98, appScore: 95, serverScore: 96, connectSuccessRate: 99.95, activeSessions: 856, clientLatencyRatio: 0.75, serverLatencyRatio: 0.25, inTrafficRatio: 0.45, outTrafficRatio: 0.55, connectFailClient: 3, connectFailServer: 5, serverReset: 2, noResponse: 1, packetSmall: 70, packetMedium: 22, packetLarge: 8 },
+  { id: 'link_4', name: '北京专线', type: 'mpls', bandwidth: 500, healthScore: 94, avgLatency: 12, avgLoss: 0.05, tcpScore: 96, appScore: 92, serverScore: 94, connectSuccessRate: 99.9, activeSessions: 723, clientLatencyRatio: 0.70, serverLatencyRatio: 0.30, inTrafficRatio: 0.40, outTrafficRatio: 0.60, connectFailClient: 5, connectFailServer: 8, serverReset: 4, noResponse: 2, packetSmall: 65, packetMedium: 25, packetLarge: 10 },
+  { id: 'link_5', name: '深圳专线', type: 'mpls', bandwidth: 300, healthScore: 68, avgLatency: 18, avgLoss: 0.85, tcpScore: 72, appScore: 65, serverScore: 70, connectSuccessRate: 97.5, activeSessions: 534, clientLatencyRatio: 0.25, serverLatencyRatio: 0.75, inTrafficRatio: 0.55, outTrafficRatio: 0.45, connectFailClient: 18, connectFailServer: 112, serverReset: 65, noResponse: 78, packetSmall: 45, packetMedium: 38, packetLarge: 17 },
+  { id: 'link_6', name: '数据中心互联-1', type: 'dci', bandwidth: 10000, healthScore: 95, avgLatency: 2, avgLoss: 0.01, tcpScore: 97, appScore: 94, serverScore: 96, connectSuccessRate: 99.98, activeSessions: 1245, clientLatencyRatio: 0.50, serverLatencyRatio: 0.50, inTrafficRatio: 0.20, outTrafficRatio: 0.80, connectFailClient: 2, connectFailServer: 3, serverReset: 1, noResponse: 1, packetSmall: 30, packetMedium: 40, packetLarge: 30 },
+  { id: 'link_7', name: '数据中心互联-2', type: 'dci', bandwidth: 10000, healthScore: 93, avgLatency: 3, avgLoss: 0.02, tcpScore: 95, appScore: 91, serverScore: 94, connectSuccessRate: 99.95, activeSessions: 1087, clientLatencyRatio: 0.45, serverLatencyRatio: 0.55, inTrafficRatio: 0.25, outTrafficRatio: 0.75, connectFailClient: 4, connectFailServer: 6, serverReset: 3, noResponse: 2, packetSmall: 35, packetMedium: 38, packetLarge: 27 },
+  { id: 'link_8', name: '外联-银行专线', type: 'extranet', bandwidth: 100, healthScore: 85, avgLatency: 45, avgLoss: 0.25, tcpScore: 88, appScore: 82, serverScore: 85, connectSuccessRate: 96.8, activeSessions: 234, clientLatencyRatio: 0.20, serverLatencyRatio: 0.80, inTrafficRatio: 0.60, outTrafficRatio: 0.40, connectFailClient: 15, connectFailServer: 95, serverReset: 52, noResponse: 68, packetSmall: 80, packetMedium: 15, packetLarge: 5 },
+  { id: 'link_9', name: '外联-支付网关', type: 'extranet', bandwidth: 200, healthScore: 72, avgLatency: 55, avgLoss: 0.55, tcpScore: 75, appScore: 70, serverScore: 73, connectSuccessRate: 95.2, activeSessions: 456, clientLatencyRatio: 0.15, serverLatencyRatio: 0.85, inTrafficRatio: 0.65, outTrafficRatio: 0.35, connectFailClient: 28, connectFailServer: 158, serverReset: 95, noResponse: 112, packetSmall: 75, packetMedium: 18, packetLarge: 7 },
+  { id: 'link_10', name: '香港国际专线', type: 'international', bandwidth: 500, healthScore: 62, avgLatency: 185, avgLoss: 1.25, tcpScore: 65, appScore: 58, serverScore: 63, connectSuccessRate: 94.5, activeSessions: 678, clientLatencyRatio: 0.85, serverLatencyRatio: 0.15, inTrafficRatio: 0.50, outTrafficRatio: 0.50, connectFailClient: 85, connectFailServer: 42, serverReset: 28, noResponse: 35, packetSmall: 55, packetMedium: 30, packetLarge: 15 }
+];
+
+// 生成趋势数据
+function lprGenerateTrendData(link) {
+  var timestamps = [];
+  var throughputIn = [];
+  var throughputOut = [];
+  var utilizationIn = [];
+  var utilizationOut = [];
+  var latency = [];
+  var loss = [];
+
+  for (var h = 0; h < 24; h++) {
+    timestamps.push(h.toString().padStart(2, '0') + ':00');
+    var baseThroughput = link.bandwidth * 0.3;
+    var peakFactor = (h >= 9 && h <= 11) || (h >= 14 && h <= 17) ? 1.8 : (h >= 0 && h <= 6 ? 0.4 : 1);
+    if (link.type === 'internet') peakFactor = (h >= 19 && h <= 23) ? 2.2 : peakFactor;
+    if (link.type === 'dci') peakFactor = (h >= 0 && h <= 5) ? 2.5 : peakFactor;
+
+    var ti = baseThroughput * peakFactor * (0.9 + Math.random() * 0.2) * link.inTrafficRatio;
+    var to = baseThroughput * peakFactor * (0.9 + Math.random() * 0.2) * link.outTrafficRatio;
+
+    throughputIn.push(Math.round(ti));
+    throughputOut.push(Math.round(to));
+    utilizationIn.push(Math.round((ti / link.bandwidth) * 100 * 10) / 10);
+    utilizationOut.push(Math.round((to / link.bandwidth) * 100 * 10) / 10);
+
+    if (link.id === 'link_5' && h >= 14 && h <= 17) {
+      latency.push(Math.round((link.avgLatency * (2 + Math.random())) * 10) / 10);
+      loss.push(Math.round((2.5 + Math.random() * 1.5) * 100) / 100);
+    } else if (link.type === 'international') {
+      latency.push(Math.round(link.avgLatency * (0.9 + Math.random() * 0.4) * 10) / 10);
+      loss.push(Math.round((0.8 + Math.random() * 1.2) * 100) / 100);
+    } else {
+      latency.push(Math.round(link.avgLatency * (0.85 + Math.random() * 0.3) * 10) / 10);
+      loss.push(Math.round((link.avgLoss * (0.7 + Math.random() * 0.6)) * 100) / 100);
+    }
+  }
+  return { timestamp: timestamps, throughputIn: throughputIn, throughputOut: throughputOut, utilizationIn: utilizationIn, utilizationOut: utilizationOut, latency: latency, loss: loss };
+}
+
+lprLinksData.forEach(function(link) { link.trend = lprGenerateTrendData(link); });
+
+function lprAggregateData(linkData, granularity) {
+  if (granularity === 'daily') return JSON.parse(JSON.stringify(linkData.trend));
+  var result = { timestamp: [], throughputIn: [], throughputOut: [], utilizationIn: [], utilizationOut: [], latency: [], loss: [] };
+  if (granularity === 'weekly') result.timestamp = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  else for (var d = 1; d <= 30; d++) result.timestamp.push(d.toString() + '日');
+  var baseTi = linkData.trend.throughputIn.reduce(function(a,b){return a+b;},0) / linkData.trend.throughputIn.length;
+  var baseTo = linkData.trend.throughputOut.reduce(function(a,b){return a+b;},0) / linkData.trend.throughputOut.length;
+  var baseUi = linkData.trend.utilizationIn.reduce(function(a,b){return a+b;},0) / linkData.trend.utilizationIn.length;
+  var baseUo = linkData.trend.utilizationOut.reduce(function(a,b){return a+b;},0) / linkData.trend.utilizationOut.length;
+  var baseLat = linkData.trend.latency.reduce(function(a,b){return a+b;},0) / linkData.trend.latency.length;
+  var baseLoss = linkData.trend.loss.reduce(function(a,b){return a+b;},0) / linkData.trend.loss.length;
+  var count = granularity === 'weekly' ? 7 : 30;
+  for (var i = 0; i < count; i++) {
+    var factor = 0.85 + Math.random() * 0.3;
+    if (granularity === 'weekly' && (i === 5 || i === 6)) factor *= 0.6;
+    if (granularity === 'monthly' && (i >= 25 || i === 0)) factor *= 0.7;
+    result.throughputIn.push(Math.round(baseTi * factor));
+    result.throughputOut.push(Math.round(baseTo * factor));
+    result.utilizationIn.push(Math.round(baseUi * factor * 10) / 10);
+    result.utilizationOut.push(Math.round(baseUo * factor * 10) / 10);
+    result.latency.push(Math.round(baseLat * factor * 10) / 10);
+    result.loss.push(Math.round(baseLoss * factor * 100) / 100);
+  }
+  return result;
+}
+
+function lprRenderKPI() {
+  var scores = lprLinksData.map(function(l) { return l.healthScore; });
+  var avgScore = Math.round(scores.reduce(function(a,b){return a+b;},0) / scores.length);
+  var latencies = lprLinksData.map(function(l) { return l.avgLatency; });
+  var avgLatency = Math.round(latencies.reduce(function(a,b){return a+b;},0) / latencies.length);
+  var maxLatency = Math.max.apply(null, latencies);
+  var maxUtil = 0, maxUtilLink = '';
+  lprLinksData.forEach(function(l) {
+    var trend = lprAggregateData(l, lprCurrentGranularity);
+    var linkMax = Math.max.apply(null, trend.utilizationIn.concat(trend.utilizationOut));
+    if (linkMax > maxUtil) { maxUtil = linkMax; maxUtilLink = l.name; }
+  });
+  var anomalyCount = 0;
+  lprLinksData.forEach(function(l) {
+    var trend = lprAggregateData(l, lprCurrentGranularity);
+    var maxU = Math.max.apply(null, trend.utilizationIn.concat(trend.utilizationOut));
+    var avgLoss = trend.loss.reduce(function(a,b){return a+b;},0) / trend.loss.length;
+    if (maxU >= 70 || avgLoss > 1) anomalyCount++;
+  });
+
+  document.getElementById('lprHealthScore').textContent = avgScore;
+  document.getElementById('lprLatency').innerHTML = avgLatency + ' <span style="font-size:16px;font-weight:500">ms</span>';
+  document.getElementById('lprMaxLatency').textContent = maxLatency + ' ms';
+  document.getElementById('lprUtilization').innerHTML = Math.round(maxUtil) + ' <span style="font-size:16px;font-weight:500">%</span>';
+  document.getElementById('lprUtilizationLink').textContent = '最拥堵：' + maxUtilLink;
+  document.getElementById('lprAnomalyCount').textContent = anomalyCount;
+
+  var trendEl = document.getElementById('lprHealthTrend');
+  trendEl.textContent = '↑ 2%';
+  trendEl.className = 'lpr-trend-up';
+
+  // 健康度环形图
+  var ringDom = document.getElementById('lprHealthRingChart');
+  if (ringDom && typeof echarts !== 'undefined') {
+    var excellent = 0, good = 0, focus = 0;
+    lprLinksData.forEach(function(l) {
+      if (l.healthScore >= 90) excellent++;
+      else if (l.healthScore >= 70) good++;
+      else focus++;
+    });
+    var ringChart = echarts.init(ringDom);
+    ringChart.setOption({
+      tooltip: { trigger: 'item' },
+      series: [{
+        type: 'pie', radius: ['45%', '65%'], center: ['50%', '58%'],
+        label: { show: true, position: 'outside', fontSize: 10, formatter: function(p) { return p.name; } },
+        labelLine: { length: 10, length2: 5 },
+        data: [
+          { value: excellent, name: '优秀', itemStyle: { color: '#34A853' } },
+          { value: good, name: '良好', itemStyle: { color: '#F5A623' } },
+          { value: focus, name: '关注', itemStyle: { color: '#E5493F' } }
+        ]
+      }]
+    });
+    lprCharts.push(ringChart);
+  }
+}
+
+function lprRenderDiagnosis() {
+  var diagnoses = [];
+  lprLinksData.forEach(function(link, idx) {
+    var trend = lprAggregateData(link, lprCurrentGranularity);
+    var maxUtil = Math.max.apply(null, trend.utilizationIn.concat(trend.utilizationOut));
+    var avgLoss = trend.loss.reduce(function(a,b){return a+b;},0) / trend.loss.length;
+    var avgLatency = trend.latency.reduce(function(a,b){return a+b;},0) / trend.latency.length;
+
+    if (maxUtil >= 70) {
+      var direction = link.outTrafficRatio > link.inTrafficRatio ? '流出占比达 ' + Math.round(link.outTrafficRatio * 100) + '%，业务对外发送突增' : '流入占比达 ' + Math.round(link.inTrafficRatio * 100) + '%，下行流量突增';
+      diagnoses.push({ type: 'capacity', icon: 'traffic', linkName: link.name, value: '利用率 ' + Math.round(maxUtil) + '%', inference: direction, trend: '↑ ' + Math.round(Math.random() * 20 + 15) + '%', linkIndex: idx });
+    }
+    if (avgLatency > 100 || (avgLatency > link.avgLatency * 1.5 && avgLatency > 30)) {
+      var latInfer = link.serverLatencyRatio > 0.7 ? '服务端时延占比 ' + Math.round(link.serverLatencyRatio * 100) + '%，服务端处理慢' : '客户端时延占比 ' + Math.round(link.clientLatencyRatio * 100) + '%，运营商路由绕行';
+      diagnoses.push({ type: 'latency', icon: 'timer', linkName: link.name, value: '时延 ' + Math.round(avgLatency) + 'ms', inference: latInfer, trend: '↑ ' + Math.round(Math.random() * 30 + 25) + '%', linkIndex: idx });
+    }
+    if (link.connectSuccessRate < 97 || avgLoss > 1) {
+      var connInfer = link.noResponse > link.serverReset ? '服务端无响应为主，防火墙策略阻断' : '服务端Reset为主，服务端过载';
+      diagnoses.push({ type: 'connection', icon: 'warning', linkName: link.name, value: '建连成功率 ' + link.connectSuccessRate + '%，丢包率 ' + avgLoss.toFixed(2) + '%', inference: connInfer, trend: '↑ ' + Math.round(Math.random() * 40 + 30) + '%', linkIndex: idx });
+    }
+  });
+
+  var container = document.getElementById('lprDiagnosisContainer');
+  var cardsContainer = document.getElementById('lprDiagnosisCards');
+  if (diagnoses.length === 0) { container.classList.remove('has-issues'); return; }
+  container.classList.add('has-issues');
+  cardsContainer.innerHTML = diagnoses.slice(0, 3).map(function(d) {
+    var color = d.type === 'capacity' ? '#F5A623' : d.type === 'latency' ? '#1A73E8' : '#E5493F';
+    return '<div class="lpr-diagnosis-card ' + d.type + '" data-link-index="' + d.linkIndex + '" onclick="lprSelectLinkFromDiagnosis(' + d.linkIndex + ', this)">' +
+      '<div class="lpr-diagnosis-icon"><span class="material-symbols-rounded">' + d.icon + '</span></div>' +
+      '<div class="lpr-diagnosis-link">' + d.linkName + '</div>' +
+      '<div class="lpr-diagnosis-text">' + d.value + '</div>' +
+      '<div class="lpr-diagnosis-infer">💡 推断：' + d.inference + '</div>' +
+      '<div class="lpr-diagnosis-trend" style="color:' + color + '">' + d.trend + ' 较昨日同时段</div>' +
+    '</div>';
+  }).join('');
+}
+
+function lprRenderTrendChart(linkIndex) {
+  var link = lprLinksData[linkIndex];
+  var trend = lprAggregateData(link, lprCurrentGranularity);
+  var dom = document.getElementById('lprTrendChart');
+  if (dom && typeof echarts !== 'undefined') {
+    var chart = echarts.init(dom);
+    chart.setOption({
+      tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+      legend: { data: ['流入利用率', '流出利用率', '时延', '丢包率'], top: 5 },
+      grid: { left: 60, right: 60, top: 50, bottom: 40 },
+      xAxis: { type: 'category', data: trend.timestamp, axisLabel: { fontSize: 11 } },
+      yAxis: [
+        { type: 'value', name: '利用率(%)', min: 0, max: 100, axisLabel: { fontSize: 11, formatter: '{value}%' } },
+        { type: 'value', name: '时延(ms)', min: 0, max: Math.max(20, Math.ceil(Math.max.apply(null, trend.latency) / 10) * 10), axisLabel: { fontSize: 11 }, position: 'right' }
+      ],
+      series: [
+        { name: '流入利用率', type: 'line', smooth: true, data: trend.utilizationIn, lineStyle: { color: '#1A73E8', width: 2 }, itemStyle: { color: '#1A73E8' }, areaStyle: { color: 'rgba(26,115,232,0.15)' } },
+        { name: '流出利用率', type: 'line', smooth: true, data: trend.utilizationOut, lineStyle: { color: '#34A853', width: 2 }, itemStyle: { color: '#34A853' }, areaStyle: { color: 'rgba(52,168,83,0.15)' } },
+        { name: '时延', type: 'line', yAxisIndex: 1, smooth: true, data: trend.latency, lineStyle: { color: '#F5A623', width: 2 }, itemStyle: { color: '#F5A623' } },
+        { name: '丢包率', type: 'line', yAxisIndex: 1, smooth: true, data: trend.loss.map(function(l){return l*10;}), lineStyle: { color: '#E5493F', width: 2, type: 'dashed' }, itemStyle: { color: '#E5493F' } }
+      ]
+    });
+    lprCharts.push(chart);
+    document.getElementById('lprTrendChartTitle').textContent = link.name + ' 趋势分析';
+    document.getElementById('lprTrendChartLink').textContent = '当前链路：' + link.name;
+  }
+}
+
+function lprRenderTopCharts() {
+  var utilData = lprLinksData.map(function(l) {
+    var trend = lprAggregateData(l, lprCurrentGranularity);
+    var maxU = Math.max.apply(null, trend.utilizationIn.concat(trend.utilizationOut));
+    return { name: l.name, value: Math.round(maxU) };
+  }).sort(function(a,b){return b.value - a.value;}).slice(0,5);
+
+  var lossData = lprLinksData.map(function(l) {
+    var trend = lprAggregateData(l, lprCurrentGranularity);
+    var avgL = trend.loss.reduce(function(a,b){return a+b;},0) / trend.loss.length;
+    return { name: l.name, value: Math.round(avgL * 100) / 100 };
+  }).sort(function(a,b){return b.value - a.value;}).slice(0,5);
+
+  if (typeof echarts === 'undefined') return;
+
+  var utilDom = document.getElementById('lprTopUtilChart');
+  if (utilDom) {
+    var utilChart = echarts.init(utilDom);
+    utilChart.setOption({
+      tooltip: { trigger: 'axis' },
+      grid: { left: 110, right: 30, top: 10, bottom: 10 },
+      xAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%' } },
+      yAxis: { type: 'category', data: utilData.map(function(d){return d.name;}), axisLabel: { fontSize: 11 } },
+      series: [{ type: 'bar', data: utilData.map(function(d) { return { value: d.value, itemStyle: { color: d.value >= 80 ? '#E5493F' : d.value >= 60 ? '#F5A623' : '#34A853' } }; }), label: { show: true, position: 'right', formatter: '{c}%' }, barWidth: 16 }]
+    });
+    lprCharts.push(utilChart);
+  }
+
+  var lossDom = document.getElementById('lprTopLossChart');
+  if (lossDom) {
+    var lossChart = echarts.init(lossDom);
+    lossChart.setOption({
+      tooltip: { trigger: 'axis' },
+      grid: { left: 110, right: 30, top: 10, bottom: 10 },
+      xAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
+      yAxis: { type: 'category', data: lossData.map(function(d){return d.name;}), axisLabel: { fontSize: 11 } },
+      series: [{ type: 'bar', data: lossData.map(function(d) { return { value: d.value, itemStyle: { color: d.value >= 1 ? '#E5493F' : d.value >= 0.5 ? '#F5A623' : '#34A853' } }; }), label: { show: true, position: 'right', formatter: '{c}%' }, barWidth: 16 }]
+    });
+    lprCharts.push(lossChart);
+  }
+}
+
+function lprRenderTable() {
+  var tbody = document.getElementById('lprLinkTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = lprLinksData.map(function(link, idx) {
+    var trend = lprAggregateData(link, lprCurrentGranularity);
+    var totalThroughput = Math.round(trend.throughputIn.reduce(function(a,b){return a+b;},0) / trend.throughputIn.length + trend.throughputOut.reduce(function(a,b){return a+b;},0) / trend.throughputOut.length);
+    var avgUtilIn = Math.round(trend.utilizationIn.reduce(function(a,b){return a+b;},0) / trend.utilizationIn.length * 10) / 10;
+    var avgUtilOut = Math.round(trend.utilizationOut.reduce(function(a,b){return a+b;},0) / trend.utilizationOut.length * 10) / 10;
+    var avgLoss = Math.round(trend.loss.reduce(function(a,b){return a+b;},0) / trend.loss.length * 100) / 100;
+    var avgLatency = Math.round(trend.latency.reduce(function(a,b){return a+b;},0) / trend.latency.length * 10) / 10;
+    var status = link.healthScore >= 90 ? 'normal' : link.healthScore >= 70 ? 'warning' : 'critical';
+    var statusText = status === 'normal' ? '正常' : status === 'warning' ? '关注' : '异常';
+    var utilClassIn = avgUtilIn >= 70 ? 'high' : avgUtilIn >= 50 ? 'medium' : 'low';
+    var utilClassOut = avgUtilOut >= 70 ? 'high' : avgUtilOut >= 50 ? 'medium' : 'low';
+    return '<tr data-link-index="' + idx + '" onclick="lprSelectLinkFromTable(' + idx + ', this)" class="' + (idx === lprCurrentLinkIndex ? 'selected' : '') + '">' +
+      '<td class="lpr-link-name-cell">' + link.name + '</td>' +
+      '<td>' + totalThroughput + '</td>' +
+      '<td><div class="lpr-util-bar"><div class="lpr-util-bar-fill ' + utilClassIn + '" style="width:' + avgUtilIn + '%"></div></div>' + avgUtilIn + '%</td>' +
+      '<td><div class="lpr-util-bar"><div class="lpr-util-bar-fill ' + utilClassOut + '" style="width:' + avgUtilOut + '%"></div></div>' + avgUtilOut + '%</td>' +
+      '<td style="color:' + (avgLoss > 1 ? '#E5493F' : avgLoss > 0.5 ? '#F5A623' : 'inherit') + '">' + avgLoss.toFixed(2) + '</td>' +
+      '<td>' + avgLatency + '</td>' +
+      '<td style="color:' + (link.connectSuccessRate < 97 ? '#E5493F' : 'inherit') + '">' + link.connectSuccessRate + '</td>' +
+      '<td><span style="color:' + (status === 'normal' ? '#34A853' : status === 'warning' ? '#F5A623' : '#E5493F') + ';font-weight:700">' + link.healthScore + '</span></td>' +
+      '<td><span class="lpr-status-badge ' + status + '">' + statusText + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function lprRenderDetailAnalysis(linkIndex) {
+  var link = lprLinksData[linkIndex];
+  var dom = document.getElementById('lprRadarChart');
+  if (dom && typeof echarts !== 'undefined') {
+    var radarChart = echarts.init(dom);
+    radarChart.setOption({
+      tooltip: {},
+      radar: { indicator: [{ name: '网络评分', max: 100 }, { name: 'TCP评分', max: 100 }, { name: '应用评分', max: 100 }, { name: '服务端评分', max: 100 }], center: ['50%', '50%'], radius: '70%' },
+      series: [{ type: 'radar', data: [{ value: [link.healthScore, link.tcpScore, link.appScore, link.serverScore], name: link.name, areaStyle: { color: 'rgba(26,115,232,0.2)' }, lineStyle: { color: '#1A73E8', width: 2 }, itemStyle: { color: '#1A73E8' } }] }]
+    });
+    lprCharts.push(radarChart);
+  }
+  document.getElementById('lprDetailLinkName').textContent = '当前链路：' + link.name;
+  document.getElementById('lprDetailClientLatency').textContent = Math.round(link.avgLatency * link.clientLatencyRatio * 10) / 10;
+  document.getElementById('lprDetailServerLatency').textContent = Math.round(link.avgLatency * link.serverLatencyRatio * 10) / 10;
+  document.getElementById('lprDetailConnRate').textContent = link.connectSuccessRate + '%';
+  document.getElementById('lprDetailInPackets').textContent = Math.round(link.activeSessions * 1.5 / 1000 * 10) / 10 + 'K';
+  document.getElementById('lprDetailOutPackets').textContent = Math.round(link.activeSessions * 0.8 / 1000 * 10) / 10 + 'K';
+  var packetSmallEl = document.getElementById('lprPacketSmall');
+  var packetMediumEl = document.getElementById('lprPacketMedium');
+  var packetLargeEl = document.getElementById('lprPacketLarge');
+  if (packetSmallEl) { packetSmallEl.textContent = link.packetSmall + '%'; packetSmallEl.style.height = link.packetSmall + '%'; }
+  if (packetMediumEl) { packetMediumEl.textContent = link.packetMedium + '%'; packetMediumEl.style.height = link.packetMedium + '%'; }
+  if (packetLargeEl) { packetLargeEl.textContent = link.packetLarge + '%'; packetLargeEl.style.height = link.packetLarge + '%'; }
+}
+
+function lprSwitchGranularity(granularity) {
+  lprCurrentGranularity = granularity;
+  document.querySelectorAll('.lpr-time-btn').forEach(function(btn) { btn.classList.remove('active'); });
+  event.target.classList.add('active');
+  var typeText = { daily: '日报', weekly: '周报', monthly: '月报' };
+  document.querySelector('.lpr-title').innerHTML = '数据中心链路性能' + typeText[granularity];
+
+  // 更新时间范围文本
+  var now = new Date();
+  var periodText = '';
+  if (granularity === 'daily') {
+    var start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    periodText = (start.getFullYear() + '-' + String(start.getMonth() + 1).padStart(2, '0') + '-' + String(start.getDate()).padStart(2, '0') + ' ~ ' +
+      now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0'));
+  } else if (granularity === 'weekly') {
+    periodText = '最近 7 周';
+  } else {
+    periodText = '最近 30 天';
+  }
+  document.querySelector('.lpr-period').textContent = '报告周期：' + periodText;
+
+  lprInitAll();
+}
+
+function lprSelectLinkFromDiagnosis(linkIndex, el) {
+  lprCurrentLinkIndex = linkIndex;
+  document.querySelectorAll('.lpr-diagnosis-card').forEach(function(c) { c.classList.remove('active'); });
+  el.classList.add('active');
+  lprRenderTrendChart(linkIndex);
+  lprRenderDetailAnalysis(linkIndex);
+  document.querySelectorAll('#lprLinkTableBody tr').forEach(function(r) { r.classList.remove('selected'); });
+  var row = document.querySelector('#lprLinkTableBody tr[data-link-index="' + linkIndex + '"]');
+  if (row) row.classList.add('selected');
+}
+
+function lprSelectLinkFromTable(linkIndex, el) {
+  lprCurrentLinkIndex = linkIndex;
+  document.querySelectorAll('#lprLinkTableBody tr').forEach(function(r) { r.classList.remove('selected'); });
+  el.classList.add('selected');
+  lprRenderTrendChart(linkIndex);
+  lprRenderDetailAnalysis(linkIndex);
+}
+
+function lprSortTable(field) {
+  var fieldMap = {
+    name: function(l) { return l.name; },
+    throughput: function(l) { var t = lprAggregateData(l, lprCurrentGranularity); return t.throughputIn.reduce(function(a,b){return a+b;},0) + t.throughputOut.reduce(function(a,b){return a+b;},0); },
+    utilIn: function(l) { var t = lprAggregateData(l, lprCurrentGranularity); return t.utilizationIn.reduce(function(a,b){return a+b;},0); },
+    utilOut: function(l) { var t = lprAggregateData(l, lprCurrentGranularity); return t.utilizationOut.reduce(function(a,b){return a+b;},0); },
+    loss: function(l) { var t = lprAggregateData(l, lprCurrentGranularity); return t.loss.reduce(function(a,b){return a+b;},0); },
+    latency: function(l) { var t = lprAggregateData(l, lprCurrentGranularity); return t.latency.reduce(function(a,b){return a+b;},0); },
+    connRate: function(l) { return l.connectSuccessRate; },
+    health: function(l) { return l.healthScore; },
+    status: function(l) { return l.healthScore; }
+  };
+  if (lprCurrentSortField === field) { lprCurrentSortDirection = lprCurrentSortDirection === 'asc' ? 'desc' : 'asc'; }
+  else { lprCurrentSortField = field; lprCurrentSortDirection = 'desc'; }
+  var sortFn = fieldMap[field];
+  lprLinksData.sort(function(a, b) {
+    var va = sortFn(a), vb = sortFn(b);
+    return lprCurrentSortDirection === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+  lprRenderTable();
+}
+
+function lprInitAll() {
+  lprCharts.forEach(function(c) { try { c.dispose(); } catch(e) {} });
+  lprCharts = [];
+
+  // 设置初始时间范围
+  var now = new Date();
+  var start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  var periodText = (start.getFullYear() + '-' + String(start.getMonth() + 1).padStart(2, '0') + '-' + String(start.getDate()).padStart(2, '0') + ' ~ ' +
+    now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0'));
+  var periodEl = document.querySelector('.lpr-period');
+  if (periodEl) periodEl.textContent = '报告周期：' + periodText;
+
+  lprRenderKPI();
+  lprRenderDiagnosis();
+  lprRenderTrendChart(lprCurrentLinkIndex);
+  lprRenderTopCharts();
+  lprRenderTable();
+  lprRenderDetailAnalysis(lprCurrentLinkIndex);
+}
+
+/* 工作台图表初始化 */
+var wbCharts = [];
+function initWorkbenchCharts() {
+  wbCharts.forEach(function(c) { try { c.dispose(); } catch(e) {} });
+  wbCharts = [];
+
+  if (typeof echarts === 'undefined') return;
+
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  var textColor = isDark ? '#8B949E' : '#656D76';
+
+  // 初始化链路性能报告图表
+  lprInitAll();
 }
 
 /* ── 侧栏导航点击 ────────────────────────────────────── */
@@ -1584,25 +2170,54 @@ var currentViewingReport = null;
 var reportContentTemplates = {
   traffic: {
     kpis: [
-      { label: '平均带宽利用率', value: '67.3%', trend: 'up', delta: '+2.1% vs 上期' },
-      { label: '峰值流量',       value: '8.7 Gbps', trend: 'up', delta: '+0.5G vs 上期' },
-      { label: '异常流量事件',   value: '12', valueCls: 'red', trend: 'down', delta: '-3 vs 上期' },
-      { label: '链路健康率',     value: '98.6%', valueCls: 'green', trend: 'up', delta: '+0.2% vs 上期' }
+      { label: '基础设施综合评分', value: '85.6', valueCls: 'green', trend: 'up', delta: '+3.2 vs 上期' },
+      { label: '聚合峰值吞吐量',   value: '12.4 Gbps', trend: 'up', delta: '+1.8G vs 上期' },
+      { label: '高风险链路数',     value: '2', valueCls: 'orange', trend: 'down', delta: '-1 vs 上期' },
+      { label: '告警链路计数',     value: '1', valueCls: 'red', trend: 'up', delta: '+1 vs 上期' }
+    ],
+    links: [
+      { id: 'core-internet', name: 'Core-Internet-Exit', bandwidth: '1Gbps', score: 72, load: 78, status: 'warning', packetLoss: [1.2, 0.8, 1.5, 2.1, 1.8, 2.5, 1.9], tcpSuccess: 97.8, peakTime: '14:32', inRatio: 65, outRatio: 35, failure: '高负载拥塞' },
+      { id: 'hq-shanghai', name: 'HQ-to-Shanghai-MPLS', bandwidth: '500Mbps', score: 94, load: 42, status: 'normal', packetLoss: [0.1, 0.05, 0.12, 0.08, 0.15, 0.03, 0.09], tcpSuccess: 99.9, peakTime: '10:15', inRatio: 48, outRatio: 52, failure: '正常' },
+      { id: 'payment-gw', name: 'Third-Party-Payment-Gateway', bandwidth: '100Mbps', score: 58, load: 92, status: 'critical', packetLoss: [5.2, 8.1, 12.5, 9.8, 15.2, 11.3, 8.9], tcpSuccess: 88.5, peakTime: '16:45', inRatio: 82, outRatio: 18, failure: '握手失败' },
+      { id: 'cross-dc-vpc', name: 'Cross-DC-Interconnect-VPC', bandwidth: '10Gbps', score: 96, load: 68, status: 'normal', packetLoss: [0.02, 0.01, 0.03, 0.02, 0.01, 0.04, 0.02], tcpSuccess: 99.98, peakTime: '02:30', inRatio: 55, outRatio: 45, failure: '正常' }
     ],
     charts: [
-      { icon: 'show_chart',  label: '带宽利用率趋势（近 7 天）' },
-      { icon: 'donut_large', label: '协议分布（HTTP / HTTPS / SSH / DNS / 其他）' },
-      { icon: 'bar_chart',   label: '流量 TOP 10 源 IP 排名' }
+      { icon: 'show_chart',  label: '多链路聚合流量趋势（近 7 天）' },
+      { icon: 'donut_large', label: '流量协议分布（HTTP/HTTPS/SSH/DNS）' },
+      { icon: 'bar_chart',   label: '各链路峰值吞吐量对比' }
     ],
     sections: [
-      { title: '带宽利用率趋势分析', icon: 'trending_up',
-        text: '过去 30 天全网平均带宽利用率维持在 67.3%，较上一周期上升 2.1 个百分点。核心链路（Core-SW-01 ↔ Core-SW-02）利用率持续高于 80%，建议重点关注扩容规划。接入层链路平均利用率 45%，处于健康区间。' },
-      { title: '流量 TOP N 排名', icon: 'leaderboard',
-        text: '流量 TOP 10 源 IP 集中在数据中心出口区域，前 3 名 IP 贡献了全网 38% 的流量。其中 10.1.1.100（业务服务器集群）日均流量 1.2TB，建议对高流量服务器部署专线接入。' },
-      { title: '异常流量检测', icon: 'warning',
-        text: '报告期内共检测到 12 起异常流量事件：突增事件 8 起（峰值出现在 6 月 18 日 14:32，瞬时流量达 12.3Gbps），突降事件 3 起，突刺事件 1 起。9 起已自动恢复，3 起需人工介入排查。' },
-      { title: '结论与建议', icon: 'lightbulb',
-        text: '1. 核心链路利用率偏高，建议在 Q3 规划扩容至 40G 上联\n2. 服务器集群流量集中，建议部署流量调度策略\n3. 异常事件环比下降 20%，当前安全态势向好\n4. 建议将流量报告调度频率调整为每周一自动生成' }
+      { title: '数据中心多链路聚合概览分析', icon: 'hub',
+        text: '当前监控 5 条活跃链路，综合基础设施评分 85.6 分（较上期提升 3.2 分）。聚合峰值吞吐量达 12.4Gbps，整体网络运行态势良好。2 条链路处于高负载状态（>=70%），1 条支付网关链路存在严重握手失败告警，需立即介入排查。' },
+      { title: '链路性能深度诊断', icon: 'speed',
+        text: '【Core-Internet-Exit】负载率 78% 触发黄色预警，建议实施流量分流策略。【Third-Party-Payment-Gateway】TCP 成功率仅 88.5%，丢包率持续偏高，已触发红色告警。【Cross-DC-Interconnect-VPC】10Gbps 链路运行稳定，承载核心跨机房数据同步。MPLS 专线链路质量优秀，延迟抖动控制在 2ms 以内。' },
+      { title: 'TCP 握手质量评估', icon: 'security',
+        text: '全网平均 TCP 握手成功率 96.55%，其中支付网关链路成功率仅 88.5%，严重影响交易稳定性。经初步排查，该链路存在 ISP 端端口复用问题，建议建立专线备份通道。互联网出口链路成功率 97.8%，高峰时段偶发性丢包，建议扩容至 2Gbps。' },
+      { title: '优化建议与行动计划', icon: 'lightbulb',
+        text: '1. 【紧急】支付网关链路：立即联系运营商排查端口复用问题，24 小时内启动专线备份方案\n2. 【高优】互联网出口：Q3 完成带宽扩容，目标 2Gbps\n3. 【中优】流量调度：实施智能 DNS 解析，均衡跨 DC 流量分布\n4. 【监控】新增链路质量仪表盘，实现 1 分钟级告警响应\n5. 【常规】建议将流量分析报告调度频率提升至每日自动生成' }
+    ]
+  },
+  process: {
+    kpis: [
+      { label: '链路平均可用率', value: '99.85%', valueCls: 'green', trend: 'up', delta: '+0.12% vs 上期' },
+      { label: '平均链路延迟',   value: '18.7ms', valueCls: 'blue', trend: 'down', delta: '-2.3ms vs 上期' },
+      { label: '链路丢包率',     value: '0.31%', valueCls: 'green', trend: 'down', delta: '-0.08% vs 上期' },
+      { label: '链路抖动',       value: '2.1ms', valueCls: 'orange', trend: 'up', delta: '+0.5ms vs 上期' }
+    ],
+    charts: [
+      { icon: 'show_chart',  label: '互联网链路延迟趋势（近 7 天）' },
+      { icon: 'bar_chart_4', label: '运营商 SLA 达标率对比' },
+      { icon: 'leaderboard', label: '链路质量评分排名 TOP 10' }
+    ],
+    sections: [
+      { title: '互联网链路可用性分析', icon: 'check_circle',
+        text: '本周全网 8 条互联网出口链路综合可用率 99.85%，较上周提升 0.12 个百分点。中国电信 3 条链路可用率 99.92%，中国联通 2 条链路 99.78%，中国移动 2 条链路 99.87%，教育网 1 条链路 99.65%。仅 6 月 23 日联通主线出现 12 分钟中断（设备割接导致），其余时段运行稳定。' },
+      { title: '延迟与丢包深度分析', icon: 'speed',
+        text: '三大运营商平均延迟：电信 15.2ms、联通 20.5ms、移动 20.4ms。工作日 9:00-11:00 和 14:00-17:00 为延迟高峰时段，较夜间均值上升约 25%。本周共检测到 3 次丢包率突增事件（>1%），均发生在联通链路上，持续时间 5-15 分钟，经排查为运营商骨干网拥塞所致。' },
+      { title: '路由路径质量评估', icon: 'route',
+        text: '本周 BGP 路由变化共计 247 次，其中电信出口 89 次、联通 76 次、移动 82 次。检测到 3 次跨运营商绕行事件：原走电信的北美流量两次绕行联通（延迟增加 40ms），原走联通的欧洲流量一次绕行移动（延迟增加 35ms）。建议开启 BGP 路径质量探测，自动绕行高延迟路径。' },
+      { title: '结论与优化建议', icon: 'lightbulb',
+        text: '1. 整体链路质量良好，综合评分 94/100（优秀）\n2. 运营商推荐排序：电信（96分）> 移动（93分）> 联通（91分）\n3. 联通链路延迟波动较大，建议与运营商协商优化路由\n4. 建议将出口抖动告警阈值从 5ms 下调至 3ms\n5. 建议部署智能 DNS 解析，根据链路质量自动分流' }
     ]
   },
   fault: {
@@ -1742,11 +2357,11 @@ function renderReportViewer(report) {
     '</div>';
   }).join('') + '</div>';
 
-  /* 图表区域 */
-  var chartHtml = tpl.charts.map(function(c) {
-    return '<div class="rv-chart-block">' +
-      '<span class="material-symbols-rounded">' + c.icon + '</span>' +
-      '<span>' + c.label + '</span>' +
+  /* 图表区域 - 使用真正的 ECharts 渲染 */
+  var chartHtml = tpl.charts.map(function(c, idx) {
+    return '<div class="rv-chart-block real-chart" style="height:240px;padding:16px;background:#fff;border:1px solid #D0D7DE;border-radius:12px;">' +
+      '<div style="font-size:12px;font-weight:600;color:#656D76;margin-bottom:10px;">' + c.label + '</div>' +
+      '<div id="rvChart' + idx + '" style="width:100%;height:180px;"></div>' +
     '</div>';
   }).join('');
 
@@ -1761,6 +2376,104 @@ function renderReportViewer(report) {
   /* 渲染调度下拉菜单内容 */
   renderScheduleDropdownMenu(type);
 
+  /* 流量分析报告专属：多链路概览仪表盘 */
+  var multiLinkHtml = '';
+  if (type === 'traffic' && tpl.links) {
+    /* 链路矩阵卡片 */
+    var linkCardsHtml = tpl.links.map(function(link) {
+      var statusColor = link.status === 'critical' ? 'red' : link.status === 'warning' ? 'orange' : 'green';
+      var statusBg = link.status === 'critical' ? '#FFEBE9' : link.status === 'warning' ? '#FFF8E6' : '#DDFBE6';
+      var statusLabel = link.status === 'critical' ? '🔴 告警' : link.status === 'warning' ? '🟠 预警' : '🟢 正常';
+      var loadLabel = link.load >= 70 ? '高负载' : link.load >= 50 ? '中负载' : '低负载';
+      var loadColor = link.load >= 70 ? 'red' : link.load >= 50 ? 'orange' : 'green';
+
+      /* 微趋势图数据点 */
+      var chartData = link.packetLoss.map(function(v, i) {
+        var x = 8 + (i * 18);
+        var y = 28 - (v * 1.5);
+        return (i === 0 ? 'M' : 'L') + x + ',' + y;
+      }).join(' ');
+
+      return '<div class="multi-link-card" data-link-id="' + link.id + '">' +
+        '<div class="multi-link-header">' +
+          '<div class="multi-link-name">' + link.name + '</div>' +
+          '<span class="multi-link-bandwidth">' + link.bandwidth + '</span>' +
+        '</div>' +
+        '<div class="multi-link-tags">' +
+          '<span class="link-tag score" style="background:#E8EAED">评分: <b>' + link.score + '</b></span>' +
+          '<span class="link-tag load" style="background:' + statusBg + '">负载: <b class="' + loadColor + '">' + loadLabel + '</b></span>' +
+        '</div>' +
+        '<div class="multi-link-micro-chart">' +
+          '<svg viewBox="0 0 140 35" style="width:100%;height:35px">' +
+            '<polyline fill="none" stroke="' + (link.status === 'critical' ? '#CF222E' : link.status === 'warning' ? '#BF8700' : '#1A7F37') + '" stroke-width="2" points="' + chartData + '" />' +
+          '</svg>' +
+          '<span class="micro-chart-label">丢包率趋势</span>' +
+        '</div>' +
+        '<div class="multi-link-status-bar">' +
+          '<div class="status-indicator ' + statusColor + '">' + statusLabel + '</div>' +
+          '<span class="tcp-rate">TCP: ' + link.tcpSuccess + '%</span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    /* 链路对比表格 */
+    var tableRowsHtml = tpl.links.map(function(link) {
+      var statusBadge = link.status === 'critical' ? '<span class="table-badge critical">🔴 告警</span>' :
+                        link.status === 'warning' ? '<span class="table-badge warning">🟠 预警</span>' :
+                        '<span class="table-badge normal">🟢 正常</span>';
+      var inBarWidth = link.inRatio;
+      var outBarWidth = link.outRatio;
+
+      return '<tr>' +
+        '<td><div class="link-cell-name"><b>' + link.name + '</b><span style="font-size:11px;color:#656D76">' + link.bandwidth + '</span></div></td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td><span class="score-value" style="color:' + (link.score >= 90 ? '#1A7F37' : link.score >= 70 ? '#BF8700' : '#CF222E') + '">' + link.score + '</span></td>' +
+        '<td><span class="tcp-cell-value">' + link.tcpSuccess + '%</span></td>' +
+        '<td class="peak-time-cell">' + link.peakTime + '</td>' +
+        '<td>' +
+          '<div class="util-bars">' +
+            '<div class="util-bar in" style="width:' + inBarWidth + '%"></div>' +
+            '<div class="util-bar out" style="width:' + outBarWidth + '%"></div>' +
+          '</div>' +
+          '<div class="util-labels"><span>In ' + link.inRatio + '%</span><span>Out ' + link.outRatio + '%</span></div>' +
+        '</td>' +
+        '<td class="failure-cell">' + link.failure + '</td>' +
+      '</tr>';
+    }).join('');
+
+    multiLinkHtml =
+      '<div class="multi-link-section">' +
+        '<div class="section-header-bar">' +
+          '<span class="section-icon">⬡</span>' +
+          '<div class="section-title-group">' +
+            '<h3 class="section-main-title">Data Center Multi-Link Consolidated Overview</h3>' +
+            '<p class="section-subtitle">5 Active Links Under Continuous Monitoring</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="link-cards-grid">' + linkCardsHtml + '</div>' +
+        '<div class="comparison-table-container">' +
+          '<div class="table-header-bar">' +
+            '<span class="material-symbols-rounded">table_chart</span>' +
+            '<span>Multi-Link Performance Comparison Matrix</span>' +
+          '</div>' +
+          '<table class="comparison-table">' +
+            '<thead>' +
+              '<tr>' +
+                '<th>链路标识</th>' +
+                '<th>运行状态</th>' +
+                '<th>网络评分</th>' +
+                '<th>TCP 成功率</th>' +
+                '<th>峰值时段</th>' +
+                '<th>入站/出站利用率</th>' +
+                '<th>主要故障向量</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody>' + tableRowsHtml + '</tbody>' +
+          '</table>' +
+        '</div>' +
+      '</div>';
+  }
+
   /* 完整报告内容 */
   document.getElementById('rvContent').innerHTML =
     '<div class="rv-content-header">' +
@@ -1769,14 +2482,188 @@ function renderReportViewer(report) {
         formatTimeShort(report.generatedAt) + '</div>' +
     '</div>' +
     kpiHtml +
+    multiLinkHtml +
     '<div class="rv-charts-area">' + chartHtml + '</div>' +
     '<div class="rv-sections-area">' + sectionHtml + '</div>' +
     '<div class="rv-footer">' +
       '<div class="rv-footer-note">本报告由 NGPM 智能报表引擎自动生成 · 数据采集时间 ' + formatTimeShort(report.generatedAt) + '</div>' +
     '</div>';
 
+  /* 初始化 Chart.js 图表 */
+  setTimeout(function() {
+    initReportCharts(type, tpl);
+  }, 100);
+
   /* 历史版本列表 */
   renderViewerHistory(report);
+}
+
+/* 全局图表实例 */
+var reportCharts = [];
+
+/* 销毁所有图表 */
+function destroyAllCharts() {
+  reportCharts.forEach(function(chart) {
+    try { chart.dispose(); } catch(e) {}
+  });
+  reportCharts = [];
+}
+
+/* 初始化报告图表（使用 ECharts） */
+function initReportCharts(type, tpl) {
+  destroyAllCharts();
+
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  var textColor = isDark ? '#8B949E' : '#656D76';
+
+  /* 流量分析报告图表 */
+  if (type === 'traffic') {
+    /* 图表 0: 多链路聚合流量趋势 */
+    var dom0 = document.getElementById('rvChart0');
+    if (dom0 && typeof echarts !== 'undefined') {
+      var chart0 = echarts.init(dom0);
+      chart0.setOption({
+        tooltip: { trigger: 'axis' },
+        legend: { data: ['Core-Internet', 'MPLS-Shanghai', 'Payment-Gateway', 'Cross-DC-VPC'], textStyle: { color: textColor, fontSize: 11 } },
+        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+        xAxis: { type: 'category', boundaryGap: false, data: ['6-18', '6-19', '6-20', '6-21', '6-22', '6-23', '6-24'], axisLine: { lineStyle: { color: textColor } }, axisLabel: { fontSize: 10 } },
+        yAxis: { type: 'value', name: 'Gbps', nameTextStyle: { fontSize: 10 }, axisLine: { lineStyle: { color: textColor } }, splitLine: { lineStyle: { color: gridColor } }, axisLabel: { fontSize: 10 } },
+        series: [
+          { name: 'Core-Internet', type: 'line', smooth: true, data: [7.2, 8.1, 7.8, 9.2, 8.5, 10.1, 9.5], lineStyle: { color: '#6E40C9' }, areaStyle: { color: 'rgba(110,64,201,0.1)' } },
+          { name: 'MPLS-Shanghai', type: 'line', smooth: true, data: [2.1, 2.3, 2.0, 2.5, 2.2, 2.8, 2.4], lineStyle: { color: '#1A7F37' }, areaStyle: { color: 'rgba(26,127,55,0.1)' } },
+          { name: 'Payment-Gateway', type: 'line', smooth: true, data: [0.5, 0.6, 0.7, 0.5, 0.8, 0.6, 0.7], lineStyle: { color: '#CF222E' }, areaStyle: { color: 'rgba(207,34,46,0.1)' } },
+          { name: 'Cross-DC-VPC', type: 'line', smooth: true, data: [4.2, 4.5, 5.1, 4.8, 5.5, 5.2, 5.8], lineStyle: { color: '#0550AE' }, areaStyle: { color: 'rgba(5,80,174,0.1)' } }
+        ]
+      });
+      reportCharts.push(chart0);
+    }
+
+    /* 图表 1: 协议分布饼图 */
+    var dom1 = document.getElementById('rvChart1');
+    if (dom1 && typeof echarts !== 'undefined') {
+      var chart1 = echarts.init(dom1);
+      chart1.setOption({
+        tooltip: { trigger: 'item' },
+        legend: { orient: 'vertical', right: 10, top: 'center', textStyle: { color: textColor, fontSize: 11 } },
+        series: [{
+          type: 'pie',
+          radius: ['40%', '70%'],
+          center: ['40%', '50%'],
+          avoidLabelOverlap: false,
+          label: { show: false },
+          emphasis: { label: { show: true, fontSize: 12, fontWeight: 'bold' } },
+          labelLine: { show: false },
+          data: [
+            { value: 45, name: 'HTTPS', itemStyle: { color: '#6E40C9' } },
+            { value: 28, name: 'HTTP', itemStyle: { color: '#0550AE' } },
+            { value: 12, name: 'SSH', itemStyle: { color: '#1A7F37' } },
+            { value: 8, name: 'DNS', itemStyle: { color: '#BF8700' } },
+            { value: 7, name: '其他', itemStyle: { color: '#656D76' } }
+          ]
+        }]
+      });
+      reportCharts.push(chart1);
+    }
+
+    /* 图表 2: 各链路峰值吞吐量对比 */
+    var dom2 = document.getElementById('rvChart2');
+    if (dom2 && typeof echarts !== 'undefined') {
+      var chart2 = echarts.init(dom2);
+      chart2.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+        xAxis: { type: 'value', axisLine: { lineStyle: { color: textColor } }, splitLine: { lineStyle: { color: gridColor } }, axisLabel: { fontSize: 10 } },
+        yAxis: { type: 'category', data: ['Core-Internet', 'Cross-DC-VPC', 'MPLS-Shanghai', 'Payment-GW'], axisLine: { lineStyle: { color: textColor } }, axisLabel: { fontSize: 10 } },
+        series: [{
+          type: 'bar',
+          data: [
+            { value: 10.1, itemStyle: { color: '#6E40C9' } },
+            { value: 5.8, itemStyle: { color: '#0550AE' } },
+            { value: 2.8, itemStyle: { color: '#1A7F37' } },
+            { value: 0.8, itemStyle: { color: '#CF222E' } }
+          ],
+          barWidth: '50%',
+          label: { show: true, position: 'right', fontSize: 10, color: textColor }
+        }]
+      });
+      reportCharts.push(chart2);
+    }
+  }
+
+  /* 流程分析报告图表 */
+  if (type === 'process') {
+    /* 图表 0: 互联网链路延迟趋势 */
+    var dom0 = document.getElementById('rvChart0');
+    if (dom0 && typeof echarts !== 'undefined') {
+      var chart0 = echarts.init(dom0);
+      chart0.setOption({
+        tooltip: { trigger: 'axis' },
+        legend: { data: ['中国电信', '中国联通', '中国移动'], textStyle: { color: textColor, fontSize: 11 } },
+        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+        xAxis: { type: 'category', boundaryGap: false, data: ['6-18', '6-19', '6-20', '6-21', '6-22', '6-23', '6-24'], axisLine: { lineStyle: { color: textColor } }, axisLabel: { fontSize: 10 } },
+        yAxis: { type: 'value', name: 'ms', nameTextStyle: { fontSize: 10 }, axisLine: { lineStyle: { color: textColor } }, splitLine: { lineStyle: { color: gridColor } }, axisLabel: { fontSize: 10 } },
+        series: [
+          { name: '中国电信', type: 'line', smooth: true, data: [14.2, 15.1, 14.8, 16.2, 15.5, 15.8, 15.2], lineStyle: { color: '#1A7F37' }, areaStyle: { color: 'rgba(26,127,55,0.1)' } },
+          { name: '中国联通', type: 'line', smooth: true, data: [22.1, 20.3, 21.5, 19.8, 20.5, 21.2, 20.5], lineStyle: { color: '#CF222E' }, areaStyle: { color: 'rgba(207,34,46,0.1)' } },
+          { name: '中国移动', type: 'line', smooth: true, data: [19.5, 20.1, 19.8, 21.2, 20.5, 20.8, 20.4], lineStyle: { color: '#0550AE' }, areaStyle: { color: 'rgba(5,80,174,0.1)' } }
+        ]
+      });
+      reportCharts.push(chart0);
+    }
+
+    /* 图表 1: 运营商 SLA 达标率对比 */
+    var dom1 = document.getElementById('rvChart1');
+    if (dom1 && typeof echarts !== 'undefined') {
+      var chart1 = echarts.init(dom1);
+      chart1.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+        xAxis: { type: 'value', min: 99, max: 100, axisLine: { lineStyle: { color: textColor } }, splitLine: { lineStyle: { color: gridColor } }, axisLabel: { fontSize: 10 } },
+        yAxis: { type: 'category', data: ['中国电信', '中国移动', '中国联通', '教育网'], axisLine: { lineStyle: { color: textColor } }, axisLabel: { fontSize: 10 } },
+        series: [{
+          type: 'bar',
+          data: [
+            { value: 99.92, itemStyle: { color: '#1A7F37' } },
+            { value: 99.87, itemStyle: { color: '#0550AE' } },
+            { value: 99.78, itemStyle: { color: '#BF8700' } },
+            { value: 99.65, itemStyle: { color: '#656D76' } }
+          ],
+          barWidth: '50%',
+          label: { show: true, position: 'right', fontSize: 10, color: textColor }
+        }]
+      });
+      reportCharts.push(chart1);
+    }
+
+    /* 图表 2: 链路质量评分排名 */
+    var dom2 = document.getElementById('rvChart2');
+    if (dom2 && typeof echarts !== 'undefined') {
+      var chart2 = echarts.init(dom2);
+      chart2.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+        xAxis: { type: 'value', min: 85, max: 100, axisLine: { lineStyle: { color: textColor } }, splitLine: { lineStyle: { color: gridColor } }, axisLabel: { fontSize: 10 } },
+        yAxis: { type: 'category', data: ['电信-北京', '移动-上海', '电信-广州', '联通-北京', '移动-深圳', '电信-成都', '联通-上海', '移动-北京'], axisLine: { lineStyle: { color: textColor } }, axisLabel: { fontSize: 10 } },
+        series: [{
+          type: 'bar',
+          data: [
+            { value: 96, itemStyle: { color: '#1A7F37' } },
+            { value: 95, itemStyle: { color: '#1A7F37' } },
+            { value: 94, itemStyle: { color: '#1A7F37' } },
+            { value: 93, itemStyle: { color: '#0550AE' } },
+            { value: 93, itemStyle: { color: '#0550AE' } },
+            { value: 92, itemStyle: { color: '#0550AE' } },
+            { value: 91, itemStyle: { color: '#BF8700' } },
+            { value: 91, itemStyle: { color: '#BF8700' } }
+          ],
+          barWidth: '50%',
+          label: { show: true, position: 'right', fontSize: 10, color: textColor }
+        }]
+      });
+      reportCharts.push(chart2);
+    }
+  }
 }
 
 /* ── 日历视图相关变量 ────────────────────────────────── */
@@ -2126,6 +3013,7 @@ function wizardSelectTemplate(tpl) {
   /* 更新模板说明 */
   var details = {
     traffic: { body: '流量分析报告包含带宽利用率趋势、协议分布、异常流量检测等核心维度，适合日常运维监控场景。', kpis: ['带宽利用率', '协议分布', '异常检测', 'TOP10 IP'] },
+    process: { body: '流程分析报告深度分析互联网链路质量、路由性能、运营商SLA达标率，助力出口带宽优化决策。', kpis: ['可用率', '延迟抖动', 'SLA达标', '路由质量'] },
     fault: { body: '故障统计报告涵盖故障事件趋势、MTTR/MTBF 可靠性指标、根因分布分析，帮助提升故障处置效率。', kpis: ['故障总数', 'MTTR', '根因分布', '告警收敛'] },
     capacity: { body: '容量规划报告提供链路容量现状、增长趋势预测、扩容建议，助力前瞻性资源规划。', kpis: ['使用率', '增长预测', '瓶颈识别', '扩容建议'] },
     health: { body: '网络健康报告综合评估可用性、延迟、丢包率、设备健康评分，全面掌握网络状态。', kpis: ['可用性', '延迟', '健康评分', '风险预警'] },
@@ -2510,6 +3398,7 @@ function showToast(message, type) {
 /* ── 提示词面板 ───────────────────────────────────────── */
 var promptTemplates = {
   traffic: '分析 {{timeRange}} 内所有 {{targets}} 的流量数据。\n\n重点关注以下维度：\n1. 带宽利用率趋势及峰值分析\n2. 流量 TOP 10 源/目的 IP 排名\n3. 协议分布（HTTP/HTTPS/SSH/DNS/其他）\n4. 异常流量检测（突增/突降/突刺）\n5. 链路健康度评估\n\n输出格式要求：\n- 包含 KPI 概览卡片（平均利用率、峰值、异常事件数、健康率）\n- 趋势折线图（按天聚合）\n- 协议分布饼图\n- 异常事件时间轴',
+  process: '分析 {{timeRange}} 内 {{targets}} 的互联网链路质量。\n\n重点关注以下维度：\n1. 链路可用性及 SLA 达标率统计\n2. 链路延迟/抖动趋势分析（按运营商区分）\n3. 丢包事件深度排查与根因分析\n4. BGP 路由变化及跨运营商绕行检测\n5. 链路质量评分排名\n\n输出格式要求：\n- KPI 概览（可用率、平均延迟、丢包率、抖动）\n- 多运营商延迟对比趋势图\n- SLA 达标率柱状图\n- 链路质量排名表',
   fault: '统计 {{timeRange}} 内 {{targets}} 的故障事件数据。\n\n重点关注以下维度：\n1. 故障事件总数及趋势\n2. MTTR / MTBF 可靠性指标\n3. 故障根因 TOP N 分布\n4. 告警收敛趋势分析\n5. 故障影响范围评估\n\n输出格式要求：\n- KPI 概览（故障总数、平均 MTTR、根因集中度）\n- 故障趋势折线图\n- 根因分布饼图\n- 故障时间轴',
   capacity: '分析 {{timeRange}} 内 {{targets}} 的容量使用情况。\n\n重点关注以下维度：\n1. 链路容量使用率现状\n2. 增长趋势预测（未来 30/60/90 天）\n3. 扩容建议及优先级排序\n4. 资源瓶颈热点识别\n5. 成本效益分析\n\n输出格式要求：\n- KPI 概览（平均使用率、峰值、预测瓶颈时间）\n- 容量趋势及预测图\n- 链路使用率排名表\n- 扩容建议清单',
   health: '评估 {{timeRange}} 内 {{targets}} 的网络健康状态。\n\n重点关注以下维度：\n1. 网络可用性（SLA 达标率）\n2. 丢包率/延迟趋势\n3. 设备健康评分排名\n4. 链路冗余度分析\n5. 潜在风险预警\n\n输出格式要求：\n- KPI 概览（可用性、平均延迟、健康评分）\n- 健康评分仪表盘\n- 延迟/丢包趋势图\n- 风险预警列表',
@@ -2862,6 +3751,7 @@ function renderFreqCell(tpl, freq) {
 function getTypeIcon(type) {
   var icons = {
     traffic: '<span class="material-symbols-rounded">show_chart</span>',
+    process: '<span class="material-symbols-rounded">hub</span>',
     fault: '<span class="material-symbols-rounded">warning</span>',
     capacity: '<span class="material-symbols-rounded">storage</span>',
     health: '<span class="material-symbols-rounded">favorite</span>',
@@ -3456,6 +4346,18 @@ renderMyReports();
 switchView('my-reports');
 setActiveNav('.report-nav-item[data-role="my-reports-home"]');
 setPromptMode('editor');
+
+/* 主题变化时重新渲染图表 */
+document.addEventListener('ngpm-theme-change', function(e) {
+  if (currentViewingReport) {
+    var tpl = reportContentTemplates[currentViewingReport.type];
+    if (tpl) {
+      setTimeout(function() {
+        initReportCharts(currentViewingReport.type, tpl);
+      }, 50);
+    }
+  }
+});
 </script>
 
 <style>

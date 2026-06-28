@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📡 数据中心链路性能报表</title>
+<script src="echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #F5F7FA;
+  color: #202124;
+  padding: 20px;
+  min-width: 1400px;
+}
+
+/* ========== 模块一：标题与时间控制 ========== */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 16px 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #202124;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-period {
+  font-size: 13px;
+  color: #5F6368;
+  margin-top: 4px;
+}
+
+.time-buttons {
+  display: flex;
+  gap: 8px;
+  background: #F1F3F4;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.time-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: #5F6368;
+  transition: all 0.2s;
+}
+
+.time-btn.active {
+  background: #1A73E8;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(26,115,232,0.3);
+}
+
+.time-btn:hover:not(.active) {
+  background: #E8EAED;
+}
+
+/* ========== 通用卡片样式 ========== */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #202124;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========== 模块二：KPI概览 ========== */
+.kpi-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 280px;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.kpi-card:nth-child(1)::before { background: #34A853; }
+.kpi-card:nth-child(2)::before { background: #1A73E8; }
+.kpi-card:nth-child(3)::before { background: #F5A623; }
+.kpi-card:nth-child(4)::before { background: #E5493F; }
+
+.kpi-label {
+  font-size: 13px;
+  color: #5F6368;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #202124;
+  line-height: 1.1;
+}
+
+.kpi-sub {
+  font-size: 12px;
+  color: #5F6368;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kpi-trend-up { color: #E5493F; }
+.kpi-trend-down { color: #34A853; }
+
+/* 健康度分布环形图 */
+.health-ring-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.health-ring-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #202124;
+  margin-bottom: 8px;
+}
+
+#healthRingChart {
+  flex: 1;
+  min-height: 120px;
+}
+
+/* ========== 模块三：智能诊断摘要 ========== */
+.diagnosis-container {
+  display: none;
+}
+
+.diagnosis-container.has-issues {
+  display: block;
+}
+
+.diagnosis-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #E5493F;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.diagnosis-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.diagnosis-card {
+  padding: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.diagnosis-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.diagnosis-card:hover,
+.diagnosis-card.active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.diagnosis-card.capacity { background: #FFF3E0; }
+.diagnosis-card.capacity::before { background: #F5A623; }
+.diagnosis-card.capacity:hover,
+.diagnosis-card.capacity.active { border-color: #F5A623; }
+
+.diagnosis-card.latency { background: #E8F0FE; }
+.diagnosis-card.latency::before { background: #1A73E8; }
+.diagnosis-card.latency:hover,
+.diagnosis-card.latency.active { border-color: #1A73E8; }
+
+.diagnosis-card.connection { background: #FCE8E6; }
+.diagnosis-card.connection::before { background: #E5493F; }
+.diagnosis-card.connection:hover,
+.diagnosis-card.connection.active { border-color: #E5493F; }
+
+.diagnosis-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.diagnosis-link {
+  font-size: 14px;
+  font-weight: 700;
+  color: #202124;
+  margin-bottom: 6px;
+}
+
+.diagnosis-text {
+  font-size: 12px;
+  color: #5F6368;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.diagnosis-infer {
+  font-size: 11px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 6px;
+  color: #202124;
+  font-weight: 500;
+}
+
+.diagnosis-trend {
+  font-size: 11px;
+  margin-top: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ========== 模块四：全局趋势图 ========== */
+.trend-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+#trendChart {
+  height: 320px;
+  width: 100%;
+}
+
+/* ========== 模块五：Top N 排行与明细表 ========== */
+.top-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.top-chart {
+  height: 200px;
+}
+
+/* 表格样式 */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th {
+  background: #F8F9FA;
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #5F6368;
+  border-bottom: 2px solid #E8EAED;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.data-table th:hover {
+  background: #F1F3F4;
+}
+
+.data-table th .sort-icon {
+  position: absolute;
+  right: 4px;
+  opacity: 0.4;
+}
+
+.data-table th.sorted .sort-icon {
+  opacity: 1;
+  color: #1A73E8;
+}
+
+.data-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #F1F3F4;
+  color: #202124;
+}
+
+.data-table tbody tr {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.data-table tbody tr:hover {
+  background: #E8F0FE;
+}
+
+.data-table tbody tr.selected {
+  background: #E8F0FE;
+21 word-spacing: color: color: ;;;   type: 'internet',
+    bandwidth: 1000,
+    healthScore: 82,
+    avgLatency: 25,
+    avgLoss: 0.35,
+    tcpScore: 85,
+    appScore: 78,
+    serverScore: 82,
+    connectSuccessRate: 98.8,
+    activeSessions: 3523,
+    clientLatencyRatio: 0.35,
+    serverLatencyRatio: 0.65,
+    inTrafficRatio: 0.75,
+    outTrafficRatio: 0.25,
+    connectFailClient: 25,
+    connectFailServer: 68,
+    serverReset: 35,
+    noResponse: 42,
+    packetSmall: 55, packetMedium: 30, packetLarge: 15
+  },
+  {
+    id: 'link_2',
+    name: '互联网出口-2',
+    type: 'internet',
+    bandwidth: 1000,
+    healthScore: 78,
+    avgLatency: 32,
+    avgLoss: 0.48,
+    tcpScore: 80,
+    appScore: 75,
+    serverScore: 79,
+    connectSuccessRate: 98.2,
+    activeSessions: 2847,
+    clientLatencyRatio: 0.40,
+    serverLatencyRatio: 0.60,
+    inTrafficRatio: 0.70,
+    outTrafficRatio: 0.30,
+    connectFailClient: 32,
+    connectFailServer: 85,
+    serverReset: 48,
+    noResponse: 55,
+    packetSmall: 50, packetMedium: 35, packetLarge: 15
+  },
+  {
+    id: 'link_3',
+    name: '上海专线',
+    type: 'mpls',
+    bandwidth: 500,
+    healthScore: 96,
+    avgLatency: 8,
+    avgLoss: 0.02,
+    tcpScore: 98,
+    appScore: 95,
+    serverScore: 96,
+    connectSuccessRate: 99.95,
+    activeSessions: 856,
+    clientLatencyRatio: 0.75,
+    serverLatencyRatio: 0.25,
+    inTrafficRatio: 0.45,
+    outTrafficRatio: 0.55,
+    connectFailClient: 3,
+    connectFailServer: 5,
+    serverReset: 2,
+    noResponse: 1,
+    packetSmall: 70, packetMedium: 22, packetLarge: 8
+  },
+  {
+    id: 'link_4',
+    name: '北京专线',
+    type: 'mpls',
+    bandwidth: 500,
+    healthScore: 94,
+    avgLatency: 12,
+    avgLoss: 0.05,
+    tcpScore: 96,
+    appScore: 92,
+    serverScore: 94,
+    connectSuccessRate: 99.9,
+    activeSessions: 723,
+    clientLatencyRatio: 0.70,
+    serverLatencyRatio: 0.30,
+    inTrafficRatio: 0.40,
+    outTrafficRatio: 0.60,
+    connectFailClient: 5,
+    connectFailServer: 8,
+    serverReset: 4,
+    noResponse: 2,
+    packetSmall: 65, packetMedium: 25, packetLarge: 10
+  },
+  {
+    id: 'link_5',
+    name: '深圳专线',
+    type: 'mpls',
+    bandwidth: 300,
+    healthScore: 68,
+    avgLatency: 18,
+    avgLoss: 0.85,
+    tcpScore: 72,
+    appScore: 65,
+    serverScore: 70,
+    connectSuccessRate: 97.5,
+    activeSessions: 534,
+    clientLatencyRatio: 0.25,
+    serverLatencyRatio: 0.75,
+    inTrafficRatio: 0.55,
+    outTrafficRatio: 0.45,
+    connectFailClient: 18,
+    connectFailServer: 112,
+    serverReset: 65,
+    noResponse: 78,
+    packetSmall: 45, packetMedium: 38, packetLarge: 17
+  },
+  {
+    id: 'link_6',
+    name: '数据中心互联-1',
+    type: 'dci',
+    bandwidth: 10000,
+    healthScore: 95,
+    avgLatency: 2,
+    avgLoss: 0.01,
+    tcpScore: 97,
+    appScore: 94,
+    serverScore: 96,
+    connectSuccessRate: 99.98,
+    activeSessions: 1245,
+    clientLatencyRatio: 0.50,
+    serverLatencyRatio: 0.50,
+    inTrafficRatio: 0.20,
+    outTrafficRatio: 0.80,
+    connectFailClient: 2,
+    connectFailServer: 3,
+    serverReset: 1,
+    noResponse: 1,
+    packetSmall: 30, packetMedium: 40, packetLarge: 30
+  },
+  {
+    id: 'link_7',
+    name: '数据中心互联-2',
+    type: 'dci',
+    bandwidth: 10000,
+    healthScore: 93,
+    avgLatency: 3,
+    avgLoss: 0.02,
+    tcpScore: 95,
+    appScore: 91,
+    serverScore: 94,
+    connectSuccessRate: 99.95,
+    activeSessions: 1087,
+    clientLatencyRatio: 0.45,
+    serverLatencyRatio: 0.55,
+    inTrafficRatio: 0.25,
+    outTrafficRatio: 0.75,
+    connectFailClient: 4,
+    connectFailServer: 6,
+    serverReset: 3,
+    noResponse: 2,
+    packetSmall: 35, packetMedium: 38, packetLarge: 27
+  },
+  {
+    id: 'link_8',
+    name: '外联-银行专线',
+    type: 'extranet',
+    bandwidth: 100,
+    healthScore: 85,
+    avgLatency: 45,
+    avgLoss: 0.25,
+    tcpScore: 88,
+    appScore: 82,
+    serverScore: 85,
+    connectSuccessRate: 96.8,
+    activeSessions: 234,
+    clientLatencyRatio: 0.20,
+    serverLatencyRatio: 0.80,
+    inTrafficRatio: 0.60,
+    outTrafficRatio: 0.40,
+    connectFailClient: 15,
+    connectFailServer: 95,
+    serverReset: 52,
+    noResponse: 68,
+    packetSmall: 80, packetMedium: 15, packetLarge: 5
+  },
+  {
+    id: 'link_9',
+    name: '外联-支付网关',
+    type: 'extranet',
+    bandwidth: 200,
+    healthScore: 72,
+    avgLatency: 55,
+    avgLoss: 0.55,
+    tcpScore: 75,
+    appScore: 70,
+    serverScore: 73,
+    connectSuccessRate: 95.2,
+    activeSessions: 456,
+    clientLatencyRatio: 0.15,
+    serverLatencyRatio: 0.85,
+    inTrafficRatio: 0.65,
+    outTrafficRatio: 0.35,
+    connectFailClient: 28,
+    connectFailServer: 158,
+    serverReset: 95,
+    noResponse: 112,
+    packetSmall: 75, packetMedium: 18, packetLarge: 7
+  },
+  {
+    id: 'link_10',
+    name: '香港国际专线',
+    type: 'international',
+    bandwidth: 500,
+    healthScore: 62,
+    avgLatency: 185,
+    avgLoss: 1.25,
+    tcpScore: 65,
+    appScore: 58,
+    serverScore: 63,
+    connectSuccessRate: 94.5,
+    activeSessions: 678,
+    clientLatencyRatio: 0.85,
+    serverLatencyRatio: 0.15,
+    inTrafficRatio: 0.50,
+    outTrafficRatio: 0.50,
+    connectFailClient: 85,
+    connectFailServer: 42,
+    serverReset: 28,
+    noResponse: 35,
+    packetSmall: 55, packetMedium: 30, packetLarge: 15
+  }
+];
+
+// ========== 生成24小时趋势数据 ==========
+function generateTrendData(link) {
+  var timestamps = [];
+  var throughputIn = [];
+  var throughputOut = [];
+  var utilizationIn = [];
+  var utilizationOut = [];
+  var latency = [];
+  var loss = [];
+
+  for (var h = 0; h < 24; h++) {
+    timestamps.push(h.toString().padStart(2, '0') + ':00');
+
+    // 基础流量值
+    var baseThroughput = link.bandwidth * 0.3;
+    var peakFactor = (h >= 9 && h <= 11) || (h >= 14 && h <= 17) ? 1.8 : (h >= 0 && h <= 6 ? 0.4 : 1);
+
+    // 互联网出口：晚高峰较高
+    if (link.type === 'internet') {
+      peakFactor = (h >= 19 && h <= 23) ? 2.2 : peakFactor;
+    }
+
+    // DCI：凌晨备份高峰
+    if (link.type === 'dci') {
+      peakFactor = (h >= 0 && h <= 5) ? 2.5 : peakFactor;
+    }
+
+    var ti = baseThroughput * peakFactor * (0.9 + Math.random() * 0.2) * link.inTrafficRatio;
+    var to = baseThroughput * peakFactor * (0.9 + Math.random() * 0.2) * link.outTrafficRatio;
+
+    throughputIn.push(Math.round(ti));
+    throughputOut.push(Math.round(to));
+    utilizationIn.push(Math.round((ti / link.bandwidth) * 100 * 10) / 10);
+    utilizationOut.push(Math.round((to / link.bandwidth) * 100 * 10) / 10);
+
+    // 时延：深圳专线下午突发
+    if (link.id === 'link_5' && h >= 14 && h <= 17) {
+      latency.push(Math.round((link.avgLatency * (2 + Math.random())) * 10) / 10);
+      loss.push(Math.round((2.5 + Math.random() * 1.5) * 100) / 100);
+    } else if (link.type === 'international') {
+      latency.push(Math.round(link.avgLatency * (0.9 + Math.random() * 0.4) * 10) / 10);
+      loss.push(Math.round((0.8 + Math.random() * 1.2) * 100) / 100);
+    } else {
+      latency.push(Math.round(link.avgLatency * (0.85 + Math.random() * 0.3) * 10) / 10);
+      loss.push(Math.round((link.avgLoss * (0.7 + Math.random() * 0.6)) * 100) / 100);
+    }
+  }
+
+  return {
+    timestamp: timestamps,
+    throughputIn: throughputIn,
+    throughputOut: throughputOut,
+    utilizationIn: utilizationIn,
+    utilizationOut: utilizationOut,
+    latency: latency,
+    loss: loss
+  };
+}
+
+// 初始化所有链路的趋势数据
+linksData.forEach(function(link) {
+  link.trend = generateTrendData(link);
+});
+
+// =========================================================
+// 数据聚合函数 aggregateData
+// =========================================================
+
+function aggregateData(linkData, granularity) {
+  var result = {
+    timestamp: [],
+    throughputIn: [],
+    throughputOut: [],
+    utilizationIn: [],
+    utilizationOut: [],
+    latency: [],
+    loss: []
+  };
+
+  if (granularity === 'daily') {
+    // 日报：直接返回24小时数据
+    return JSON.parse(JSON.stringify(linkData.trend));
+  }
+
+  var source = linkData.trend;
+  var groupCount = granularity === 'weekly' ? 7 : 30;
+
+  // 聚合标签
+  if (granularity === 'weekly') {
+    result.timestamp = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  } else {
+    for (var d = 1; d <= 30; d++) {
+      result.timestamp.push(d.toString() + '日');
+    }
+  }
+
+  // 模拟聚合数据（基于24小时基准数据生成周/月数据点）
+  var baseTi = source.throughputIn.reduce(function(a, b) { return a + b; }, 0) / source.throughputIn.length;
+  var baseTo = source.throughputOut.reduce(function(a, b) { return a + b; }, 0) / source.throughputOut.length;
+  var baseUi = source.utilizationIn.reduce(function(a, b) { return a + b; }, 0) / source.utilizationIn.length;
+  var baseUo = source.utilizationOut.reduce(function(a, b) { return a + b; }, 0) / source.utilizationOut.length;
+  var baseLat = source.latency.reduce(function(a, b) { return a + b; }, 0) / source.latency.length;
+  var baseLoss = source.loss.reduce(function(a, b) { return a + b; }, 0) / source.loss.length;
+
+  for (var i = 0; i < groupCount; i++) {
+    var factor = 0.85 + Math.random() * 0.3;
+    // 周末/月末波动
+    if (granularity === 'weekly' && (i === 5 || i === 6)) {
+      factor *= 0.6;
+    }
+    if (granularity === 'monthly' && (i >= 25 || i === 0)) {
+      factor *= 0.7;
+    }
+    result.throughputIn.push(Math.round(baseTi * factor));
+    result.throughputOut.push(Math.round(baseTo * factor));
+    result.utilizationIn.push(Math.round(baseUi * factor * 10) / 10);
+    result.utilizationOut.push(Math.round(baseUo * factor * 10) / 10);
+    result.latency.push(Math.round(baseLat * factor * 10) / 10);
+    result.loss.push(Math.round(baseLoss * factor * 100) / 100);
+  }
+
+  return result;
+}
+
+// =========================================================
+// KPI 计算与渲染
+// =========================================================
+
+var trendChart, healthRingChart, topUtilChart, topLossChart, radarChart;
+
+function calculateKPI() {
+  var scores = linksData.map(function(l) { return l.healthScore; });
+  var avgScore = Math.round(scores.reduce(function(a, b) { return a + b; }, 0) / scores.length);
+
+  var latencies = linksData.map(function(l) { return l.avgLatency; });
+  var avgLatency = Math.round(latencies.reduce(function(a, b) { return a + b; }, 0) / latencies.length);
+  var maxLatency = Math.max.apply(null, latencies);
+
+  // 查找全局最大利用率
+  var maxUtil = 0;
+  var maxUtilLink = '';
+  linksData.forEach(function(l) {
+    var trend = aggregateData(l, currentGranularity);
+    var allUtil = trend.utilizationIn.concat(trend.utilizationOut);
+    var linkMax = Math.max.apply(null, allUtil);
+    if (linkMax > maxUtil) {
+      maxUtil = linkMax;
+      maxUtilLink = l.name;
+    }
+  });
+
+  // 异常链路计数
+  var anomalyCount = 0;
+  linksData.forEach(function(l) {
+    var trend = aggregateData(l, currentGranularity);
+    var maxU = Math.max.apply(null, trend.utilizationIn.concat(trend.utilizationOut));
+    var avgLoss = trend.loss.reduce(function(a, b) { return a + b; }, 0) / trend.loss.length;
+    if (maxU >= 70 || avgLoss > 1) anomalyCount++;
+  });
+
+  return {
+    healthScore: avgScore,
+    healthTrend: 2, // 模拟较昨日
+    avgLatency: avgLatency,
+    maxLatency: maxLatency,
+    peakUtilization: Math.round(maxUtil),
+    peakUtilLink: maxUtilLink,
+    anomalyCount: anomalyCount
+  };
+}
+
+function renderKPI(kpi) {
+  document.getElementById('kpiHealthScore').textContent = kpi.healthScore;
+  document.getElementById('kpiLatency').innerHTML = kpi.avgLatency + ' <span style="font-size:16px;font-weight:500">ms</span>';
+  document.getElementById('kpiMaxLatency').textContent = kpi.maxLatency + ' ms';
+  document.getElementById('kpiUtilization').innerHTML = kpi.peakUtilization + ' <span style="font-size:16px;font-weight:500">%</span>';
+  document.getElementById('kpiUtilizationLink').textContent = '最拥堵：' + kpi.peakUtilLink;
+  document.getElementById('kpiAnomalyCount').textContent = kpi.anomalyCount;
+
+  var trendEl = document.getElementById('kpiHealthTrend');
+  trendEl.textContent = (kpi.healthTrend >= 0 ? '↑ ' : '↓ ') + Math.abs(kpi.healthTrend) + '%';
+  trendEl.className = kpi.healthTrend >= 0 ? 'kpi-trend-up' : 'kpi-trend-down';
+
+  // 健康度分布
+  var excellent = 0, good = 0, focus = 0;
+  linksData.forEach(function(l) {
+    if (l.healthScore >= 90) excellent++;
+    else if (l.healthScore >= 70) good++;
+    else focus++;
+  });
+
+  if (!healthRingChart) {
+    healthRingChart = echarts.init(document.getElementById('healthRingChart'));
+  }
+  healthRingChart.setOption({
+    tooltip: { trigger: 'item' },
+    series: [{
+      type: 'pie',
+      radius: ['55%', '75%'],
+      center: ['50%', '55%'],
+      label: {
+        show: true,
+        position: 'outside',
+        fontSize: 11,
+        formatter: function(p) { return p.name + ': ' + p.value + '条'; }
+      },
+      data: [
+        { value: excellent, name: '优秀(≥90)', itemStyle: { color: '#34A853' } },
+        { value: good, name: '良好(70-89)', itemStyle: { color: '#F5A623' } },
+        { value: focus, name: '关注(<70)', itemStyle: { color: '#E5493F' } }
+      ]
+    }]
+  }, true);
+}
+
+// =========================================================
+// 智能诊断模块
+// =========================================================
+
+function generateDiagnosis() {
+  var diagnoses = [];
+
+  linksData.forEach(function(link) {
+    var trend = aggregateData(link, currentGranularity);
+    var maxUtil = Math.max.apply(null, trend.utilizationIn.concat(trend.utilizationOut));
+    var avgLoss = trend.loss.reduce(function(a, b) { return a + b; }, 0) / trend.loss.length;
+    var avgLatency = trend.latency.reduce(function(a, b) { return a + b; }, 0) / trend.latency.length;
+
+    // 容量拥堵诊断
+    if (maxUtil >= 70) {
+      var direction = link.outTrafficRatio > link.inTrafficRatio ?
+        '流出占比达 ' + Math.round(link.outTrafficRatio * 100) + '%，业务对外发送突增（如数据备份）' :
+        '流入占比达 ' + Math.round(link.inTrafficRatio * 100) + '%，下行流量突增（如视频/下载）';
+      diagnoses.push({
+        type: 'capacity',
+        icon: '🚦',
+        linkName: link.name,
+        value: '利用率 ' + Math.round(maxUtil) + '%',
+        inference: direction,
+        trend: '↑ ' + Math.round(Math.random() * 20 + 15) + '%',
+        linkIndex: linksData.indexOf(link)
+      });
+    }
+
+    // 时延异常诊断
+    if (avgLatency > 100 || (avgLatency > link.avgLatency * 1.5 && avgLatency > 30)) {
+      var latInfer = link.serverLatencyRatio > 0.7 ?
+        '服务端时延占比 ' + Math.round(link.serverLatencyRatio * 100) + '%，对端服务器或安全设备处理慢' :
+        '客户端时延占比 ' + Math.round(link.clientLatencyRatio * 100) + '%，物理距离或运营商路由绕行';
+      diagnoses.push({
+        type: 'latency',
+        icon: '⏱️',
+        linkName: link.name,
+        value: '时延 ' + Math.round(avgLatency) + 'ms',
+        inference: latInfer,
+        trend: '↑ ' + Math.round(Math.random() * 30 + 25) + '%',
+        linkIndex: linksData.indexOf(link)
+      });
+    }
+
+    // 连接失败诊断
+    if (link.connectSuccessRate < 97 || avgLoss > 1) {
+      var connInfer = link.noResponse > link.serverReset ?
+        '服务端无响应为主，防火墙策略阻断或服务未监听' :
+        '服务端Reset为主，服务端过载或应用崩溃';
+      diagnoses.push({
+        type: 'connection',
+        icon: '📡',
+        linkName: link.name,
+        value: '建连成功率 ' + link.connectSuccessRate + '%，丢包率 ' + avgLoss.toFixed(2) + '%',
+        inference: connInfer,
+        trend: '↑ ' + Math.round(Math.random() * 40 + 30) + '%',
+        linkIndex: linksData.indexOf(link)
+      });
+    }
+  });
+
+  return diagnoses.slice(0, 3);
+}
+
+function renderDiagnosis() {
+  var diagnoses = generateDiagnosis();
+  var container = document.getElementById('diagnosisContainer');
+  var cardsContainer = document.getElementById('diagnosisCards');
+
+  if (diagnoses.length === 0) {
+    container.classList.remove('has-issues');
+    return;
+  }
+
+  container.classList.add('has-issues');
+  cardsContainer.innerHTML = diagnoses.map(function(d, idx) {
+    return '<div class="diagnosis-card ' + d.type + '" data-link-index="' + d.linkIndex + '" onclick="selectLinkFromDiagnosis(' + d.linkIndex + ', this)">' +
+      '<div class="diagnosis-icon">' + d.icon + '</div>' +
+      '<div class="diagnosis-link">' + d.linkName + '</div>' +
+      '<div class="diagnosis-text">' + d.value + '</div>' +
+      '<div class="diagnosis-infer">💡 推断：' + d.inference + '</div>' +
+      '<div class="diagnosis-trend" style="color:' + (d.type === 'capacity' ? '#F5A623' : d.type === 'latency' ? '#1A73E8' : '#E5493F') + '">' + d.trend + ' 较昨日同时段</div>' +
+    '</div>';
+  }).join('');
+}
+
+// =========================================================
+// 趋势图渲染
+// =========================================================
+
+function renderTrendChart(linkIndex) {
+  var link = linksData[linkIndex];
+  var trend = aggregateData(link, currentGranularity);
+
+  if (!trendChart) {
+    trendChart = echarts.init(document.getElementById('trendChart'));
+    window.addEventListener('resize', function() { trendChart.resize(); });
+  }
+
+  // 标记异常点
+  var markPoints = [];
+  for (var i = 0; i < trend.loss.length; i++) {
+    if (trend.loss[i] > 1 || trend.utilizationIn[i] > 80 || trend.utilizationOut[i] > 80) {
+      markPoints.push({
+        xAxis: i,
+        yAxis: Math.max(trend.loss[i] * 50, trend.utilizationIn[i], trend.utilizationOut[i]),
+        itemStyle: { color: '#E5493F' },
+        symbol: 'circle',
+        symbolSize: 12
+      });
+    }
+  }
+
+  trendChart.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+    legend: {
+      data: ['流入利用率', '流出利用率', '时延', '丢包率'],
+      top: 5
+    },
+    grid: { left: 60, right: 60, top: 50, bottom: 40 },
+    xAxis: {
+      type: 'category',
+      data: trend.timestamp,
+      axisLabel: { fontSize: 11 }
+    },
+    yAxis: [
+      {
+        type: 'value',
+        name: '利用率',
+        min: 0,
+        max: 100,
+        axisLabel: { fontSize: 11, formatter: '{value}%' }
+      },
+      {
+        type: 'value',
+        name: '时延(ms)',
+        min: 0,
+        max: Math.max(20, Math.ceil(Math.max.apply(null, trend.latency) / 10) * 10),
+        axisLabel: { fontSize: 11, formatter: '{value}' },
+        position: 'right'
+      }
+    ],
+    series: [
+      {
+        name: '流入利用率',
+        type: 'line',
+        smooth: true,
+        data: trend.utilizationIn,
+        lineStyle: { color: '#1A73E8', width: 2 },
+        itemStyle: { color: '#1A73E8' },
+        areaStyle: { color: 'rgba(26,115,232,0.15)' }
+      },
+      {
+        name: '流出利用率',
+        type: 'line',
+        smooth: true,
+        data: trend.utilizationOut,
+        lineStyle: { color: '#34A853', width: 2 },
+        itemStyle: { color: '#34A853' },
+        areaStyle: { color: 'rgba(52,168,83,0.15)' }
+      },
+      {
+        name: '时延',
+        type: 'line',
+        yAxisIndex: 1,
+        smooth: true,
+        data: trend.latency,
+        lineStyle: { color: '#F5A623', width: 2 },
+        itemStyle: { color: '#F5A623' }
+      },
+      {
+        name: '丢包率(x10)',
+        type: 'line',
+        yAxisIndex: 1,
+        smooth: true,
+        data: trend.loss.map(function(l) { return l * 10; }),
+        lineStyle: { color: '#E5493F', width: 2, type: 'dashed' },
+        itemStyle: { color: '#E5493F' }
+      }
+    ]
+  }, true);
+
+  document.getElementById('trendChartLink').textContent = '当前链路：' + link.name;
+  document.getElementById('trendChartTitle').textContent = link.name + ' 趋势分析';
+}
+
+// =========================================================
+// Top N 排行图表
+// =========================================================
+
+function renderTopCharts() {
+  var utilData = linksData.map(function(l) {
+    var trend = aggregateData(l, currentGranularity);
+    var maxU = Math.max.apply(null, trend.utilizationIn.concat(trend.utilizationOut));
+    return { name: l.name, value: Math.round(maxU) };
+  }).sort(function(a, b) { return b.value - a.value; }).slice(0, 5);
+
+  var lossData = linksData.map(function(l) {
+    var trend = aggregateData(l, currentGranularity);
+    var avgL = trend.loss.reduce(function(a, b) { return a + b; }, 0) / trend.loss.length;
+    return { name: l.name, value: Math.round(avgL * 100) / 100 };
+  }).sort(function(a, b) { return b.value - a.value; }).slice(0, 5);
+
+  if (!topUtilChart) {
+    topUtilChart = echarts.init(document.getElementById('topUtilChart'));
+    topLossChart = echarts.init(document.getElementById('topLossChart'));
+  }
+
+  topUtilChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 110, right: 30, top: 10, bottom: 10 },
+    xAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%' } },
+    yAxis: { type: 'category', data: utilData.map(function(d) { return d.name; }), axisLabel: { fontSize: 11 } },
+    series: [{
+      type: 'bar',
+      data: utilData.map(function(d) {
+        return {
+          value: d.value,
+          itemStyle: { color: d.value >= 80 ? '#E5493F' : d.value >= 60 ? '#F5A623' : '#34A853' }
+        };
+      }),
+      label: { show: true, position: 'right', formatter: '{c}%' },
+      barWidth: 16
+    }]
+  }, true);
+
+  topLossChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 110, right: 30, top: 10, bottom: 10 },
+    xAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
+    yAxis: { type: 'category', data: lossData.map(function(d) { return d.name; }), axisLabel: { fontSize: 11 } },
+    series: [{
+      type: 'bar',
+      data: lossData.map(function(d) {
+        return {
+          value: d.value,
+          itemStyle: { color: d.value >= 1 ? '#E5493F' : d.value >= 0.5 ? '#F5A623' : '#34A853' }
+        };
+      }),
+      label: { show: true, position: 'right', formatter: '{c}%' },
+      barWidth: 16
+    }]
+  }, true);
+}
+
+// =========================================================
+// 链路明细表格
+// =========================================================
+
+function renderTable() {
+  var tbody = document.getElementById('linkTableBody');
+  tbody.innerHTML = linksData.map(function(link, idx) {
+    var trend = aggregateData(link, currentGranularity);
+    var totalThroughput = Math.round(trend.throughputIn.reduce(function(a, b) { return a + b; }, 0) / trend.throughputIn.length +
+      trend.throughputOut.reduce(function(a, b) { return a + b; }, 0) / trend.throughputOut.length);
+    var avgUtilIn = Math.round(trend.utilizationIn.reduce(function(a, b) { return a + b; }, 0) / trend.utilizationIn.length * 10) / 10;
+    var avgUtilOut = Math.round(trend.utilizationOut.reduce(function(a, b) { return a + b; }, 0) / trend.utilizationOut.length * 10) / 10;
+    var avgLoss = Math.round(trend.loss.reduce(function(a, b) { return a + b; }, 0) / trend.loss.length * 100) / 100;
+    var avgLatency = Math.round(trend.latency.reduce(function(a, b) { return a + b; }, 0) / trend.latency.length * 10) / 10;
+
+    var status = link.healthScore >= 90 ? 'normal' : link.healthScore >= 70 ? 'warning' : 'critical';
+    var statusText = status === 'normal' ? '正常' : status === 'warning' ? '关注' : '异常';
+
+    var utilClassIn = avgUtilIn >= 70 ? 'high' : avgUtilIn >= 50 ? 'medium' : 'low';
+    var utilClassOut = avgUtilOut >= 70 ? 'high' : avgUtilOut >= 50 ? 'medium' : 'low';
+
+    return '<tr data-link-index="' + idx + '" onclick="selectLinkFromTable(' + idx + ', this)" class="' + (idx === currentLinkIndex ? 'selected' : '') + '">' +
+      '<td class="link-name-cell">' + link.name + '</td>' +
+      '<td>' + totalThroughput + '</td>' +
+      '<td><div class="util-bar"><div class="util-bar-fill ' + utilClassIn + '" style="width:' + avgUtilIn + '%"></div></div>' + avgUtilIn + '%</td>' +
+      '<td><div class="util-bar"><div class="util-bar-fill ' + utilClassOut + '" style="width:' + avgUtilOut + '%"></div></div>' + avgUtilOut + '%</td>' +
+      '<td style="color:' + (avgLoss > 1 ? '#E5493F' : avgLoss > 0.5 ? '#F5A623' : 'inherit') + '">' + avgLoss.toFixed(2) + '</td>' +
+      '<td>' + avgLatency + '</td>' +
+      '<td style="color:' + (link.connectSuccessRate < 97 ? '#E5493F' : 'inherit') + '">' + link.connectSuccessRate + '</td>' +
+      '<td><span style="color:' + (status === 'normal' ? '#34A853' : status === 'warning' ? '#F5A623' : '#E5493F') + ';font-weight:700">' + link.healthScore + '</span></td>' +
+      '<td><span class="status-badge ' + status + '">' + statusText + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+// =========================================================
+// 单链路深度分析（雷达图+指标卡）
+// =========================================================
+
+function renderDetailAnalysis(linkIndex) {
+  var link = linksData[linkIndex];
+
+  if (!radarChart) {
+    radarChart = echarts.init(document.getElementById('radarChart'));
+  }
+
+  radarChart.setOption({
+    tooltip: {},
+    radar: {
+      indicator: [
+        { name: '网络评分', max: 100 },
+        { name: 'TCP评分', max: 100 },
+        { name: '应用评分', max: 100 },
+        { name: '服务器评分', max: 100 }
+      ],
+      center: ['50%', '50%'],
+      radius: '70%'
+    },
+    series: [{
+      type: 'radar',
+      data: [{
+        value: [link.healthScore, link.tcpScore, link.appScore, link.serverScore],
+        name: link.name,
+        areaStyle: { color: 'rgba(26,115,232,0.2)' },
+        lineStyle: { color: '#1A73E8', width: 2 },
+        itemStyle: { color: '#1A73E8' }
+      }]
+    }]
+  }, true);
+
+  document.getElementById('detailLinkName').textContent = '当前链路：' + link.name;
+  document.getElementById('detailClientLatency').textContent = Math.round(link.avgLatency * link.clientLatencyRatio * 10) / 10;
+  document.getElementById('detailServerLatency').textContent = Math.round(link.avgLatency * link.serverLatencyRatio * 10) / 10;
+  document.getElementById('detailConnRate').textContent = link.connectSuccessRate + '%';
+  document.getElementById('detailFailRate').textContent = (100 - link.connectSuccessRate).toFixed(2) + '%';
+  document.getElementById('detailInPackets').textContent = Math.round(link.activeSessions * 1.5 / 1000 * 10) / 10 + 'K';
+  document.getElementById('detailOutPackets').textContent = Math.round(link.activeSessions * 0.8 / 1000 * 10) / 10 + 'K';
+
+  document.getElementById('packetSmall').textContent = link.packetSmall + '%';
+  document.getElementById('packetMedium').textContent = link.packetMedium + '%';
+  document.getElementById('packetLarge').textContent = link.packetLarge + '%';
+  document.getElementById('packetSmall').style.height = link.packetSmall + '%';
+  document.getElementById('packetMedium').style.height = link.packetMedium + '%';
+  document.getElementById('packetLarge').style.height = link.packetLarge + '%';
+}
+
+// =========================================================
+// 交互逻辑
+// =========================================================
+
+function switchTimeGranularity(granularity) {
+  currentGranularity = granularity;
+
+  // 更新按钮状态
+  document.querySelectorAll('.time-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+
+  // 更新标题与周期
+  var typeText = { daily: '日报', weekly: '周报', monthly: '月报' };
+  document.getElementById('reportTypeLabel').textContent = typeText[granularity];
+
+  var now = new Date();
+  var periodText = '';
+  if (granularity === 'daily') {
+    periodText = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + ' 00:00 ~ 23:59';
+  } else if (granularity === 'weekly') {
+    periodText = now.getFullYear() + ' 第' + Math.ceil(now.getDate() / 7) + '周（周一至周日）';
+  } else {
+    periodText = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '（全月共30天）';
+  }
+  document.getElementById('periodText').textContent = '报告周期：' + periodText;
+
+  // 刷新所有图表和数据
+  var kpi = calculateKPI();
+  renderKPI(kpi);
+  renderDiagnosis();
+  renderTrendChart(currentLinkIndex);
+  renderTopCharts();
+  renderTable();
+}
+
+function selectLinkFromDiagnosis(linkIndex, el) {
+  currentLinkIndex = linkIndex;
+
+  // 高亮诊断卡片
+  document.querySelectorAll('.diagnosis-card').forEach(function(c) { c.classList.remove('active'); });
+  el.classList.add('active');
+
+  renderTrendChart(linkIndex);
+  renderDetailAnalysis(linkIndex);
+
+  // 高亮表格行
+  document.querySelectorAll('#linkTableBody tr').forEach(function(r) { r.classList.remove('selected'); });
+  var row = document.querySelector('#linkTableBody tr[data-link-index="' + linkIndex + '"]');
+  if (row) row.classList.add('selected');
+}
+
+function selectLinkFromTable(linkIndex, el) {
+  currentLinkIndex = linkIndex;
+
+  document.querySelectorAll('#linkTableBody tr').forEach(function(r) { r.classList.remove('selected'); });
+  el.classList.add('selected');
+
+  renderTrendChart(linkIndex);
+  renderDetailAnalysis(linkIndex);
+}
+
+function sortTable(field) {
+  var fieldMap = {
+    name: function(l) { return l.name; },
+    throughput: function(l) {
+      var t = aggregateData(l, currentGranularity);
+      return t.throughputIn.reduce(function(a, b) { return a + b; }, 0) + t.throughputOut.reduce(function(a, b) { return a + b; }, 0);
+    },
+    utilIn: function(l) { var t = aggregateData(l, currentGranularity); return t.utilizationIn.reduce(function(a, b) { return a + b; }, 0); },
+    utilOut: function(l) { var t = aggregateData(l, currentGranularity); return t.utilizationOut.reduce(function(a, b) { return a + b; }, 0); },
+    loss: function(l) { var t = aggregateData(l, currentGranularity); return t.loss.reduce(function(a, b) { return a + b; }, 0); },
+    latency: function(l) { var t = aggregateData(l, currentGranularity); return t.latency.reduce(function(a, b) { return a + b; }, 0); },
+    connRate: function(l) { return l.connectSuccessRate; },
+    health: function(l) { return l.healthScore; },
+    status: function(l) { return l.healthScore; }
+  };
+
+  if (currentSortField === field) {
+    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSortField = field;
+    currentSortDirection = 'desc';
+  }
+
+  var sortFn = fieldMap[field];
+  linksData.sort(function(a, b) {
+    var va = sortFn(a);
+    var vb = sortFn(b);
+    return currentSortDirection === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+
+  renderTable();
+}
+
+// =========================================================
+// 页面初始化
+// =========================================================
+
+function init() {
+  var kpi = calculateKPI();
+  renderKPI(kpi);
+  renderDiagnosis();
+  renderTrendChart(currentLinkIndex);
+  renderTopCharts();
+  renderTable();
+  renderDetailAnalysis(currentLinkIndex);
+
+  // 窗口大小变化时重绘图表
+  window.addEventListener('resize', function() {
+    if (trendChart) trendChart.resize();
+    if (healthRingChart) healthRingChart.resize();
+    if (topUtilChart) topUtilChart.resize();
+    if (topLossChart) topLossChart.resize();
+    if (radarChart) radarChart.resize();
+  });
+}
+
+// 加载完成后初始化
+document.addEventListener('DOMContentLoaded', init);
+
+// 立即执行一次初始化（防止DOM已就绪）
+init();
+
+</script>
+</body>
+</html>

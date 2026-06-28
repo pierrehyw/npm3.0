@@ -96,26 +96,59 @@
 <body>
 <div class="app">
 
-  <!-- ── Sidebar ─────────────────────────────────────────── -->
+  <!-- ── Sidebar: 历史会话 ───────────────────────────────── -->
   <aside class="sidebar secondary-rail">
-    <div class="secondary-rail-title" aria-hidden="true"><span class="material-symbols-rounded">subdirectory_arrow_right</span></div>
-    <div class="page-tabs">
-      <a href="ai-agent.html" class="page-tab active">
-        <span class="material-symbols-rounded">smart_toy</span>
-        <span class="page-tab-text"><span class="page-tab-main">AI Agent</span><span class="page-tab-sub">智能自动化助手</span></span>
-      </a>
-      <a href="topology.html" class="page-tab">
-        <span class="material-symbols-rounded">account_tree</span>
-        <span class="page-tab-text"><span class="page-tab-main">网络拓扑</span><span class="page-tab-sub">结构 · 路径 · 会话追踪</span></span>
-      </a>
-      <a href="traffic.html" class="page-tab">
-        <span class="material-symbols-rounded">stacked_line_chart</span>
-        <span class="page-tab-text"><span class="page-tab-main">流量分析</span><span class="page-tab-sub">带宽 · TopN · 会话 · 协议</span></span>
-      </a>
-      <a href="dashboard.html?goto=ops-fault" class="page-tab">
-        <span class="material-symbols-rounded">bug_report</span>
-        <span class="page-tab-text"><span class="page-tab-main">故障分析</span><span class="page-tab-sub">告警 · 根因 · 影响范围</span></span>
-      </a>
+    <div class="chat-sidebar-header">
+      <button class="new-chat-btn" onclick="createNewChat()">
+        <span class="material-symbols-rounded">edit_square</span>
+        <span>新对话</span>
+      </button>
+    </div>
+    <div class="chat-history-group">
+      <div class="chat-history-label">
+        <span class="material-symbols-rounded">schedule</span>
+        <span>今天</span>
+      </div>
+      <div class="chat-history-item active">
+        <span class="chat-item-title">核心交换机热降频根因分析</span>
+        <span class="chat-item-time">14:32</span>
+      </div>
+      <div class="chat-history-item">
+        <span class="chat-item-title">上海专线带宽突增告警分析</span>
+        <span class="chat-item-time">11:05</span>
+      </div>
+      <div class="chat-history-item">
+        <span class="chat-item-title">数据中心互联链路抖动排查</span>
+        <span class="chat-item-time">09:18</span>
+      </div>
+    </div>
+    <div class="chat-history-group">
+      <div class="chat-history-label">
+        <span class="material-symbols-rounded">calendar_today</span>
+        <span>昨天</span>
+      </div>
+      <div class="chat-history-item">
+        <span class="chat-item-title">VLAN 100 网段连接异常诊断</span>
+        <span class="chat-item-time">16:42</span>
+      </div>
+      <div class="chat-history-item">
+        <span class="chat-item-title">全网设备健康度周报生成</span>
+        <span class="chat-item-time">10:15</span>
+      </div>
+    </div>
+    <div class="chat-history-group">
+      <div class="chat-history-label">
+        <span class="material-symbols-rounded">calendar_month</span>
+        <span>6月23日</span>
+      </div>
+      <div class="chat-history-item">
+        <span class="chat-item-title">防火墙策略变更影响评估</span>
+        <span class="chat-item-time">15:30</span>
+      </div>
+      <div class="chat-history-item">
+        <span class="chat-item-title">BGP 路由异常波动溯源</span>
+        <span class="chat-item-time">08:45</span>
+      </div>
     </div>
   </aside>
 <!-- ── Main ───────────────────────────────────────────── -->
@@ -128,7 +161,7 @@
       <nav class="top-primary-nav">
         <div class="nav-list">
           <a href="dashboard.html" class="nav-item"><span class="material-symbols-rounded">dashboard</span><span>总览</span></a>
-          <a href="network.html" class="nav-item"><span class="material-symbols-rounded">account_tree</span><span>数据分析</span></a>
+          <a href="traffic.html" class="nav-item"><span class="material-symbols-rounded">stacked_line_chart</span><span>数据分析</span></a>
           <a href="topology.html" class="nav-item"><span class="material-symbols-rounded">location_on</span><span>数字地图</span></a>
           <a href="report.html" class="nav-item"><span class="material-symbols-rounded">area_chart</span><span>报表报告</span></a>
           <a href="ai-agent.html" class="nav-item active"><span class="material-symbols-rounded">smart_toy</span><span>AI Agent</span></a>
@@ -263,108 +296,15 @@
       <div class="ai-main-panel">
 
         <div class="ai-chat-area" id="chatArea">
-
-          <!-- P1: 三场景导航卡大厅 -->
-          <div class="ai-hub-section">
-            <div class="ai-hub-status">
-              <span class="hub-status-dot"></span>
-              AI 已接入监控数据 &nbsp;·&nbsp;
-              <span class="hub-status-alert">5 个活跃告警，1 个严重</span>
-              &nbsp;·&nbsp; 今日 14:15
-            </div>
-            <div class="ai-hub-cards">
-
-              <!-- 故障分析卡 -->
-              <div class="hub-card hub-card--fault">
-                <div class="hub-card-header">
-                  <span class="material-symbols-rounded hub-card-icon" style="font-variation-settings:'FILL' 1">bug_report</span>
-                  <span class="hub-card-title">有告警要处理</span>
-                  <span class="hub-card-badge">5</span>
-                </div>
-                <div class="hub-card-stats">
-                  <div class="hub-stat">
-                    <div class="hub-stat-value">5</div>
-                    <div class="hub-stat-label">活跃告警</div>
-                  </div>
-                  <div class="hub-stat">
-                    <div class="hub-stat-value warn">1 严重</div>
-                    <div class="hub-stat-label">需立即处置</div>
-                  </div>
-                </div>
-                <div class="hub-card-latest">
-                  <span class="material-symbols-rounded" style="font-size:12px;color:#CF222E;font-variation-settings:'FILL' 1">circle</span>
-                  SW-Core-02 · 热降频 · CPU 60%
-                </div>
-                <a href="dashboard.html?goto=ops-fault" class="hub-card-btn hub-card-btn--fault">
-                  进入故障分析<span class="material-symbols-rounded">arrow_forward</span>
-                </a>
-              </div>
-
-              <!-- 流量分析卡 -->
-              <div class="hub-card hub-card--traffic">
-                <div class="hub-card-header">
-                  <span class="material-symbols-rounded hub-card-icon">stacked_line_chart</span>
-                  <span class="hub-card-title">看流量 / 容量</span>
-                </div>
-                <div class="hub-card-stats">
-                  <div class="hub-stat">
-                    <div class="hub-stat-value">4.82 <small style="font-size:12px;font-weight:400">Gbps</small></div>
-                    <div class="hub-stat-label">当前全网流量</div>
-                  </div>
-                  <div class="hub-stat">
-                    <div class="hub-stat-value warn">WAN 84%</div>
-                    <div class="hub-stat-label">出口利用率</div>
-                  </div>
-                </div>
-                <div class="hub-card-latest">
-                  <span class="material-symbols-rounded" style="font-size:12px;color:#D09B00;font-variation-settings:'FILL' 1">warning</span>
-                  WAN-01 · 预测 48h 达 91%，建议处置
-                </div>
-                <a href="traffic.html" class="hub-card-btn hub-card-btn--traffic">
-                  进入流量分析<span class="material-symbols-rounded">arrow_forward</span>
-                </a>
-              </div>
-
-              <!-- 网络拓扑卡 -->
-              <div class="hub-card hub-card--topo">
-                <div class="hub-card-header">
-                  <span class="material-symbols-rounded hub-card-icon">account_tree</span>
-                  <span class="hub-card-title">理解网络结构</span>
-                </div>
-                <div class="hub-card-stats">
-                  <div class="hub-stat">
-                    <div class="hub-stat-value">87</div>
-                    <div class="hub-stat-label">在线设备</div>
-                  </div>
-                  <div class="hub-stat">
-                    <div class="hub-stat-value" style="font-size:14px;color:#0969DA;font-weight:700">+2 台</div>
-                    <div class="hub-stat-label">今日新增发现</div>
-                  </div>
-                </div>
-                <div class="hub-card-latest">
-                  <span class="material-symbols-rounded" style="font-size:12px;color:#1A7F37;font-variation-settings:'FILL' 1">check_circle</span>
-                  AGG-04、AP-305 已自动纳入监控
-                </div>
-                <a href="topology.html" class="hub-card-btn hub-card-btn--topo">
-                  进入网络拓扑<span class="material-symbols-rounded">arrow_forward</span>
-                </a>
-              </div>
-
-            </div><!-- /ai-hub-cards -->
-          </div><!-- /ai-hub-section -->
-
-          <div class="ai-hub-divider">或者，直接向 AI 提问深入分析</div>
-
-          <div class="ai-welcome" style="padding:10px 14px;gap:10px">
-            <span class="material-symbols-rounded ai-welcome-icon" style="font-size:24px;font-variation-settings:'FILL' 1">psychology</span>
+          <div class="ai-welcome" style="padding:20px 14px;gap:12px">
+            <span class="material-symbols-rounded ai-welcome-icon" style="font-size:28px;font-variation-settings:'FILL' 1;color:#6E40C9">smart_toy</span>
             <div class="ai-welcome-content">
-              <div class="ai-welcome-title" style="font-size:13px">AI 深度分析随时待命</div>
+              <div class="ai-welcome-title" style="font-size:15px">AI 智能分析助手</div>
               <div class="ai-welcome-desc" style="font-size:12px">
-                可针对具体设备、链路或事件进行根因分析、影响评估和处置建议。点击上方卡片直接进入对应模块，或在下方输入框描述你的问题。
+                针对网络设备、链路流量、告警事件进行智能根因分析、影响评估和处置建议。在下方输入框描述你的问题开始分析。
               </div>
             </div>
           </div>
-
         </div>
 
         <!-- 快捷场景 -->
@@ -392,74 +332,6 @@
             </button>
           </div>
           <span class="ai-input-hint">Enter 发送 · Shift+Enter 换行</span>
-        </div>
-      </div>
-
-      <!-- 右：摘要面板 -->
-      <div class="ai-summary-panel">
-        <div class="asp-header">
-          <span class="material-symbols-rounded" style="color:#6E40C9;font-size:16px;font-variation-settings:'FILL' 1">monitoring</span>
-          <span class="asp-title">网络健康摘要</span>
-        </div>
-        <div class="asp-body">
-          <div class="asp-stat-block">
-            <div class="asp-stat-label">受影响链路</div>
-            <div class="asp-stat-value red">3 条</div>
-            <div class="asp-stat-sub">共监控 24 条链路</div>
-          </div>
-          <div class="asp-stat-block">
-            <div class="asp-stat-label">互联网出口利用率</div>
-            <div class="asp-stat-value yellow">84%</div>
-            <div class="asp-stat-sub">WAN-01 · 预测 48h 达 91%</div>
-          </div>
-          <div class="asp-stat-block">
-            <div class="asp-stat-label">平均包转发延迟</div>
-            <div class="asp-stat-value yellow">18 ms</div>
-            <div class="asp-stat-sub">正常基线 &lt; 5ms</div>
-          </div>
-          <div class="asp-stat-block">
-            <div class="asp-stat-label">设备可用率</div>
-            <div class="asp-stat-value green">97.4%</div>
-            <div class="asp-stat-sub">1 台严重故障</div>
-          </div>
-          <div style="font-size:12px;font-weight:700;color:#1F2328;padding:4px 0 2px">活跃告警</div>
-          <div class="asp-alert-list">
-            <div class="asp-alert-item" data-scenario="sw-core-02">
-              <div class="asp-alert-dot crit"></div>
-              <div class="asp-alert-content">
-                <div class="asp-alert-device">SW-Core-02</div>
-                <div class="asp-alert-desc">热降频 · CPU 效能 60%</div>
-              </div>
-            </div>
-            <div class="asp-alert-item" data-scenario="wan-01">
-              <div class="asp-alert-dot warn"></div>
-              <div class="asp-alert-content">
-                <div class="asp-alert-device">WAN-01</div>
-                <div class="asp-alert-desc">带宽 84% · 接近阈值</div>
-              </div>
-            </div>
-            <div class="asp-alert-item" data-scenario="vlan100">
-              <div class="asp-alert-dot warn"></div>
-              <div class="asp-alert-content">
-                <div class="asp-alert-device">VLAN100</div>
-                <div class="asp-alert-desc">东西向延迟 18ms</div>
-              </div>
-            </div>
-            <div class="asp-alert-item" data-scenario="iscsi">
-              <div class="asp-alert-dot warn"></div>
-              <div class="asp-alert-content">
-                <div class="asp-alert-device">iSCSI-02</div>
-                <div class="asp-alert-desc">存储链路 76%</div>
-              </div>
-            </div>
-          </div>
-          <div style="font-size:12px;font-weight:700;color:#1F2328;padding:4px 0 2px">AI 建议</div>
-          <div style="background:#FFF8C5;border:1px solid #D09B00;border-radius:8px;padding:10px 12px;font-size:12px;color:#6A4800;line-height:1.6">
-            <strong>⚡ 立即操作：</strong>对 SW-Core-02 降低工作时钟或迁移关键 VLAN 至 SW-Core-01，恢复转发能力。
-          </div>
-          <div style="background:#DDF4FF;border:1px solid #0969DA;border-radius:8px;padding:10px 12px;font-size:12px;color:#0550AE;line-height:1.6">
-            <strong>📊 中期优化：</strong>建议开启 SD-WAN 流量调度策略，将超量流量分流至 WAN-02 备用链路。
-          </div>
         </div>
       </div>
 
